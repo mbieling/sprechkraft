@@ -73,29 +73,29 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| RECORD-01 | — | pending |
-| RECORD-02 | — | pending |
-| RECORD-03 | — | pending |
-| RECORD-04 | — | pending |
-| RECORD-05 | — | pending |
-| FEED-01 | — | pending |
-| FEED-02 | — | pending |
-| FEED-03 | — | pending |
-| OUT-01 | — | pending |
-| OUT-02 | — | pending |
-| OUT-03 | — | pending |
-| PROF-01 | — | pending |
-| PROF-02 | — | pending |
-| PROF-03 | — | pending |
-| PROF-04 | — | pending |
-| PROF-05 | — | pending |
-| HIST-01 | — | pending |
-| HIST-02 | — | pending |
-| HIST-03 | — | pending |
-| HIST-04 | — | pending |
-| SET-01 | — | pending |
-| SET-02 | — | pending |
-| SET-03 | — | pending |
-| SET-04 | — | pending |
-| SET-05 | — | pending |
-| SET-06 | — | pending |
+| RECORD-01 | Phase 2 | pending |
+| RECORD-02 | Phase 2 | pending |
+| RECORD-03 | Phase 2 | pending |
+| RECORD-04 | Phase 3 | pending |
+| RECORD-05 | Phase 3 | pending |
+| FEED-01 | Phase 1 | pending |
+| FEED-02 | Phase 2 | pending |
+| FEED-03 | Phase 2 | pending |
+| OUT-01 | Phase 4 | pending |
+| OUT-02 | Phase 4 | pending |
+| OUT-03 | Phase 4 | pending |
+| PROF-01 | Phase 5 | pending |
+| PROF-02 | Phase 5 | pending |
+| PROF-03 | Phase 5 | pending |
+| PROF-04 | Phase 5 | pending |
+| PROF-05 | Phase 5 | pending |
+| HIST-01 | Phase 6 | pending |
+| HIST-02 | Phase 6 | pending |
+| HIST-03 | Phase 6 | pending |
+| HIST-04 | Phase 6 | pending |
+| SET-01 | Phase 5 | pending |
+| SET-02 | Phase 1 | pending |
+| SET-03 | Phase 2 | pending |
+| SET-04 | Phase 2 | pending |
+| SET-05 | Phase 1 | pending |
+| SET-06 | Phase 1 | pending |
