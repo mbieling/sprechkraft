@@ -17,9 +17,10 @@ Der Entwickler selbst (Power-User, Mac-Nutzer, der schnelles qualitatives Diktat
 ## Context
 
 - Greenfield macOS-Projekt, Native Swift/SwiftUI
-- Lokale Transkription: Parakeet v3 (NVIDIA ASR), in der App gebundelt
+- Lokale Transkription: Parakeet v3 (NVIDIA ASR), via Python/MLX-Subprocess, Modell-Download beim Erststart
 - LLM Post-Processing: Groq API mit qwen/qwen3-32b
 - Kein Cloud-Transkriptions-Dienst, maximale Privatsphäre
+- Vertrieb: Nur lokal (kein App Store, kein Signing/Notarisierung nötig)
 
 ## How It Works
 
@@ -40,7 +41,7 @@ Der Entwickler selbst (Power-User, Mac-Nutzer, der schnelles qualitatives Diktat
 
 **Aufnahme & Transkription**
 - [ ] Globaler Hotkey startet/stoppt Aufnahme (konfigurierbar)
-- [ ] Parakeet v3 läuft lokal, gebundelt in der App
+- [ ] Parakeet v3 läuft lokal via Python/MLX-Subprocess (Modell-Download beim Erststart)
 - [ ] Menüleisten-Icon ändert Farbe/Animation während Aufnahme und Verarbeitung
 
 **Ausgabe**
@@ -74,11 +75,13 @@ Der Entwickler selbst (Power-User, Mac-Nutzer, der schnelles qualitatives Diktat
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Parakeet v3 lokal gebundelt | Privatsphäre, offline-fähig, keine Latenz durch Netzwerk | — Pending |
-| Groq API für LLM-Post-Processing | Geschwindigkeit (niedrige Latenz), qwen3-32b verfügbar | — Pending |
-| Menu Bar App ohne Dock-Icon | Immer verfügbar, nicht ablenkend, System-App-Charakter | — Pending |
-| Swift/SwiftUI | Native macOS, beste Accessibility-Integration, kein Electron-Overhead | — Pending |
-| Mehrere Prompt-Profile mit eigenen Hotkeys | Flexibel für verschiedene Kontexte (Korrektur, E-Mail-Stil, etc.) | — Pending |
+| Parakeet v3 via Python/MLX-Subprocess | Beste ASR-Genauigkeit; Python-Bridge akzeptabel da nur lokaler Einsatz | ✓ Entschieden |
+| Modell-Download beim Erststart | App-Download klein, Modell (~1.5GB) lädt beim ersten Start | ✓ Entschieden |
+| Nur lokale Distribution (kein App Store) | Kein Signing/Notarisierung nötig; globale Hotkeys + Text-Injektion uneingeschränkt | ✓ Entschieden |
+| Groq API für LLM-Post-Processing | Geschwindigkeit (niedrige Latenz), qwen3-32b verfügbar | ✓ Entschieden |
+| Menu Bar App ohne Dock-Icon | Immer verfügbar, nicht ablenkend, System-App-Charakter | ✓ Entschieden |
+| Swift/SwiftUI + AppKit (NSStatusItem) | Native macOS, NSStatusItem für Icon-Animation, SwiftUI für Settings | ✓ Entschieden |
+| Mehrere Prompt-Profile mit eigenen Hotkeys | Flexibel für verschiedene Kontexte (Korrektur, E-Mail-Stil, etc.) | ✓ Entschieden |
 
 ## Evolution
 
