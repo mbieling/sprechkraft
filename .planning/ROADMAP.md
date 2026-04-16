@@ -34,7 +34,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 01-01-PLAN.md — Xcode-Projekt, Info.plist (LSUIElement=YES), SPM-Dependencies, Test-Scaffolds (RED)
 - [x] 01-02-PLAN.md — RecordingState + AppState @Observable + StatusBarIconView + DesignTokens (GREEN)
 - [x] 01-03-PLAN.md — VoiceScribeApp @main + AppDelegate (NSStatusItem, Split-Click, Menü, Hotkey) + SettingsView + KeyboardShortcuts.Name
-- [ ] 01-04-PLAN.md — Manuelle Human-Verify-Checkpoints (Dock-Icon, 4 Zustände, Menü, LaunchAtLogin-Persistenz)
+- [x] 01-04-PLAN.md — Manuelle Human-Verify-Checkpoints (Dock-Icon, 4 Zustände, Menü, LaunchAtLogin-Persistenz)
 
 ### Phase 2: Audio Capture
 **Goal**: The hotkey starts and stops real microphone recording, silence auto-stops recording, audio cues play, and a live level meter animates in the icon.
