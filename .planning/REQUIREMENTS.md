@@ -40,10 +40,10 @@
 ### SET — Einstellungen & App-Verhalten
 
 - [ ] **SET-01**: Groq API-Key wird sicher im macOS Keychain gespeichert
-- [ ] **SET-02**: Globaler Aufnahme-Hotkey ist konfigurierbar (Standard: `⌥⌘R`)
+- [x] **SET-02**: Globaler Aufnahme-Hotkey ist konfigurierbar (Standard: `⌥⌘R`)
 - [ ] **SET-03**: Stille-Erkennungs-Schwellwert ist konfigurierbar (Sekunden bis Auto-Stopp)
 - [ ] **SET-04**: Mikrofon-Eingabegerät ist in Einstellungen wählbar
-- [ ] **SET-05**: App startet automatisch beim Mac-Login (konfigurierbar)
+- [x] **SET-05**: App startet automatisch beim Mac-Login (konfigurierbar)
 - [x] **SET-06**: App läuft als Menu Bar App ohne Dock-Icon (`LSUIElement = YES`)
 
 ---
@@ -94,8 +94,8 @@
 | HIST-03 | Phase 6 | pending |
 | HIST-04 | Phase 6 | pending |
 | SET-01 | Phase 5 | pending |
-| SET-02 | Phase 1 | pending |
+| SET-02 | Phase 1 | Complete |
 | SET-03 | Phase 2 | pending |
 | SET-04 | Phase 2 | pending |
-| SET-05 | Phase 1 | pending |
+| SET-05 | Phase 1 | Complete |
 | SET-06 | Phase 1 | Complete |

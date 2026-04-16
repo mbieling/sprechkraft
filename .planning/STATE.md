@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-app-shell-01-02-PLAN.md
-last_updated: "2026-04-16T17:52:42.773Z"
+stopped_at: Completed 01-app-shell-01-03-PLAN.md
+last_updated: "2026-04-16T18:12:12.776Z"
 last_activity: 2026-04-16
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
-  percent: 50
+  completed_plans: 3
+  percent: 75
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 01 (app-shell) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-04-16
 
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 01-app-shell P01 | 25 | 4 tasks | 9 files |
 | Phase 01-app-shell P02 | 15 | 3 tasks | 5 files |
+| Phase 01-app-shell P03 | 20 | 4 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,8 @@ Recent decisions affecting current work:
 - [Phase 01-app-shell]: SWIFT_STRICT_CONCURRENCY = complete aktiviert ab Plan 01-01
 - [Phase 01-app-shell]: SwiftUI renderingMode(.original) statt .alwaysOriginal — Image.TemplateRenderingMode kennt kein .alwaysOriginal (NSImage-API); Verhalten äquivalent
 - [Phase 01-app-shell]: KeyboardShortcuts+Names.swift aus Plan 03 vorgezogen — HotkeyTests blockierte Test-Target-Build; Plan 03 konsumiert Extension nur noch in AppDelegate
+- [Phase 01-app-shell]: Observation-Strategie B (manueller updateIcon-Aufruf) statt withObservationTracking — robuster für Swift 6 strict concurrency
+- [Phase 01-app-shell]: Guard statusItem != nil in updateIcon() verhindert Crash wenn onAppear vor applicationDidFinishLaunching feuert (Test-Host-Umgebung)
 
 ### Pending Todos
 
@@ -92,6 +95,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-16T17:52:42.770Z
-Stopped at: Completed 01-app-shell-01-02-PLAN.md
+Last session: 2026-04-16T18:12:12.773Z
+Stopped at: Completed 01-app-shell-01-03-PLAN.md
 Resume file: None
