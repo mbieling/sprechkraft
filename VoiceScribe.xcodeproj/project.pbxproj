@@ -12,6 +12,8 @@
 		AA000202 /* StatusBarIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000203 /* StatusBarIconView.swift */; };
 		AA000204 /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000205 /* DesignTokens.swift */; };
 		AA000207 /* KeyboardShortcuts+Names.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000208 /* KeyboardShortcuts+Names.swift */; };
+		AA000210 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000211 /* SettingsView.swift */; };
+		AA000212 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000213 /* AppDelegate.swift */; };
 		AA000010 /* RecordingStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000011 /* RecordingStateTests.swift */; };
 		AA000012 /* AppStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000013 /* AppStateTests.swift */; };
 		AA000014 /* HotkeyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000015 /* HotkeyTests.swift */; };
@@ -26,6 +28,8 @@
 		AA000203 /* StatusBarIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarIconView.swift; sourceTree = "<group>"; };
 		AA000205 /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
 		AA000208 /* KeyboardShortcuts+Names.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyboardShortcuts+Names.swift"; sourceTree = "<group>"; };
+		AA000211 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AA000213 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AA000003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA000004 /* VoiceScribe.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VoiceScribe.entitlements; sourceTree = "<group>"; };
 		AA000005 /* VoiceScribe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoiceScribe.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -60,8 +64,10 @@
 			isa = PBXGroup;
 			children = (
 				AA000002 /* VoiceScribeApp.swift */,
+				AA000213 /* AppDelegate.swift */,
 				AA000201 /* AppState.swift */,
 				AA000203 /* StatusBarIconView.swift */,
+				AA000211 /* SettingsView.swift */,
 				AA000206 /* Constants */,
 				AA000209 /* Extensions */,
 				AA000003 /* Info.plist */,
@@ -220,6 +226,8 @@
 				AA000202 /* StatusBarIconView.swift in Sources */,
 				AA000204 /* DesignTokens.swift in Sources */,
 				AA000207 /* KeyboardShortcuts+Names.swift in Sources */,
+				AA000210 /* SettingsView.swift in Sources */,
+				AA000212 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
