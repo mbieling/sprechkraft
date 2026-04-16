@@ -12,7 +12,7 @@
 
 ### FEED — Visuelles & Audio-Feedback
 
-- [ ] **FEED-01**: Menüleisten-Icon zeigt 4 Zustände: Idle / Aufnahme / Transkribieren / LLM-Verarbeitung
+- [x] **FEED-01**: Menüleisten-Icon zeigt 4 Zustände: Idle / Aufnahme / Transkribieren / LLM-Verarbeitung
 - [ ] **FEED-02**: Kurze Töne beim Starten und Stoppen der Aufnahme
 - [ ] **FEED-03**: Waveform / Level-Meter im Menüleisten-Icon während Aufnahme
 
@@ -78,7 +78,7 @@
 | RECORD-03 | Phase 2 | pending |
 | RECORD-04 | Phase 3 | pending |
 | RECORD-05 | Phase 3 | pending |
-| FEED-01 | Phase 1 | pending |
+| FEED-01 | Phase 1 | Complete |
 | FEED-02 | Phase 2 | pending |
 | FEED-03 | Phase 2 | pending |
 | OUT-01 | Phase 4 | pending |
