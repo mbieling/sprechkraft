@@ -44,7 +44,7 @@
 - [ ] **SET-03**: Stille-Erkennungs-Schwellwert ist konfigurierbar (Sekunden bis Auto-Stopp)
 - [ ] **SET-04**: Mikrofon-Eingabegerät ist in Einstellungen wählbar
 - [ ] **SET-05**: App startet automatisch beim Mac-Login (konfigurierbar)
-- [ ] **SET-06**: App läuft als Menu Bar App ohne Dock-Icon (`LSUIElement = YES`)
+- [x] **SET-06**: App läuft als Menu Bar App ohne Dock-Icon (`LSUIElement = YES`)
 
 ---
 
@@ -98,4 +98,4 @@
 | SET-03 | Phase 2 | pending |
 | SET-04 | Phase 2 | pending |
 | SET-05 | Phase 1 | pending |
-| SET-06 | Phase 1 | pending |
+| SET-06 | Phase 1 | Complete |

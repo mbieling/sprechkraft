@@ -30,7 +30,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Pressing the default hotkey (⌥⌘R) cycles the icon through Idle, Recording, Transcribing, and LLM states visually
   3. A menu bar dropdown shows the app name, a quit option, and a placeholder for settings
   4. The app can be configured to launch automatically at login via a toggle in the menu
-**Plans**: TBD
+**Plans**: 4 plans
+- [x] 01-01-PLAN.md — Xcode-Projekt, Info.plist (LSUIElement=YES), SPM-Dependencies, Test-Scaffolds (RED)
+- [ ] 01-02-PLAN.md — RecordingState + AppState @Observable + StatusBarIconView + DesignTokens (GREEN)
+- [ ] 01-03-PLAN.md — VoiceScribeApp @main + AppDelegate (NSStatusItem, Split-Click, Menü, Hotkey) + SettingsView + KeyboardShortcuts.Name
+- [ ] 01-04-PLAN.md — Manuelle Human-Verify-Checkpoints (Dock-Icon, 4 Zustände, Menü, LaunchAtLogin-Persistenz)
 
 ### Phase 2: Audio Capture
 **Goal**: The hotkey starts and stops real microphone recording, silence auto-stops recording, audio cues play, and a live level meter animates in the icon.
@@ -98,7 +102,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. App Shell | 0/TBD | Not started | - |
+| 1. App Shell | 1/4 | In Progress|  |
 | 2. Audio Capture | 0/TBD | Not started | - |
 | 3. Transcription | 0/TBD | Not started | - |
 | 4. Text Output | 0/TBD | Not started | - |
