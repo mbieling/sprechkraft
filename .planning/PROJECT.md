@@ -35,7 +35,10 @@ Der Entwickler selbst (Power-User, Mac-Nutzer, der schnelles qualitatives Diktat
 
 ### Validated
 
-(None yet — ship to validate)
+- Menu Bar App ohne Dock-Icon (LSUIElement=YES, .accessory activation policy) — Validated in Phase 01: app-shell
+- 4 Icon-Zustände (idle/recording/transcribing/llmProcessing) mit Farbe und Pulse-Animation — Validated in Phase 01: app-shell
+- Globaler Hotkey ⌥⌘R systemweit via KeyboardShortcuts — Validated in Phase 01: app-shell
+- Autostart beim Login via LaunchAtLogin-modern — Validated in Phase 01: app-shell
 
 ### Active
 
@@ -101,4 +104,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-15 after initialization*
+*Last updated: 2026-04-16 — Phase 01 (app-shell) complete*
