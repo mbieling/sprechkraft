@@ -23,7 +23,7 @@ struct VoiceScribeApp: App {
 
         // Echtes Einstellungsfenster (UI-SPEC Einstellungsfenster Contract).
         Window("VoiceScribe — Einstellungen", id: "settings") {
-            SettingsView()
+            SettingsView(appState: appState)
                 .frame(minWidth: 400, minHeight: 300)
         }
         .windowResizability(.contentSize)
