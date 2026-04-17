@@ -13,6 +13,10 @@
 		AA000204 /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000205 /* DesignTokens.swift */; };
 		AA000207 /* KeyboardShortcuts+Names.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000208 /* KeyboardShortcuts+Names.swift */; };
 		AA000214 /* Defaults+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000215 /* Defaults+Keys.swift */; };
+		AA000216 /* AudioController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000217 /* AudioController.swift */; };
+		AA000218 /* AudioDeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000219 /* AudioDeviceManager.swift */; };
+		AA000016 /* AudioControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000017 /* AudioControllerTests.swift */; };
+		AA000018 /* DefaultsKeysTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000019 /* DefaultsKeysTests.swift */; };
 		AA000210 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000211 /* SettingsView.swift */; };
 		AA000212 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000213 /* AppDelegate.swift */; };
 		AA000010 /* RecordingStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000011 /* RecordingStateTests.swift */; };
@@ -30,6 +34,10 @@
 		AA000205 /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
 		AA000208 /* KeyboardShortcuts+Names.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyboardShortcuts+Names.swift"; sourceTree = "<group>"; };
 		AA000215 /* Defaults+Keys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Defaults+Keys.swift"; sourceTree = "<group>"; };
+		AA000217 /* AudioController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioController.swift; sourceTree = "<group>"; };
+		AA000219 /* AudioDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDeviceManager.swift; sourceTree = "<group>"; };
+		AA000017 /* AudioControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioControllerTests.swift; sourceTree = "<group>"; };
+		AA000019 /* DefaultsKeysTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultsKeysTests.swift; sourceTree = "<group>"; };
 		AA000211 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		AA000213 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AA000003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -70,12 +78,22 @@
 				AA000201 /* AppState.swift */,
 				AA000203 /* StatusBarIconView.swift */,
 				AA000211 /* SettingsView.swift */,
+				AA000220 /* Audio */,
 				AA000206 /* Constants */,
 				AA000209 /* Extensions */,
 				AA000003 /* Info.plist */,
 				AA000004 /* VoiceScribe.entitlements */,
 			);
 			path = VoiceScribe;
+			sourceTree = "<group>";
+		};
+		AA000220 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				AA000217 /* AudioController.swift */,
+				AA000219 /* AudioDeviceManager.swift */,
+			);
+			path = Audio;
 			sourceTree = "<group>";
 		};
 		AA000209 /* Extensions */ = {
@@ -101,6 +119,8 @@
 				AA000011 /* RecordingStateTests.swift */,
 				AA000013 /* AppStateTests.swift */,
 				AA000015 /* HotkeyTests.swift */,
+				AA000017 /* AudioControllerTests.swift */,
+				AA000019 /* DefaultsKeysTests.swift */,
 			);
 			path = VoiceScribeTests;
 			sourceTree = "<group>";
@@ -230,6 +250,8 @@
 				AA000204 /* DesignTokens.swift in Sources */,
 				AA000207 /* KeyboardShortcuts+Names.swift in Sources */,
 				AA000214 /* Defaults+Keys.swift in Sources */,
+				AA000216 /* AudioController.swift in Sources */,
+				AA000218 /* AudioDeviceManager.swift in Sources */,
 				AA000210 /* SettingsView.swift in Sources */,
 				AA000212 /* AppDelegate.swift in Sources */,
 			);
@@ -242,6 +264,8 @@
 				AA000010 /* RecordingStateTests.swift in Sources */,
 				AA000012 /* AppStateTests.swift in Sources */,
 				AA000014 /* HotkeyTests.swift in Sources */,
+				AA000016 /* AudioControllerTests.swift in Sources */,
+				AA000018 /* DefaultsKeysTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
