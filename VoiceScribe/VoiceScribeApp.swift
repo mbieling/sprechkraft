@@ -58,7 +58,7 @@ private struct HiddenActivationView: View {
                     // 2. Einstellungsfenster öffnen bzw. vordergrundieren.
                     openWindow(id: "settings")
                     if let win = NSApp.windows.first(where: {
-                        $0.title.contains("Einstellungen")
+                        $0.identifier?.rawValue == "settings"
                     }) {
                         win.makeKeyAndOrderFront(nil)
                     }
