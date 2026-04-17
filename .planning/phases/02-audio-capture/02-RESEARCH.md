@@ -537,21 +537,20 @@ func updateSilenceDetection(rms: Float, bufferDuration: TimeInterval) {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Waveform-Update-Performance mit NSHostingView-Pattern (Observation-B)**
-   - Was wir wissen: Observation-B erstellt bei jedem `updateIcon()`-Aufruf ein neues `NSHostingView` und ersetzt das alte. Das funktioniert für diskrete Zustandsänderungen (Phase 1). Bei ~20-30 Hz Waveform-Updates könnte das teuer werden.
-   - Was unklar ist: Ist die Perf-Grenze 10 Hz, 30 Hz oder 60 Hz für NSHostingView-Erstellung?
-   - Empfehlung: Erst implementieren, dann messen. Wenn sichtbares Ruckeln: `audioLevel` als `@Published`-Property in `NSHostingView.rootView` direkt aktualisieren statt neues View zu erstellen (Observation-A-Pattern nur für Waveform).
+1. **Waveform-Update-Performance mit NSHostingView-Pattern (Observation-B)** -- *Accepted Assumption A1: measure at implementation time*
+   - Was wir wissen: Observation-B erstellt bei jedem `updateIcon()`-Aufruf ein neues `NSHostingView` und ersetzt das alte. Das funktioniert fuer diskrete Zustandsaenderungen (Phase 1). Bei ~20-30 Hz Waveform-Updates koennte das teuer werden.
+   - Was unklar ist: Ist die Perf-Grenze 10 Hz, 30 Hz oder 60 Hz fuer NSHostingView-Erstellung?
+   - Disposition: Akzeptiert als Assumption A1. Erst implementieren, dann messen. Fallback: `CAShapeLayer` direkt in NSView oder Observation-A-Pattern nur fuer Waveform.
 
-2. **Gerätewechsel während laufender Aufnahme**
-   - Was wir wissen: setDeviceID sollte vor engine.start() aufgerufen werden. Nutzer-Erwartung laut D-11: Gerät wählen, nächste Aufnahme verwendet es.
-   - Was unklar ist: Ob der Gerätewechsel in der Settings-UI sofort zum AudioController propagiert werden soll oder ob ein "wird ab nächster Aufnahme verwendet"-Pattern genug ist.
-   - Empfehlung: Lazy-Anwendung — beim nächsten startRecording() wird selectedMicUID aus Defaults gelesen und gesetzt. Kein Mid-Recording-Switch in Phase 2.
+2. **Geraetewechsel waehrend laufender Aufnahme** -- *RESOLVED: Lazy-Anwendung geplant*
+   - Was wir wissen: setDeviceID sollte vor engine.start() aufgerufen werden. Nutzer-Erwartung laut D-11: Geraet waehlen, naechste Aufnahme verwendet es.
+   - Resolution: Lazy-Anwendung umgesetzt in Plan 02-01 (AudioController.startRecording liest Defaults[.selectedMicUID] beim Start). Kein Mid-Recording-Switch in Phase 2. Geraetewechsel wirkt ab naechster Aufnahme.
 
-3. **Silence-Detection-Threshold (RMS-Wert)**
-   - Was wir wissen: D-08 legt Methode (RMS) und D-09 legt Dauer (1.5s) fest. Den RMS-Schwellwert-Wert lässt CONTEXT.md bei Claude's Discretion.
-   - Empfehlung: Start mit `0.01` (ca. -40 dBFS) als silenceThresholdRMS. Das ist konservativ genug für Hintergrundgeräusche aber reagiert auf echte Sprachpausen. Nicht konfigurierbar (nur Dauer ist konfigurierbar laut SET-03).
+3. **Silence-Detection-Threshold (RMS-Wert)** -- *RESOLVED: 0.01 als Default geplant*
+   - Was wir wissen: D-08 legt Methode (RMS) und D-09 legt Dauer (1.5s) fest. Den RMS-Schwellwert-Wert laesst CONTEXT.md bei Claude's Discretion.
+   - Resolution: `silenceThresholdRMS = 0.01` (~-40 dBFS) als Konstante in AudioController geplant (Plan 02-01 Task 2). Nicht konfigurierbar -- nur Dauer ist konfigurierbar laut SET-03.
 
 ---
 
@@ -586,16 +585,16 @@ func updateSilenceDetection(rms: Float, bufferDuration: TimeInterval) {
 
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| RECORD-01 | toggleRecording() .idle → .recording | unit | Full suite | ❌ Wave 0 (AppStateTests erweitern) |
-| RECORD-01 | toggleRecording() .recording → .transcribing | unit | Full suite | ❌ Wave 0 |
-| RECORD-02 | Silence nach 1.5s löst Auto-Stopp aus | unit | Full suite | ❌ Wave 0: AudioControllerTests.swift |
-| RECORD-02 | Silence-Timer reset bei Sprache | unit | Full suite | ❌ Wave 0 |
+| RECORD-01 | toggleRecording() .idle → .recording | unit | Full suite | Wave 0 (AppStateTests erweitern) |
+| RECORD-01 | toggleRecording() .recording → .transcribing | unit | Full suite | Wave 0 |
+| RECORD-02 | Silence nach 1.5s löst Auto-Stopp aus | unit | Full suite | Wave 0: AudioControllerTests.swift |
+| RECORD-02 | Silence-Timer reset bei Sprache | unit | Full suite | Wave 0 |
 | RECORD-03 | availableMicrophones() gibt non-empty List zurück | integration (manualOnly) | — | Nur auf echtem Mac mit Mikrofon testbar |
-| SET-03 | silenceDuration-Defaults-Key hat Standardwert 1.5 | unit | Full suite | ❌ Wave 0: DefaultsKeysTests.swift |
-| SET-04 | selectedMicUID-Defaults-Key ist initial nil | unit | Full suite | ❌ Wave 0 |
-| FEED-02 | NSSound play() wird bei start/stop aufgerufen | unit (mock) | Full suite | ❌ Wave 0 — NSSound schwer mockbar; Smoke-Test via Integration |
-| FEED-03 | StatusBarIconView zeigt WaveformView wenn .recording + level > 0 | unit | Full suite | ❌ Wave 0 |
-| FEED-03 | WaveformView ist hidden bei .idle | unit | Full suite | ❌ Wave 0 |
+| SET-03 | silenceDuration-Defaults-Key hat Standardwert 1.5 | unit | Full suite | Wave 0: DefaultsKeysTests.swift |
+| SET-04 | selectedMicUID-Defaults-Key ist initial nil | unit | Full suite | Wave 0 |
+| FEED-02 | NSSound play() wird bei start/stop aufgerufen | unit (mock) | Full suite | Wave 0 — NSSound schwer mockbar; Smoke-Test via Integration |
+| FEED-03 | StatusBarIconView zeigt WaveformView wenn .recording + level > 0 | unit | Full suite | Wave 0 |
+| FEED-03 | WaveformView ist hidden bei .idle | unit | Full suite | Wave 0 |
 
 ### Sampling Rate
 - **Per task commit:** `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS' -only-testing:VoiceScribeTests 2>&1 | grep -E "(passed|failed|error)"`
