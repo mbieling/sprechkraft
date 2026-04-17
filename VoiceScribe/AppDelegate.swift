@@ -123,7 +123,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard let button = statusItem.button else { return }
 
         let state = appState?.recordingState ?? .idle
-        let hostingView = NSHostingView(rootView: StatusBarIconView(state: state))
+        let level = appState?.audioLevel ?? 0.0
+        let hostingView = NSHostingView(rootView: StatusBarIconView(state: state, audioLevel: level))
         hostingView.frame = NSRect(x: 0, y: 0, width: 26, height: 26)
 
         // Alte Subviews entfernen, neue einsetzen.
