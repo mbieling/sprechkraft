@@ -65,6 +65,10 @@ private struct HiddenActivationView: View {
 
                     // 3. Zurück auf .accessory, damit Dock-Icon verschwindet,
                     //    sobald Fenster geschlossen wird.
+                    // TODO: Vor Produktion durch NSWindow.didBecomeKeyNotification-Beobachtung
+                    //       ersetzen (One-Shot-Observer), um die Activation-Policy erst dann
+                    //       zurückzusetzen, wenn das Fenster tatsächlich Key ist. Der feste
+                    //       300ms-Sleep ist ein pragmatischer Workaround für Phase 1.
                     try? await Task.sleep(for: .milliseconds(300))
                     NSApp.setActivationPolicy(.accessory)
                 }
