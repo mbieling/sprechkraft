@@ -34,9 +34,9 @@ struct StatusBarIconView: View {
     /// - .llmProcessing → easeInOut 1.2s, opacity 1.0 ↔ 0.5, repeatForever
     /// - .idle / .transcribing → keine Animation, opacity 1.0
     private func applyAnimation(for state: RecordingState) {
-        if state.isPulsing {
+        if let speed = state.pulseSpeed {
             withAnimation(
-                .easeInOut(duration: state.pulseSpeed)
+                .easeInOut(duration: speed)
                     .repeatForever(autoreverses: true)
             ) {
                 opacity = 0.5

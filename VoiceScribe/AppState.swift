@@ -33,8 +33,13 @@ enum RecordingState: Equatable {
     }
 
     /// Pulse-Geschwindigkeit (D-04): 0.8s Recording, 1.2s LLM.
-    var pulseSpeed: Double {
-        self == .recording ? 0.8 : 1.2
+    /// Gibt nil zurück, wenn der Zustand keine Pulse-Animation hat (.idle, .transcribing).
+    var pulseSpeed: Double? {
+        switch self {
+        case .recording:     return 0.8
+        case .llmProcessing: return 1.2
+        default:             return nil
+        }
     }
 
     /// Accessibility Contract laut UI-SPEC: deutscher Text pro Zustand.
