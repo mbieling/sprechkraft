@@ -49,7 +49,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 - [x] 02-01-PLAN.md — Audio-Subsystem Core: AudioController (AVAudioEngine, RMS, Silence-Detection), AudioDeviceManager, Defaults-Keys, AppState-Erweiterung, Info.plist
 - [x] 02-02-PLAN.md — UI + Integration: WaveformView, SettingsView (Mic-Picker, Stille-Slider, Permission-Banner), AppDelegate-Wiring, Audio-Cues
-- [ ] 02-03-PLAN.md — Manuelle Human-Verify-Checkpoints (Aufnahme, Waveform, Auto-Stopp, Settings)
+- [x] 02-03-PLAN.md — Manuelle Human-Verify-Checkpoints (Aufnahme, Waveform, Auto-Stopp, Settings)
 **UI hint**: yes
 
 ### Phase 3: Transcription
