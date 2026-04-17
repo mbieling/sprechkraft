@@ -16,7 +16,7 @@ extension Notification.Name {
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private var statusItem: NSStatusItem!
+    private lazy var statusItem: NSStatusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     var appState: AppState?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -25,7 +25,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.accessory)
 
         // NSStatusItem-Button mit Split-Click konfigurieren.
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        // statusItem ist lazy var — wird hier beim ersten Zugriff initialisiert.
         guard let button = statusItem.button else { return }
         button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         button.action = #selector(handleClick(_:))
@@ -120,9 +120,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Begründung: Expliziter Aufruf ist robuster als withObservationTracking-Re-Registrierung
     /// in Swift 6 strict concurrency Kontexten.
     func updateIcon() {
-        // Guard: statusItem wird erst in applicationDidFinishLaunching initialisiert.
-        // onAppear in HiddenActivationView kann vor applicationDidFinishLaunching feuern.
-        guard statusItem != nil, let button = statusItem.button else { return }
+        guard let button = statusItem.button else { return }
 
         let state = appState?.recordingState ?? .idle
         let hostingView = NSHostingView(rootView: StatusBarIconView(state: state))
