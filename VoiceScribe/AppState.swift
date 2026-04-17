@@ -70,14 +70,26 @@ final class AppState {
 
     init() {}
 
-    /// Phase 1 Demo: cycelt zyklisch durch alle 4 Zustände.
-    /// Phase 2 ersetzt dies durch echte Audio-Capture-Events.
+    /// Phase 2: Echte Zustandsuebergaenge fuer Audio-Capture.
+    /// Aufgerufen von AppDelegate nach startRecording()/stopRecording().
+    /// .idle -> .recording beim Start; .recording -> .transcribing beim Stopp.
+    /// Phase 3 fuellt .transcribing mit echter Transkription.
     func toggleRecording() {
         switch recordingState {
-        case .idle:          recordingState = .recording
-        case .recording:     recordingState = .transcribing
-        case .transcribing:  recordingState = .llmProcessing
-        case .llmProcessing: recordingState = .idle
+        case .idle:
+            recordingState = .recording
+        case .recording:
+            recordingState = .transcribing
+            audioLevel = 0.0  // Waveform zuruecksetzen beim Stopp
+        default:
+            break  // .transcribing und .llmProcessing werden von spaeteren Phasen behandelt
         }
+    }
+
+    /// Setzt Zustand nach Stopp zurueck auf .idle (bis Phase 3 Transkription einfuegt).
+    /// Wird von AppDelegate aufgerufen, nachdem .transcribing-State gesetzt wurde.
+    func resetToIdle() {
+        recordingState = .idle
+        audioLevel = 0.0
     }
 }

@@ -45,6 +45,8 @@ private struct HiddenActivationView: View {
             .onAppear {
                 // AppState in AppDelegate injizieren — einmalig beim Start.
                 appDelegate.appState = appState
+                // AudioController nach AppState-Injection initialisieren und verdrahten.
+                appDelegate.setupAudioController()
                 // Icon nach AppState-Injection aktualisieren.
                 appDelegate.updateIcon()
             }

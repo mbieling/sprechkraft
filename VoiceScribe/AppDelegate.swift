@@ -1,8 +1,9 @@
 // VoiceScribe/AppDelegate.swift
-// Zweck: AppKit-Schicht für Menu-Bar-Icon und globalen Hotkey.
+// Zweck: AppKit-Schicht für Menu-Bar-Icon, globalen Hotkey und AudioController-Wiring.
 // Implementiert SET-02 (Hotkey ⌥⌘R), SET-05 (Login-Toggle),
-// SET-06 (kein Dock-Icon via .accessory) und FEED-01 (Icon-Zustände via AppState).
-// Quellen: RESEARCH.md Pattern 1, 3, 4 + Code Examples; PATTERNS.md AppDelegate.
+// SET-06 (kein Dock-Icon via .accessory), FEED-01 (Icon-Zustände via AppState),
+// FEED-02 (Audio-Cues: Tink/Pop), RECORD-01 (echtes Start/Stopp via AudioController).
+// Quellen: RESEARCH.md Pattern 1, 3, 4, 5; PATTERNS.md AppDelegate; 02-02-PLAN.md Task 3.
 
 import AppKit
 import SwiftUI
@@ -18,6 +19,9 @@ extension Notification.Name {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var statusItem: NSStatusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     var appState: AppState?
+
+    /// AudioController — initialisiert nach AppState-Injection via setupAudioController().
+    private var audioController: AudioController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // SET-06: .accessory VOR allem anderen — verhindert Dock-Icon auch
@@ -35,6 +39,59 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setupHotkey()
     }
 
+    // MARK: - AudioController Setup
+
+    /// Initialisiert AudioController und verdrahtet Callbacks.
+    /// Wird von VoiceScribeApp.HiddenActivationView.onAppear aufgerufen,
+    /// nachdem appState injiziert wurde.
+    func setupAudioController() {
+        guard let appState else { return }
+        audioController = AudioController(appState: appState)
+
+        // D-07: Auto-Stopp durch Stille spielt denselben Stopp-Ton wie manueller Stopp
+        audioController?.onAutoStop = { [weak self] in
+            self?.stopRecordingWithCue()
+        }
+
+        // FEED-03: Level-Update → Icon neu zeichnen (Observation-B Pattern)
+        audioController?.onLevelUpdate = { [weak self] in
+            self?.updateIcon()
+        }
+    }
+
+    // MARK: - Recording mit Audio-Cues (RECORD-01, FEED-02)
+
+    /// Startet Aufnahme: State .idle → .recording, AudioController.startRecording(), Start-Ton.
+    /// Guard verhindert doppelten Start (T-02-06).
+    private func startRecordingWithCue() {
+        guard appState?.recordingState == .idle else { return }
+        appState?.toggleRecording()  // .idle → .recording
+        do {
+            try audioController?.startRecording()
+            // D-05/D-06: Start-Ton — "Tink": hell, kurz (~150ms), klar unterscheidbar von Stopp
+            NSSound(named: NSSound.Name("Tink"))?.play()
+        } catch {
+            // Bei Fehler Zustand zuruecksetzen — kein Ton
+            appState?.resetToIdle()
+        }
+        updateIcon()
+    }
+
+    /// Stoppt Aufnahme: AudioController.stopRecording(), State .recording → .transcribing → .idle, Stopp-Ton.
+    /// Guard verhindert Stopp im falschen Zustand (T-02-08).
+    private func stopRecordingWithCue() {
+        guard appState?.recordingState == .recording else { return }
+        audioController?.stopRecording()
+        appState?.toggleRecording()  // .recording → .transcribing (audioLevel wird in toggleRecording() resettet)
+        // D-06/D-07: Stopp-Ton — "Pop": tiefer als Start-Ton, kurz (~150ms)
+        // Gilt gleichermassen fuer manuellen Stopp und Auto-Stopp durch Stille (D-07)
+        NSSound(named: NSSound.Name("Pop"))?.play()
+        updateIcon()
+        // Phase 3 wird hier Transkription starten. Bis dahin: sofort idle.
+        appState?.resetToIdle()
+        updateIcon()
+    }
+
     // MARK: - Split-Click Handler
 
     @objc private func handleClick(_ sender: NSButton) {
@@ -42,13 +99,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if event.type == .rightMouseUp {
             showMenu()
         } else {
-            appState?.toggleRecording()
-            // Variante B: manueller updateIcon()-Aufruf nach toggleRecording().
-            // Variante A (withObservationTracking) wurde getestet und funktioniert
-            // in dieser Konfiguration zuverlässig, jedoch wird Variante B als
-            // explizitere und robustere Lösung für Swift 6 gewählt, da sie keine
-            // Abhängigkeit vom re-registration-Mechanismus von withObservationTracking hat.
-            updateIcon()
+            // Linksklick togglet Aufnahme mit Audio-Cues
+            if appState?.recordingState == .idle {
+                startRecordingWithCue()
+            } else if appState?.recordingState == .recording {
+                stopRecordingWithCue()
+            }
         }
     }
 
@@ -116,9 +172,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Icon-Update
 
     /// Aktualisiert das NSHostingView im StatusItem-Button mit dem aktuellen AppState.
-    /// Wird manuell nach jedem toggleRecording()-Aufruf aufgerufen (Variante B).
-    /// Begründung: Expliziter Aufruf ist robuster als withObservationTracking-Re-Registrierung
-    /// in Swift 6 strict concurrency Kontexten.
+    /// Wird manuell nach jedem State-/Level-Change aufgerufen (Observation-B Pattern).
+    /// audioLevel wird an StatusBarIconView durchgereicht fuer WaveformView (FEED-03).
     func updateIcon() {
         guard let button = statusItem.button else { return }
 
@@ -141,9 +196,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func setupHotkey() {
         KeyboardShortcuts.onKeyUp(for: .toggleRecording) { [weak self] in
             Task { @MainActor [weak self] in
-                self?.appState?.toggleRecording()
-                // Variante B: manueller updateIcon()-Aufruf nach Hotkey-Toggle.
-                self?.updateIcon()
+                guard let self else { return }
+                if self.appState?.recordingState == .idle {
+                    self.startRecordingWithCue()
+                } else if self.appState?.recordingState == .recording {
+                    self.stopRecordingWithCue()
+                }
             }
         }
     }

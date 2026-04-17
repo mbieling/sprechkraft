@@ -36,6 +36,10 @@ final class AudioController: @unchecked Sendable {
     /// Wird auf dem Main Thread via Task { @MainActor in } aufgerufen.
     var onAutoStop: (() -> Void)?
 
+    /// Callback nach jedem audioLevel-Update; signalisiert AppDelegate, updateIcon() aufzurufen.
+    /// Wird auf dem Main Thread via Task { @MainActor in } aufgerufen (FEED-03, Observation-B).
+    var onLevelUpdate: (() -> Void)?
+
     // MARK: - Initializer
 
     init(appState: AppState) {
@@ -97,9 +101,10 @@ final class AudioController: @unchecked Sendable {
             // T-02-03: RMS clampen auf 0.0-1.0 — verhindert Out-of-Bounds fuer Waveform-Rendering
             let clampedLevel = CGFloat(min(1.0, rms * 4.0))
 
-            // Observation-B: AppState auf Main Thread aktualisieren
+            // Observation-B: AppState auf Main Thread aktualisieren + Icon-Update signalisieren
             Task { @MainActor [weak self] in
                 self?.appState?.audioLevel = clampedLevel
+                self?.onLevelUpdate?()
             }
         }
 
