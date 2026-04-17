@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 2 UI-SPEC approved
-last_updated: "2026-04-17T04:14:57.824Z"
-last_activity: 2026-04-17 -- Phase 2 planning complete
+stopped_at: Completed 02-audio-capture-02-01-PLAN.md
+last_updated: "2026-04-17T16:55:06.989Z"
+last_activity: 2026-04-17
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 7
-  completed_plans: 4
-  percent: 57
+  completed_plans: 5
+  percent: 71
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** Text per Sprache eingeben, genau wie tippen — schnell, systemweit, ohne Fenster wechseln zu müssen.
-**Current focus:** Phase 01 — app-shell
+**Current focus:** Phase 02 — audio-capture
 
 ## Current Position
 
-Phase: 2
-Plan: Not started
+Phase: 02 (audio-capture) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-04-17 -- Phase 2 planning complete
+Last activity: 2026-04-17
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -55,6 +55,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-app-shell P01 | 25 | 4 tasks | 9 files |
 | Phase 01-app-shell P02 | 15 | 3 tasks | 5 files |
 | Phase 01-app-shell P03 | 20 | 4 tasks | 4 files |
+| Phase 02-audio-capture P01 | 375 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,9 @@ Recent decisions affecting current work:
 - [Phase 01-app-shell]: KeyboardShortcuts+Names.swift aus Plan 03 vorgezogen — HotkeyTests blockierte Test-Target-Build; Plan 03 konsumiert Extension nur noch in AppDelegate
 - [Phase 01-app-shell]: Observation-Strategie B (manueller updateIcon-Aufruf) statt withObservationTracking — robuster für Swift 6 strict concurrency
 - [Phase 01-app-shell]: Guard statusItem != nil in updateIcon() verhindert Crash wenn onAppear vor applicationDidFinishLaunching feuert (Test-Host-Umgebung)
+- [Phase 02-audio-capture]: AudioController als nonisolated @unchecked Sendable — installTap-Callbacks laufen auf Audio-Render-Thread, kein @MainActor moeglich
+- [Phase 02-audio-capture]: startRecording() synchron throws — Permission-Request bei .undetermined via Task{} dispatched, Caller nutzt requestPermissionIfNeeded() separat
+- [Phase 02-audio-capture]: CFString-Qualifier in AudioObjectGetPropertyData via withUnsafePointer — vermeidet UnsafeRawPointer-Warning
 
 ### Pending Todos
 
@@ -95,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-17T03:36:09.833Z
-Stopped at: Phase 2 UI-SPEC approved
-Resume file: .planning/phases/02-audio-capture/02-UI-SPEC.md
+Last session: 2026-04-17T16:55:06.985Z
+Stopped at: Completed 02-audio-capture-02-01-PLAN.md
+Resume file: None

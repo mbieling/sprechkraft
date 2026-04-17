@@ -4,9 +4,9 @@
 
 ### RECORD — Aufnahme & Transkription
 
-- [ ] **RECORD-01**: User kann Aufnahme per Hotkey starten (einmal drücken = Start, einmal drücken = Stopp)
-- [ ] **RECORD-02**: Aufnahme stoppt automatisch nach konfigurierbarer Stille-Dauer
-- [ ] **RECORD-03**: User kann Mikrofon-Eingabegerät in den Einstellungen wählen
+- [x] **RECORD-01**: User kann Aufnahme per Hotkey starten (einmal drücken = Start, einmal drücken = Stopp)
+- [x] **RECORD-02**: Aufnahme stoppt automatisch nach konfigurierbarer Stille-Dauer
+- [x] **RECORD-03**: User kann Mikrofon-Eingabegerät in den Einstellungen wählen
 - [ ] **RECORD-04**: Parakeet v3 transkribiert Aufnahme lokal via Python/MLX-Subprocess
 - [ ] **RECORD-05**: Parakeet-Modell wird beim Erststart heruntergeladen (mit Fortschrittsanzeige)
 
@@ -41,8 +41,8 @@
 
 - [ ] **SET-01**: Groq API-Key wird sicher im macOS Keychain gespeichert
 - [x] **SET-02**: Globaler Aufnahme-Hotkey ist konfigurierbar (Standard: `⌥⌘R`)
-- [ ] **SET-03**: Stille-Erkennungs-Schwellwert ist konfigurierbar (Sekunden bis Auto-Stopp)
-- [ ] **SET-04**: Mikrofon-Eingabegerät ist in Einstellungen wählbar
+- [x] **SET-03**: Stille-Erkennungs-Schwellwert ist konfigurierbar (Sekunden bis Auto-Stopp)
+- [x] **SET-04**: Mikrofon-Eingabegerät ist in Einstellungen wählbar
 - [x] **SET-05**: App startet automatisch beim Mac-Login (konfigurierbar)
 - [x] **SET-06**: App läuft als Menu Bar App ohne Dock-Icon (`LSUIElement = YES`)
 
@@ -73,9 +73,9 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| RECORD-01 | Phase 2 | pending |
-| RECORD-02 | Phase 2 | pending |
-| RECORD-03 | Phase 2 | pending |
+| RECORD-01 | Phase 2 | Complete |
+| RECORD-02 | Phase 2 | Complete |
+| RECORD-03 | Phase 2 | Complete |
 | RECORD-04 | Phase 3 | pending |
 | RECORD-05 | Phase 3 | pending |
 | FEED-01 | Phase 1 | Complete |
@@ -95,7 +95,7 @@
 | HIST-04 | Phase 6 | pending |
 | SET-01 | Phase 5 | pending |
 | SET-02 | Phase 1 | Complete |
-| SET-03 | Phase 2 | pending |
-| SET-04 | Phase 2 | pending |
+| SET-03 | Phase 2 | Complete |
+| SET-04 | Phase 2 | Complete |
 | SET-05 | Phase 1 | Complete |
 | SET-06 | Phase 1 | Complete |
