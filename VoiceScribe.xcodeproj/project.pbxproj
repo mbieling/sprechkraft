@@ -12,6 +12,7 @@
 		AA000202 /* StatusBarIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000203 /* StatusBarIconView.swift */; };
 		AA000204 /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000205 /* DesignTokens.swift */; };
 		AA000207 /* KeyboardShortcuts+Names.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000208 /* KeyboardShortcuts+Names.swift */; };
+		AA000214 /* Defaults+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000215 /* Defaults+Keys.swift */; };
 		AA000210 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000211 /* SettingsView.swift */; };
 		AA000212 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000213 /* AppDelegate.swift */; };
 		AA000010 /* RecordingStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000011 /* RecordingStateTests.swift */; };
@@ -28,6 +29,7 @@
 		AA000203 /* StatusBarIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarIconView.swift; sourceTree = "<group>"; };
 		AA000205 /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
 		AA000208 /* KeyboardShortcuts+Names.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyboardShortcuts+Names.swift"; sourceTree = "<group>"; };
+		AA000215 /* Defaults+Keys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Defaults+Keys.swift"; sourceTree = "<group>"; };
 		AA000211 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		AA000213 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AA000003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -80,6 +82,7 @@
 			isa = PBXGroup;
 			children = (
 				AA000208 /* KeyboardShortcuts+Names.swift */,
+				AA000215 /* Defaults+Keys.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -226,6 +229,7 @@
 				AA000202 /* StatusBarIconView.swift in Sources */,
 				AA000204 /* DesignTokens.swift in Sources */,
 				AA000207 /* KeyboardShortcuts+Names.swift in Sources */,
+				AA000214 /* Defaults+Keys.swift in Sources */,
 				AA000210 /* SettingsView.swift in Sources */,
 				AA000212 /* AppDelegate.swift in Sources */,
 			);

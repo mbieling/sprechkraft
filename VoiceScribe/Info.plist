@@ -22,6 +22,8 @@
     <string>14.0</string>
     <key>LSUIElement</key>
     <true/>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>VoiceScribe benoetigt Mikrofonzugriff fuer die lokale Spracherkennung. Die Aufnahme wird ausschliesslich lokal verarbeitet und nicht uebertragen.</string>
     <key>NSHumanReadableCopyright</key>
     <string>Copyright © 2026 VoiceScribe. All rights reserved.</string>
 </dict>

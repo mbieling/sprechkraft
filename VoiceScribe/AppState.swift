@@ -60,6 +60,14 @@ enum RecordingState: Equatable {
 final class AppState {
     var recordingState: RecordingState = .idle
 
+    /// Normierter RMS-Pegel 0.0-1.0, aktualisiert vom AudioController via Task { @MainActor in }.
+    /// Wird von StatusBarIconView (FEED-03) fuer die Waveform-Anzeige konsumiert.
+    var audioLevel: CGFloat = 0.0
+
+    /// true wenn AVAudioApplication.recordPermission == .denied.
+    /// Wird in SettingsView (D-13) fuer den roten Permission-Banner konsumiert.
+    var micPermissionDenied: Bool = false
+
     init() {}
 
     /// Phase 1 Demo: cycelt zyklisch durch alle 4 Zustände.
