@@ -155,6 +155,7 @@ final class AudioController: @unchecked Sendable {
         if rms < silenceThresholdRMS {
             silenceAccumulator += bufferDuration
             if silenceAccumulator >= Defaults[.silenceDuration] {
+                silenceAccumulator = 0  // Wiederholtes Ausloesen verhindern (WR-01)
                 // Auto-Stopp auf Main Thread ausloesen (D-07)
                 Task { @MainActor [weak self] in
                     self?.onAutoStop?()
