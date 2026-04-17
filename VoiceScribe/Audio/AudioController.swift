@@ -26,6 +26,10 @@ final class AudioController: @unchecked Sendable {
     /// Akkumulierte Stille-Dauer in Sekunden. Nur auf dem Audio-Render-Thread geschrieben.
     private var silenceAccumulator: TimeInterval = 0
 
+    /// Zuletzt an den Main Thread dispatches Level-Wert. Nur auf dem Audio-Render-Thread geschrieben.
+    /// Verhindert unnoetige Icon-Updates bei minimaler Pegelaenderung (WR-02).
+    private var lastDispatchedLevel: CGFloat = -1
+
     /// RMS-Schwellwert fuer Stille-Erkennung. ~-40 dBFS (Claude's Discretion, D-08).
     private let silenceThresholdRMS: Float = 0.01
 
@@ -101,6 +105,11 @@ final class AudioController: @unchecked Sendable {
             // T-02-03: RMS clampen auf 0.0-1.0 — verhindert Out-of-Bounds fuer Waveform-Rendering
             let clampedLevel = CGFloat(min(1.0, rms * 4.0))
 
+            // WR-02: Nur dispatchen wenn sich der Level signifikant geaendert hat (>0.05).
+            // Verhindert NSHostingView-Erstellung bei ~43 Hz auf dem Main Thread.
+            guard abs(clampedLevel - self.lastDispatchedLevel) > 0.05 else { return }
+            self.lastDispatchedLevel = clampedLevel
+
             // Observation-B: AppState auf Main Thread aktualisieren + Icon-Update signalisieren
             Task { @MainActor [weak self] in
                 self?.appState?.audioLevel = clampedLevel
@@ -110,6 +119,7 @@ final class AudioController: @unchecked Sendable {
 
         try engine.start()
         silenceAccumulator = 0
+        lastDispatchedLevel = -1  // WR-02: Reset, damit erster Level-Dispatch sicher gefeuert wird
     }
 
     /// Stoppt die Mikrofon-Aufnahme und setzt den Tap zurueck.
@@ -119,6 +129,7 @@ final class AudioController: @unchecked Sendable {
         engine.inputNode.removeTap(onBus: 0)
         engine.stop()
         silenceAccumulator = 0
+        lastDispatchedLevel = -1  // WR-02: Reset fuer naechste Aufnahme-Session
     }
 
     /// Fordert Mikrofon-Berechtigung an, falls noch nicht erteilt.
