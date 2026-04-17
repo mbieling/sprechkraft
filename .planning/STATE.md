@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-audio-capture-02-01-PLAN.md
-last_updated: "2026-04-17T16:55:06.989Z"
+stopped_at: Completed 02-audio-capture-02-02-PLAN.md
+last_updated: "2026-04-17T17:03:07.464Z"
 last_activity: 2026-04-17
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 7
-  completed_plans: 5
-  percent: 71
+  completed_plans: 6
+  percent: 86
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 02 (audio-capture) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-17
 
@@ -56,6 +56,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-app-shell P02 | 15 | 3 tasks | 5 files |
 | Phase 01-app-shell P03 | 20 | 4 tasks | 4 files |
 | Phase 02-audio-capture P01 | 375 | 2 tasks | 8 files |
+| Phase 02-audio-capture P02 | 333 | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,8 @@ Recent decisions affecting current work:
 - [Phase 02-audio-capture]: AudioController als nonisolated @unchecked Sendable — installTap-Callbacks laufen auf Audio-Render-Thread, kein @MainActor moeglich
 - [Phase 02-audio-capture]: startRecording() synchron throws — Permission-Request bei .undetermined via Task{} dispatched, Caller nutzt requestPermissionIfNeeded() separat
 - [Phase 02-audio-capture]: CFString-Qualifier in AudioObjectGetPropertyData via withUnsafePointer — vermeidet UnsafeRawPointer-Warning
+- [Phase 02-audio-capture]: onLevelUpdate-Callback in AudioController statt withObservationTracking — konsistent mit Observation-B-Pattern
+- [Phase 02-audio-capture]: AppState.toggleRecording() bricht Demo-Cycle: idle->recording, recording->transcribing; Phase 3 fuellt .transcribing
 
 ### Pending Todos
 
@@ -99,6 +102,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-17T16:55:06.985Z
-Stopped at: Completed 02-audio-capture-02-01-PLAN.md
+Last session: 2026-04-17T17:03:07.459Z
+Stopped at: Completed 02-audio-capture-02-02-PLAN.md
 Resume file: None

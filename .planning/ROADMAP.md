@@ -48,7 +48,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. The silence threshold (seconds) is configurable and takes effect on the next recording
 **Plans**: 3 plans
 - [x] 02-01-PLAN.md — Audio-Subsystem Core: AudioController (AVAudioEngine, RMS, Silence-Detection), AudioDeviceManager, Defaults-Keys, AppState-Erweiterung, Info.plist
-- [ ] 02-02-PLAN.md — UI + Integration: WaveformView, SettingsView (Mic-Picker, Stille-Slider, Permission-Banner), AppDelegate-Wiring, Audio-Cues
+- [x] 02-02-PLAN.md — UI + Integration: WaveformView, SettingsView (Mic-Picker, Stille-Slider, Permission-Banner), AppDelegate-Wiring, Audio-Cues
 - [ ] 02-03-PLAN.md — Manuelle Human-Verify-Checkpoints (Aufnahme, Waveform, Auto-Stopp, Settings)
 **UI hint**: yes
 
@@ -106,7 +106,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. App Shell | 3/4 | In Progress|  |
-| 2. Audio Capture | 1/3 | In Progress|  |
+| 2. Audio Capture | 2/3 | In Progress|  |
 | 3. Transcription | 0/TBD | Not started | - |
 | 4. Text Output | 0/TBD | Not started | - |
 | 5. LLM + Prompt Profiles | 0/TBD | Not started | - |
