@@ -62,6 +62,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         audioController?.onLevelUpdate = { [weak self] in
             self?.updateIcon()
         }
+
+        // Phase 3: Transkription nach Aufnahme-Ende (RECORD-04, D-05)
+        // Callback laeuft auf @MainActor (Task { @MainActor } in AudioController.stopRecording())
+        audioController?.onRecordingComplete = { [weak self] samples, sampleRate in
+            guard let self else { return }
+            Task {
+                // Resampling (D-06) und Transkription (D-07) im actor — kein Main-Thread-Block
+                let text = await self.transcriptionService.transcribeWithResampling(samples, sampleRate: sampleRate)
+                await MainActor.run {
+                    if let text {
+                        print("Transkription: \(text)")  // D-07: Pipeline-Stub, Phase 4 ersetzt dies
+                    }
+                    self.appState?.resetToIdle()  // D-08: .transcribing → .idle
+                    self.updateIcon()
+                }
+            }
+        }
     }
 
     // MARK: - Recording mit Audio-Cues (RECORD-01, FEED-02)
@@ -94,9 +111,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Gilt gleichermassen fuer manuellen Stopp und Auto-Stopp durch Stille (D-07)
         NSSound(named: NSSound.Name("Pop"))?.play()
         updateIcon()
-        // Phase 3 wird hier Transkription starten. Bis dahin: sofort idle.
-        appState?.resetToIdle()
-        updateIcon()
+        // resetToIdle() kommt via onRecordingComplete-Callback (nicht mehr hier)
     }
 
     // MARK: - Split-Click Handler

@@ -44,6 +44,15 @@ final class AudioController: @unchecked Sendable {
     /// Wird auf dem Main Thread via Task { @MainActor in } aufgerufen (FEED-03, Observation-B).
     var onLevelUpdate: (() -> Void)?
 
+    /// Akkumulierte Float-Samples waehrend der Aufnahme. Nur auf Audio-Render-Thread geschrieben
+    /// (@unchecked Sendable Invariante). Wird in stopRecording() entleert.
+    private var recordedSamples: [Float] = []
+
+    /// Callback nach stopRecording() mit dem vollstaendigen Sample-Array.
+    /// Parameter: ([Float] samples, Double sampleRate) — sampleRate ist Hardware-Rate (z.B. 44100 oder 48000).
+    /// Wird via Task { @MainActor } aufgerufen (konsistent mit onAutoStop-Pattern).
+    var onRecordingComplete: (([Float], Double) -> Void)?
+
     // MARK: - Initializer
 
     init(appState: AppState) {
@@ -102,6 +111,14 @@ final class AudioController: @unchecked Sendable {
             let bufferDuration = Double(buffer.frameLength) / buffer.format.sampleRate
             self.updateSilenceDetection(rms: rms, bufferDuration: bufferDuration)
 
+            // Phase 3: Float-Sample-Akkumulation fuer Transkription (D-04, D-05)
+            // Render-Thread-safe: recordedSamples nur hier geschrieben (@unchecked Sendable)
+            if let channelData = buffer.floatChannelData?[0] {
+                let count = Int(buffer.frameLength)
+                let newSamples = Array(UnsafeBufferPointer(start: channelData, count: count))
+                self.recordedSamples.append(contentsOf: newSamples)
+            }
+
             // T-02-03: RMS clampen auf 0.0-1.0 — verhindert Out-of-Bounds fuer Waveform-Rendering
             let clampedLevel = CGFloat(min(1.0, rms * 4.0))
 
@@ -125,6 +142,15 @@ final class AudioController: @unchecked Sendable {
     /// Stoppt die Mikrofon-Aufnahme und setzt den Tap zurueck.
     /// removeTap wird IMMER als erstes aufgerufen (Pitfall 5).
     func stopRecording() {
+        // Phase 3: Sample-Array extrahieren und Callback ausloesen (D-05)
+        // recordedSamples zuerst leeren (vor Task-Dispatch) um Memory-Spike zu vermeiden (RESEARCH.md Pitfall 5)
+        let capturedSamples = recordedSamples
+        let capturedSampleRate = engine.inputNode.outputFormat(forBus: 0).sampleRate
+        recordedSamples = []
+        Task { @MainActor [weak self] in
+            self?.onRecordingComplete?(capturedSamples, capturedSampleRate)
+        }
+
         // Pitfall 5: removeTap zuerst, dann stop — verhindert doppelte Callbacks
         engine.inputNode.removeTap(onBus: 0)
         engine.stop()
