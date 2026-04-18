@@ -60,7 +60,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. On first launch, the model download starts automatically and progress is shown in the menu bar icon or a status indicator
   2. After recording stops, the icon switches to the Transcribing state and a correct text transcript is produced
   3. Transcription completes and the result is printed to console (pipeline stub) — no hang or crash on 30-second audio
-**Plans**: TBD
+**Plans**: 5 plans
+- [ ] 03-01-PLAN.md — SPM-Dependency (WhisperKit v0.18.0) + TranscriptionServiceTests RED-Stubs (Wave 0, Build-Gate)
+- [ ] 03-02-PLAN.md — AudioController Float-Sample-Akkumulation + onRecordingComplete-Callback + AppState.isModelReady (Wave 1)
+- [ ] 03-03-PLAN.md — TranscriptionService actor: downloadAndLoad, resampleTo16kHz, transcribe, transcribeWithResampling (Wave 1, TDD)
+- [ ] 03-04-PLAN.md — AppDelegate Wiring: setupTranscription, onRecordingComplete, isModelReady-Guard, Platzhalter entfernen (Wave 2)
+- [ ] 03-05-PLAN.md — Manuelle Human-Verify-Checkpoints: Download-Fortschritt, Transkription, 30s-Test (Wave 3)
 
 ### Phase 4: Text Output
 **Goal**: Transcribed text lands in the active text field at cursor position, or on the clipboard, with a hotkey to switch modes.
@@ -107,7 +112,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. App Shell | 3/4 | In Progress|  |
 | 2. Audio Capture | 2/3 | In Progress|  |
-| 3. Transcription | 0/TBD | Not started | - |
+| 3. Transcription | 0/5 | Not started | - |
 | 4. Text Output | 0/TBD | Not started | - |
 | 5. LLM + Prompt Profiles | 0/TBD | Not started | - |
 | 6. History | 0/TBD | Not started | - |
