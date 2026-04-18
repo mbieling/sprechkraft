@@ -76,7 +76,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. After dictation in clipboard mode, the transcription is on the clipboard and ready to paste
   3. Pressing the output-mode hotkey switches between field injection and clipboard mode and the change persists across app restarts
   4. When Accessibility permission is not granted, the app falls back to clipboard and does not crash silently
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 04-01-PLAN.md — OutputMode-Enum + Defaults.Keys.outputMode + toggleOutputMode-Hotkey-Name + AppState.axPermissionDenied + Info.plist (Wave 1, parallel)
+- [ ] 04-02-PLAN.md — TextOutputService (@MainActor, AX-Injektion, 2040-Guard, Clipboard) + Unit-Tests via Protocol/Mock (Wave 1, parallel)
+- [ ] 04-03-PLAN.md — AppDelegate-Wiring (print()-Stub ersetzen, AX-Check, Hotkey, Menü-Häkchen) + SettingsView (AX-Banner, OutputMode-Section) (Wave 2)
+- [ ] 04-04-PLAN.md — Manuelle Human-Verify-Checkpoints: AX-Injektion Ziel-Apps, Clipboard-Modus, Hotkey-Toggle, Persistenz, Permission-Fallback (Wave 3)
 
 ### Phase 5: LLM + Prompt Profiles
 **Goal**: The user can create named prompt profiles with individual hotkeys and LLM toggles; holding a profile hotkey during dictation routes the transcript through Groq before output.
@@ -110,9 +114,9 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. App Shell | 3/4 | In Progress|  |
-| 2. Audio Capture | 2/3 | In Progress|  |
-| 3. Transcription | 0/5 | Not started | - |
-| 4. Text Output | 0/TBD | Not started | - |
+| 1. App Shell | 4/4 | Complete | 2026-04-18 |
+| 2. Audio Capture | 3/3 | Complete | 2026-04-18 |
+| 3. Transcription | 5/5 | Complete | 2026-04-18 |
+| 4. Text Output | 0/4 | Not started | - |
 | 5. LLM + Prompt Profiles | 0/TBD | Not started | - |
 | 6. History | 0/TBD | Not started | - |
