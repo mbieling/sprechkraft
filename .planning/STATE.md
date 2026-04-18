@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 02-audio-capture-02-02-PLAN.md
-last_updated: "2026-04-17T17:11:15.323Z"
-last_activity: 2026-04-17
+last_updated: "2026-04-18T00:00:00.000Z"
+last_activity: 2026-04-18
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 7
+  total_plans: 12
   completed_plans: 7
-  percent: 100
+  percent: 58
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** Text per Sprache eingeben, genau wie tippen — schnell, systemweit, ohne Fenster wechseln zu müssen.
-**Current focus:** Phase 02 — audio-capture
+**Current focus:** Phase 03 — transcription
 
 ## Current Position
 
 Phase: 3
 Plan: Not started
-Status: Ready to execute
-Last activity: 2026-04-17
+Status: Ready to execute (5 plans planned)
+Last activity: 2026-04-18
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -88,7 +88,7 @@ None yet.
 
 ### Blockers/Concerns
 
-- [Pre-Phase 1] Parakeet vs WhisperKit decision unresolved — blocks Phase 3 architecture. Research recommends WhisperKit; project brief says Parakeet. Needs explicit user decision before Phase 3 planning.
+- [Phase 03 RESOLVED] WhisperKit gewählt (D-01 in 03-CONTEXT.md) — Parakeet Python-Subprocess für v1 verworfen.
 - [Pre-Phase 1] macOS minimum deployment target not set — affects AVAudioEngine API availability and LaunchAtLogin-modern compatibility.
 
 ## Deferred Items
