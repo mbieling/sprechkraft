@@ -12,9 +12,9 @@ Build a native macOS menu bar dictation app from the ground up, starting with th
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: App Shell** - Menu bar app skeleton with global hotkey and icon state machine
-- [ ] **Phase 2: Audio Capture** - Microphone recording with silence detection, audio cues, and level meter
-- [ ] **Phase 3: Transcription** - Local WhisperKit/Parakeet integration with async model loading
+- [x] **Phase 1: App Shell** - Menu bar app skeleton with global hotkey and icon state machine *(completed 2026-04-18)*
+- [x] **Phase 2: Audio Capture** - Microphone recording with silence detection, audio cues, and level meter *(completed 2026-04-18)*
+- [x] **Phase 3: Transcription** - Local WhisperKit/Parakeet integration with async model loading *(completed 2026-04-18)*
 - [ ] **Phase 4: Text Output** - Text injection into active field and clipboard with mode switching
 - [ ] **Phase 5: LLM + Prompt Profiles** - Groq API integration with named, hotkey-driven prompt profiles
 - [ ] **Phase 6: History** - Persistent, full-text-searchable transcription history with GRDB/FTS5
@@ -61,11 +61,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. After recording stops, the icon switches to the Transcribing state and a correct text transcript is produced
   3. Transcription completes and the result is printed to console (pipeline stub) — no hang or crash on 30-second audio
 **Plans**: 5 plans
-- [ ] 03-01-PLAN.md — SPM-Dependency (WhisperKit v0.18.0) + TranscriptionServiceTests RED-Stubs (Wave 0, Build-Gate)
-- [ ] 03-02-PLAN.md — AudioController Float-Sample-Akkumulation + onRecordingComplete-Callback + AppState.isModelReady (Wave 1)
-- [ ] 03-03-PLAN.md — TranscriptionService actor: downloadAndLoad, resampleTo16kHz, transcribe, transcribeWithResampling (Wave 1, TDD)
-- [ ] 03-04-PLAN.md — AppDelegate Wiring: setupTranscription, onRecordingComplete, isModelReady-Guard, Platzhalter entfernen (Wave 2)
-- [ ] 03-05-PLAN.md — Manuelle Human-Verify-Checkpoints: Download-Fortschritt, Transkription, 30s-Test (Wave 3)
+- [x] 03-01-PLAN.md — SPM-Dependency (WhisperKit v0.18.0) + TranscriptionServiceTests RED-Stubs (Wave 0, Build-Gate)
+- [x] 03-02-PLAN.md — AudioController Float-Sample-Akkumulation + onRecordingComplete-Callback + AppState.isModelReady (Wave 1)
+- [x] 03-03-PLAN.md — TranscriptionService actor: downloadAndLoad, resampleTo16kHz, transcribe, transcribeWithResampling (Wave 1, TDD)
+- [x] 03-04-PLAN.md — AppDelegate Wiring: setupTranscription, onRecordingComplete, isModelReady-Guard, Platzhalter entfernen (Wave 2)
+- [x] 03-05-PLAN.md — Manuelle Human-Verify-Checkpoints: Download-Fortschritt, Transkription, 30s-Test (Wave 3)
 
 ### Phase 4: Text Output
 **Goal**: Transcribed text lands in the active text field at cursor position, or on the clipboard, with a hotkey to switch modes.
