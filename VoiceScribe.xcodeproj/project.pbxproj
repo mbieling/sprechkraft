@@ -15,9 +15,11 @@
 		AA000214 /* Defaults+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000215 /* Defaults+Keys.swift */; };
 		AA000216 /* AudioController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000217 /* AudioController.swift */; };
 		AA000218 /* AudioDeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000219 /* AudioDeviceManager.swift */; };
+		DEAD0220 /* TranscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEAD0221 /* TranscriptionService.swift */; };
 		AA000016 /* AudioControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000017 /* AudioControllerTests.swift */; };
 		AA000018 /* DefaultsKeysTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000019 /* DefaultsKeysTests.swift */; };
 		AA000026 /* WaveformViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000027 /* WaveformViewTests.swift */; };
+		CAFE0030 /* TranscriptionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE0029 /* TranscriptionServiceTests.swift */; };
 		AA000210 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000211 /* SettingsView.swift */; };
 		AA000212 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000213 /* AppDelegate.swift */; };
 		AA000010 /* RecordingStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000011 /* RecordingStateTests.swift */; };
@@ -38,9 +40,11 @@
 		AA000215 /* Defaults+Keys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Defaults+Keys.swift"; sourceTree = "<group>"; };
 		AA000217 /* AudioController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioController.swift; sourceTree = "<group>"; };
 		AA000219 /* AudioDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDeviceManager.swift; sourceTree = "<group>"; };
+		DEAD0221 /* TranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionService.swift; sourceTree = "<group>"; };
 		AA000017 /* AudioControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioControllerTests.swift; sourceTree = "<group>"; };
 		AA000019 /* DefaultsKeysTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultsKeysTests.swift; sourceTree = "<group>"; };
 		AA000027 /* WaveformViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformViewTests.swift; sourceTree = "<group>"; };
+		CAFE0029 /* TranscriptionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionServiceTests.swift; sourceTree = "<group>"; };
 		AA000211 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		AA000213 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AA000003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -83,12 +87,21 @@
 				AA000203 /* StatusBarIconView.swift */,
 				AA000211 /* SettingsView.swift */,
 				AA000220 /* Audio */,
+				DEAD0222 /* Transcription */,
 				AA000206 /* Constants */,
 				AA000209 /* Extensions */,
 				AA000003 /* Info.plist */,
 				AA000004 /* VoiceScribe.entitlements */,
 			);
 			path = VoiceScribe;
+			sourceTree = "<group>";
+		};
+		DEAD0222 /* Transcription */ = {
+			isa = PBXGroup;
+			children = (
+				DEAD0221 /* TranscriptionService.swift */,
+			);
+			path = Transcription;
 			sourceTree = "<group>";
 		};
 		AA000220 /* Audio */ = {
@@ -126,6 +139,7 @@
 				AA000017 /* AudioControllerTests.swift */,
 				AA000019 /* DefaultsKeysTests.swift */,
 				AA000027 /* WaveformViewTests.swift */,
+				CAFE0029 /* TranscriptionServiceTests.swift */,
 			);
 			path = VoiceScribeTests;
 			sourceTree = "<group>";
@@ -259,6 +273,7 @@
 				AA000214 /* Defaults+Keys.swift in Sources */,
 				AA000216 /* AudioController.swift in Sources */,
 				AA000218 /* AudioDeviceManager.swift in Sources */,
+				DEAD0220 /* TranscriptionService.swift in Sources */,
 				AA000210 /* SettingsView.swift in Sources */,
 				AA000212 /* AppDelegate.swift in Sources */,
 			);
@@ -274,6 +289,7 @@
 				AA000016 /* AudioControllerTests.swift in Sources */,
 				AA000018 /* DefaultsKeysTests.swift in Sources */,
 				AA000026 /* WaveformViewTests.swift in Sources */,
+				CAFE0030 /* TranscriptionServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
