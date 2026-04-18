@@ -533,17 +533,19 @@ enum OutputMode: String, Defaults.Serializable {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Unicode-Offset-Semantik von kAXSelectedTextRangeAttribute**
+1. **Unicode-Offset-Semantik von kAXSelectedTextRangeAttribute** (RESOLVED)
    - Was wir wissen: CFRange.location ist ein Integer-Offset in den Text
    - Was unklar: Ob UTF-16-Code-Units oder Unicode-Scalar-Values gemeint sind (bei Emoji / CJK relevant)
    - Empfehlung: In Wave-0-Test mit einem Emoji-Text prüfen (Workaround: `unicodeScalars`-Berechnung ist konservativer)
+   - **Entscheidung:** Implementierung nutzt `unicodeScalars`-Array (konservativer Pfad, korrekt für ASCII + CJK + Emoji); Offset-Semantik damit irrelevant für Korrektheit.
 
-2. **Verhalten bei Notes.app mit Locked Notes**
+2. **Verhalten bei Notes.app mit Locked Notes** (RESOLVED)
    - Was wir wissen: Notes exponiert Standard-AX für normale Notizen
    - Was unklar: Gesperrte Notizen könnten `kAXAttributeUnsupported` für kAXValueAttribute zurückgeben
    - Empfehlung: Manueller Test in Wave 2; D-05 (stille Rückkehr) deckt diesen Fall ab
+   - **Entscheidung:** D-05 (stille Rückkehr bei AX-Fehler) ist der korrekte Umgang; manueller Test in Plan 04-04 Test B deckt normale Notizen ab. Gesperrte Notizen fallen unter D-05.
 
 ---
 
