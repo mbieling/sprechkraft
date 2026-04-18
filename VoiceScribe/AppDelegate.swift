@@ -2,8 +2,9 @@
 // Zweck: AppKit-Schicht für Menu-Bar-Icon, globalen Hotkey und AudioController-Wiring.
 // Implementiert SET-02 (Hotkey ⌥⌘R), SET-05 (Login-Toggle),
 // SET-06 (kein Dock-Icon via .accessory), FEED-01 (Icon-Zustände via AppState),
-// FEED-02 (Audio-Cues: Tink/Pop), RECORD-01 (echtes Start/Stopp via AudioController).
-// Quellen: RESEARCH.md Pattern 1, 3, 4, 5; PATTERNS.md AppDelegate; 02-02-PLAN.md Task 3.
+// FEED-02 (Audio-Cues: Tink/Pop), RECORD-01 (echtes Start/Stopp via AudioController),
+// RECORD-04/RECORD-05 (Transkription via TranscriptionService, Download-Kickoff).
+// Quellen: RESEARCH.md Pattern 1, 3, 4, 5; PATTERNS.md AppDelegate; 02-02-PLAN.md Task 3; 03-04-PLAN.md.
 
 import AppKit
 import SwiftUI
@@ -23,6 +24,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// AudioController — initialisiert nach AppState-Injection via setupAudioController().
     private var audioController: AudioController?
 
+    /// TranscriptionService — Download und Transkription. Actor-isoliert.
+    private let transcriptionService = TranscriptionService()
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         // SET-06: .accessory VOR allem anderen — verhindert Dock-Icon auch
         // wenn LSUIElement aus irgendeinem Grund nicht greift.
@@ -37,6 +41,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         updateIcon()
         setupHotkey()
+        setupTranscription()
     }
 
     // MARK: - AudioController Setup
@@ -57,6 +62,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         audioController?.onLevelUpdate = { [weak self] in
             self?.updateIcon()
         }
+
+        // Phase 3: Transkription nach Aufnahme-Ende (RECORD-04, D-05)
+        // Callback laeuft auf @MainActor (Task { @MainActor } in AudioController.stopRecording())
+        audioController?.onRecordingComplete = { [weak self] samples, sampleRate in
+            guard let self else { return }
+            Task {
+                // Resampling (D-06) und Transkription (D-07) im actor — kein Main-Thread-Block
+                let text = await self.transcriptionService.transcribeWithResampling(samples, sampleRate: sampleRate)
+                await MainActor.run {
+                    if let text {
+                        print("Transkription: \(text)")  // D-07: Pipeline-Stub, Phase 4 ersetzt dies
+                    }
+                    self.appState?.resetToIdle()  // D-08: .transcribing → .idle
+                    self.updateIcon()
+                }
+            }
+        }
     }
 
     // MARK: - Recording mit Audio-Cues (RECORD-01, FEED-02)
@@ -65,6 +87,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Guard verhindert doppelten Start (T-02-06).
     private func startRecordingWithCue() {
         guard appState?.recordingState == .idle else { return }
+        // D-11: Aufnahme waehrend Download blockiert — kein Audio-Cue, kein State-Wechsel
+        guard appState?.isModelReady == true else { return }
         appState?.toggleRecording()  // .idle → .recording
         do {
             try audioController?.startRecording()
@@ -87,9 +111,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Gilt gleichermassen fuer manuellen Stopp und Auto-Stopp durch Stille (D-07)
         NSSound(named: NSSound.Name("Pop"))?.play()
         updateIcon()
-        // Phase 3 wird hier Transkription starten. Bis dahin: sofort idle.
-        appState?.resetToIdle()
-        updateIcon()
+        // resetToIdle() kommt via onRecordingComplete-Callback (nicht mehr hier)
     }
 
     // MARK: - Split-Click Handler
@@ -189,6 +211,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // UI-SPEC Accessibility Contract: Label pro Zustand.
         button.setAccessibilityLabel(state.accessibilityLabel)
+    }
+
+    // MARK: - Transcription Setup (RECORD-05)
+
+    /// Startet Modell-Download beim App-Start (D-09).
+    /// Fortschritt via NSStatusItem-Title "↓ XX%" (D-10).
+    /// isModelReady wird nach Abschluss auf true gesetzt (D-11).
+    private func setupTranscription() {
+        Task {
+            await transcriptionService.downloadAndLoad { [weak self] fraction in
+                // @MainActor (Closure deklariert in downloadAndLoad als @MainActor)
+                let pct = Int(fraction * 100)
+                self?.statusItem.button?.title = pct < 100 ? "↓ \(pct)%" : ""
+            }
+            // Download abgeschlossen (oder fehlgeschlagen — isModelReady bleibt dann false, D-13)
+            statusItem.button?.title = ""
+            appState?.isModelReady = await transcriptionService.isModelReady
+            updateIcon()
+        }
     }
 
     // MARK: - Global Hotkey (SET-02)

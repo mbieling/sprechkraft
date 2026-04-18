@@ -68,6 +68,11 @@ final class AppState {
     /// Wird in SettingsView (D-13) fuer den roten Permission-Banner konsumiert.
     var micPermissionDenied: Bool = false
 
+    /// true nach erfolgreichem Modell-Download via TranscriptionService.
+    /// Wird von AppDelegate.setupTranscription() gesetzt (D-11).
+    /// Blockiert Aufnahme-Start waehrend Download laeuft (T-03-09).
+    var isModelReady: Bool = false
+
     init() {}
 
     /// Phase 2: Echte Zustandsuebergaenge fuer Audio-Capture.
