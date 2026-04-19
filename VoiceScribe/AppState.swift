@@ -79,6 +79,19 @@ final class AppState {
     /// Bei true faellt TextOutputService automatisch auf Clipboard zurueck (D-12).
     var axPermissionDenied: Bool = false
 
+    /// ID des waehrend der laufenden Aufnahme aktivierten Profils via Profil-Hotkey.
+    /// nil = kein Profil-Hotkey gedrueckt → Standard-Profil greift in onRecordingComplete.
+    /// D-02: Erster gewinnt — wird in setupProfileHotkeys() onKeyDown gesetzt,
+    ///        spaetere Hotkey-Events waehrend derselben Aufnahme werden ignoriert.
+    /// Wird in onRecordingComplete gelesen und sofort auf nil zurueckgesetzt.
+    var activeProfileID: UUID? = nil
+
+    /// true wenn kein Groq API-Key im macOS Keychain vorhanden ist.
+    /// Wird in applicationDidFinishLaunching geprueft (analog axPermissionDenied).
+    /// Konsumiert von SettingsView fuer den roten Groq-API-Key-Banner (SET-01).
+    /// T-5-01: AppState cached NIE den Key selbst — nur dieses Bool-Flag.
+    var groqKeyMissing: Bool = false
+
     init() {}
 
     /// Phase 2: Echte Zustandsuebergaenge fuer Audio-Capture.
