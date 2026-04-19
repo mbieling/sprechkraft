@@ -59,8 +59,14 @@ final class TextOutputService: TextOutputServiceProtocol {
             // D-05: Kein fokussiertes Element — stille Rueckkehr (Pitfall 3)
             return
         }
+        // CFTypeID-Pruefung vor dem Cast — garantiert korrekte Laufzeit-Typsicherheit (REVIEW CR-01).
+        // Hinweis: `as? AXUIElement` wuerde einen Compiler-Fehler erzeugen ("conditional downcast
+        // to CoreFoundation type will always succeed"), daher bleibt force_cast nach der Pruefung.
+        guard CFGetTypeID(focusedRef) == AXUIElementGetTypeID() else {
+            return
+        }
         // swiftlint:disable:next force_cast
-        let focused = focusedRef as! AXUIElement
+        let focused = focusedRef as! AXUIElement  // sicher: Typ durch CFTypeID-Guard verifiziert
 
         // Schritt 2: Existierenden Text lesen
         var valueRef: CFTypeRef?
