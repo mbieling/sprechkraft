@@ -598,14 +598,14 @@ Task {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Hotkey-Handler Deregistrierung API**
+1. **Hotkey-Handler Deregistrierung API** — RESOLVED: Fallback-Strategie in Plan 05-05 Task 2 implementiert. Handler durch erneutes `onKeyDown`-Registrieren überschreiben (letzter Handler gewinnt). `KeyboardShortcuts.reset(for:)` löscht die gespeicherte Binding — daher nur zur Bereinigung bei Profil-Löschung verwenden.
    - What we know: KeyboardShortcuts speichert Handler intern; neue Aufrufe von `onKeyDown` für dieselbe Name überschreiben oder akkumulieren
    - What's unclear: Exakte API-Methode zum Deregistrieren eines Handlers ohne den Shortcut zu resetten (Shortcut-Binding soll erhalten bleiben, nur der Event-Handler wird neu gesetzt)
    - Recommendation: In Xcode KeyboardShortcuts-Quellcode prüfen: `disable(for:)`, `removeEventHandlers(for:)` o.ä. Falls nicht vorhanden: Handler durch erneutes `onKeyDown`-Registration überschreiben (funktioniert wenn Library letzten Handler gewinnen lässt)
 
-2. **Groq API Timeout-Wert**
+2. **Groq API Timeout-Wert** — RESOLVED: 30s als Claude's Discretion (Plan 05-04 Task 1). Groq-Inferenz typischerweise < 3s für kurze Transkripte; 30s gibt ausreichend Puffer bei Lastspitzen.
    - What we know: 30s ist eine vernünftige Heuristik für LLM-Calls; Groq ist bekannt für sehr schnelle Inferenz (~400 tokens/s)
    - What's unclear: Maximale Latenz bei hoher Last; ob 30s zu lang/kurz ist
    - Recommendation: 30s als initialen Timeout (D-09 Claude's Discretion). Bei kurzen Transkripten ist Groq typischerweise < 3s.
