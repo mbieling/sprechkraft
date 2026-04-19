@@ -113,7 +113,10 @@ final class TextOutputService: TextOutputServiceProtocol {
             kAXValueAttribute as CFString,
             composed as CFTypeRef
         ) == .success else {
-            // D-05: AX-Fehler bei vorhandener Permission — stille Rueckkehr
+            // REVIEW WR-03: Clipboard-Fallback statt stiller Rueckkehr.
+            // Read-Only-Felder, Browser-Content-Editable u.a. liefern hier einen Fehler —
+            // der dikierte Text wuerde sonst ohne Rueckmeldung verloren gehen (stiller Datenverlust).
+            writeToClipboard(text)
             return
         }
 
