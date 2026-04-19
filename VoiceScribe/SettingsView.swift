@@ -9,6 +9,7 @@
 import SwiftUI
 import Defaults
 import AVFoundation
+import KeyboardShortcuts
 
 struct SettingsView: View {
     /// Wird via VoiceScribeApp injiziert; benoetigt fuer micPermissionDenied-Banner (D-13).
@@ -16,6 +17,7 @@ struct SettingsView: View {
 
     @Default(.silenceDuration) private var silenceDuration
     @Default(.selectedMicUID) private var selectedMicUID
+    @Default(.outputMode) private var outputMode
 
     /// Verfuegbare Mikrofone — wird in onAppear via AudioDeviceManager befuellt (RECORD-03).
     @State private var availableMics: [AVCaptureDevice] = []
@@ -110,6 +112,55 @@ struct SettingsView: View {
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
             }
+
+            // --- Textausgabe-Sektion (OUT-01, OUT-02, OUT-03, D-08 bis D-12) ---
+            Section("Textausgabe") {
+                // D-11: Roter AX-Permission-Banner — nur sichtbar wenn axPermissionDenied == true
+                // Analoges Pattern zum micPermissionDenied-Banner (Phase 2)
+                if appState?.axPermissionDenied == true {
+                    HStack(spacing: DesignTokens.Spacing.sm) {
+                        Image(systemName: "hand.raised.slash.fill")
+                            .foregroundStyle(.white)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Bedienungshilfen-Zugriff erforderlich")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(.white)
+                            Text("VoiceScribe benötigt Zugriff, um Text direkt einzufügen. Stattdessen wird Clipboard verwendet.")
+                                .font(.system(size: 11))
+                                .foregroundStyle(.white.opacity(0.9))
+                        }
+                        Spacer()
+                        Button("Einstellungen öffnen") {
+                            // D-11/RESEARCH.md Pattern 4: URL für Privacy → Accessibility
+                            if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                                NSWorkspace.shared.open(url)
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    .padding(DesignTokens.Spacing.sm)
+                    .background(Color(.systemRed))
+                    .cornerRadius(8)
+                    .accessibilityLabel("Bedienungshilfen-Zugriff verweigert. Öffne Einstellungen.")
+                }
+
+                // D-08: Ausgabemodus-Picker — Häkchen-analog zum Menü
+                // D-07: Persistiert via Defaults.Key<OutputMode>
+                Picker("Ausgabemodus", selection: $outputMode) {
+                    Text("Textfeld-Injektion").tag(OutputMode.field)
+                    Text("Clipboard").tag(OutputMode.clipboard)
+                }
+                .pickerStyle(.segmented)
+                .accessibilityLabel("Ausgabemodus")
+
+                Text("Textfeld: Text wird direkt an der Cursorposition eingefügt. Clipboard: Text wird kopiert, zum Einfügen ⌘V drücken.")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+
+                // D-09: toggleOutputMode-Hotkey konfigurierbar (⇧⌘V Standard)
+                KeyboardShortcuts.Recorder("Modus-Wechsel-Hotkey", name: .toggleOutputMode)
+                    .accessibilityLabel("Modus-Wechsel-Hotkey konfigurieren")
+            }
         }
         .formStyle(.grouped)
         .padding(DesignTokens.Spacing.xl)
@@ -132,4 +183,13 @@ struct SettingsView: View {
     }
     return SettingsView(appState: state)
         .frame(width: 450, height: 400)
+}
+
+#Preview("Settings mit AX-Permission-Fehler") {
+    let state = AppState()
+    Task { @MainActor in
+        state.axPermissionDenied = true
+    }
+    return SettingsView(appState: state)
+        .frame(width: 450, height: 500)
 }
