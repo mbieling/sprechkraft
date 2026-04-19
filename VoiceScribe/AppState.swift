@@ -73,6 +73,12 @@ final class AppState {
     /// Blockiert Aufnahme-Start waehrend Download laeuft (T-03-09).
     var isModelReady: Bool = false
 
+    /// true wenn AXIsProcessTrusted() false zurueckgibt (kein AX-Permission).
+    /// Wird in applicationDidFinishLaunching gesetzt (D-10).
+    /// Konsumiert von SettingsView fuer den roten AX-Permission-Banner (D-11).
+    /// Bei true faellt TextOutputService automatisch auf Clipboard zurueck (D-12).
+    var axPermissionDenied: Bool = false
+
     init() {}
 
     /// Phase 2: Echte Zustandsuebergaenge fuer Audio-Capture.
