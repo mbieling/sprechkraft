@@ -10,6 +10,8 @@ import AppKit
 import SwiftUI
 import KeyboardShortcuts
 import LaunchAtLogin
+import ApplicationServices  // AXIsProcessTrusted()
+import Defaults             // Defaults[.outputMode]
 
 /// NotificationCenter.Name für die Brücke AppDelegate → VoiceScribeApp.
 extension Notification.Name {
@@ -42,6 +44,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         updateIcon()
         setupHotkey()
         setupTranscription()
+        setupOutputModeHotkey()
     }
 
     // MARK: - AudioController Setup
@@ -63,6 +66,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.updateIcon()
         }
 
+        // D-10: AX-Permission jetzt sicher setzen (appState ist hier garantiert nicht nil)
+        // AXIsProcessTrusted() ist ein einfacher Bool-Return, kein blocking call (T-04-08)
+        let axGranted = AXIsProcessTrusted()
+        appState.axPermissionDenied = !axGranted
+
         // Phase 3: Transkription nach Aufnahme-Ende (RECORD-04, D-05)
         // Callback laeuft auf @MainActor (Task { @MainActor } in AudioController.stopRecording())
         audioController?.onRecordingComplete = { [weak self] samples, sampleRate in
@@ -72,7 +80,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 let text = await self.transcriptionService.transcribeWithResampling(samples, sampleRate: sampleRate)
                 await MainActor.run {
                     if let text {
-                        print("Transkription: \(text)")  // D-07: Pipeline-Stub, Phase 4 ersetzt dies
+                        // OUT-01/OUT-02: Text ausgeben via TextOutputService (ersetzt Phase-3-Pipeline-Stub)
+                        // axPermissionDenied von AppState — gesetzt in setupAudioController() (D-10)
+                        let mode = Defaults[.outputMode]
+                        let axPermitted = !(self.appState?.axPermissionDenied ?? true)
+                        TextOutputService.shared.output(text, mode: mode, axPermitted: axPermitted)
                     }
                     self.appState?.resetToIdle()  // D-08: .transcribing → .idle
                     self.updateIcon()
@@ -163,6 +175,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(.separator())
 
+        // OUT-03/D-08: Ausgabemodus-Häkchen — zeigt aktiven Modus und erlaubt Umschalten
+        let currentMode = Defaults[.outputMode]
+
+        let fieldItem = NSMenuItem(
+            title: "Textfeld-Injektion",
+            action: #selector(setOutputModeField),
+            keyEquivalent: ""
+        )
+        fieldItem.target = self
+        fieldItem.state = currentMode == .field ? .on : .off
+        menu.addItem(fieldItem)
+
+        let clipItem = NSMenuItem(
+            title: "Clipboard",
+            action: #selector(setOutputModeClipboard),
+            keyEquivalent: ""
+        )
+        clipItem.target = self
+        clipItem.state = currentMode == .clipboard ? .on : .off
+        menu.addItem(clipItem)
+
+        menu.addItem(.separator())
+
         // Beenden
         menu.addItem(NSMenuItem(
             title: "Beenden",
@@ -189,6 +224,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func toggleLoginItem() {
         LaunchAtLogin.isEnabled.toggle()
+    }
+
+    @objc private func setOutputModeField() {
+        Defaults[.outputMode] = .field
+    }
+
+    @objc private func setOutputModeClipboard() {
+        Defaults[.outputMode] = .clipboard
     }
 
     // MARK: - Icon-Update
@@ -243,6 +286,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 } else if self.appState?.recordingState == .recording {
                     self.stopRecordingWithCue()
                 }
+            }
+        }
+    }
+
+    // MARK: - Output-Mode Hotkey (OUT-03, D-09)
+
+    /// Registriert den toggleOutputMode-Hotkey (⇧⌘V, konfigurierbar).
+    /// Wechselt Defaults[.outputMode] zwischen .field und .clipboard (D-07).
+    private func setupOutputModeHotkey() {
+        KeyboardShortcuts.onKeyUp(for: .toggleOutputMode) { [weak self] in
+            Task { @MainActor [weak self] in
+                guard self != nil else { return }
+                // D-07: Toggle zwischen .field und .clipboard
+                Defaults[.outputMode] = Defaults[.outputMode] == .field ? .clipboard : .field
+                // Menü spiegelt neuen Zustand beim nächsten Öffnen (showMenu() baut Menü neu)
             }
         }
     }
