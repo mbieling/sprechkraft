@@ -21,6 +21,7 @@
 		AA000026 /* WaveformViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000027 /* WaveformViewTests.swift */; };
 		CAFE0030 /* TranscriptionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE0029 /* TranscriptionServiceTests.swift */; };
 		BB040231 /* TextOutputServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB040232 /* TextOutputServiceTests.swift */; };
+		PP050100 /* PromptProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = PP050101 /* PromptProfileTests.swift */; };
 		AA000210 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000211 /* SettingsView.swift */; };
 		AA000212 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000213 /* AppDelegate.swift */; };
 		AA000010 /* RecordingStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000011 /* RecordingStateTests.swift */; };
@@ -58,6 +59,7 @@
 		AA000011 /* RecordingStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingStateTests.swift; sourceTree = "<group>"; };
 		AA000013 /* AppStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateTests.swift; sourceTree = "<group>"; };
 		AA000015 /* HotkeyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyTests.swift; sourceTree = "<group>"; };
+		PP050101 /* PromptProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptProfileTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,6 +156,7 @@
 				AA000027 /* WaveformViewTests.swift */,
 				CAFE0029 /* TranscriptionServiceTests.swift */,
 				BB040232 /* TextOutputServiceTests.swift */,
+				PP050101 /* PromptProfileTests.swift */,
 			);
 			path = VoiceScribeTests;
 			sourceTree = "<group>";
@@ -306,6 +309,7 @@
 				AA000026 /* WaveformViewTests.swift in Sources */,
 				CAFE0030 /* TranscriptionServiceTests.swift in Sources */,
 				BB040231 /* TextOutputServiceTests.swift in Sources */,
+				PP050100 /* PromptProfileTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
