@@ -32,6 +32,12 @@ final class MockTextOutputService: TextOutputServiceProtocol {
 @Suite("TextOutputService — Modus-Routing")
 struct TextOutputServiceModusTests {
 
+    // REVIEW WR-04: Pasteboard vor jeder Suite isolieren — verhindert Flaky-Tests
+    // bei paralleler Ausfuehrung (swift test --parallel).
+    init() {
+        NSPasteboard.general.clearContents()
+    }
+
     @Test("Leerer Text wird ignoriert")
     @MainActor func emptyTextIsIgnored() {
         let mock = MockTextOutputService()
@@ -163,6 +169,11 @@ struct TextOutputService2040GuardTests {
 
 @Suite("TextOutputService — Clipboard-Schreiben (OUT-02)")
 struct TextOutputServiceClipboardTests {
+
+    // REVIEW WR-04: Pasteboard-Isolation (siehe TextOutputServiceModusTests.init())
+    init() {
+        NSPasteboard.general.clearContents()
+    }
 
     @Test("writeToClipboard schreibt Text auf Pasteboard")
     @MainActor func writeToClipboard() {
