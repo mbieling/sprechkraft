@@ -4,6 +4,7 @@
 // PROF-03: LLM-Toggle unabhaengig von isDefault
 // PROF-04: isDefault-Invariante (genau 1 Default nach Markierung)
 
+import Foundation
 import Testing
 import Defaults
 @testable import VoiceScribe

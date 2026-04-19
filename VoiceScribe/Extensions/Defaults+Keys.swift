@@ -27,4 +27,12 @@ extension Defaults.Keys {
     /// Ausgabemodus: Textfeld-Injektion (.field) oder Clipboard (.clipboard).
     /// Standard .field gemaess D-06 (Core Value: Tippen-Ersatz).
     static let outputMode = Key<OutputMode>("outputMode", default: .field)
+
+    // Phase 5: PROF-01 — [PromptProfile] Persistenz via Defaults.
+    // D-04: Codable Array; D-05: ein Default-Profil "Rohe Transkription" beim ersten Start.
+    // activeProfileID ist NICHT hier gespeichert — das ist reiner Laufzeit-State in AppState.
+    static let profiles = Key<[PromptProfile]>(
+        "profiles",
+        default: [PromptProfile.defaultProfile]
+    )
 }
