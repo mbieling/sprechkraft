@@ -121,7 +121,13 @@ final class TextOutputService: TextOutputServiceProtocol {
         // Manche Apps exponieren kAXSelectedTextRangeAttribute nicht als schreibbar — ignorieren
         let insertScalarCount = text.unicodeScalars.count
         let safeLoc = min(cursorRange.location, existing.unicodeScalars.count)
-        var newCursorRange = CFRange(location: safeLoc + insertScalarCount, length: 0)
+        // REVIEW WR-01: Cursor-Position gegen composed.unicodeScalars.count clamppen.
+        // composed hat eine andere Laenge als existing (durch Einfuegen/Ersetzen), daher
+        // kann safeLoc + insertScalarCount den zusammengesetzten String ueberschreiten
+        // (z.B. bei Selektion: composed.count = existing.count - length + insertCount).
+        let composedScalarCount = composed.unicodeScalars.count
+        let newCursorLocation = min(safeLoc + insertScalarCount, composedScalarCount)
+        var newCursorRange = CFRange(location: newCursorLocation, length: 0)
         if let axRange = AXValueCreate(.cfRange, &newCursorRange) {
             // Fehler von kAXSelectedTextRangeAttribute-Set werden ignoriert (Pitfall 4)
             _ = AXUIElementSetAttributeValue(
