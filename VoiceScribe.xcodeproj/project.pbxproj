@@ -29,6 +29,7 @@
 		AA000022 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = AA000023 /* LaunchAtLogin */; };
 		AA000024 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = AA000025 /* Defaults */; };
 		CAFE0028 /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = BEEF0028 /* WhisperKit */; };
+		BB040201 /* TextOutputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB040200 /* TextOutputService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 		AA000217 /* AudioController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioController.swift; sourceTree = "<group>"; };
 		AA000219 /* AudioDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDeviceManager.swift; sourceTree = "<group>"; };
 		DEAD0221 /* TranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionService.swift; sourceTree = "<group>"; };
+		BB040200 /* TextOutputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOutputService.swift; sourceTree = "<group>"; };
 		AA000017 /* AudioControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioControllerTests.swift; sourceTree = "<group>"; };
 		AA000019 /* DefaultsKeysTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultsKeysTests.swift; sourceTree = "<group>"; };
 		AA000027 /* WaveformViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformViewTests.swift; sourceTree = "<group>"; };
@@ -88,6 +90,7 @@
 				AA000211 /* SettingsView.swift */,
 				AA000220 /* Audio */,
 				DEAD0222 /* Transcription */,
+				BB040230 /* TextOutput */,
 				AA000206 /* Constants */,
 				AA000209 /* Extensions */,
 				AA000003 /* Info.plist */,
@@ -102,6 +105,14 @@
 				DEAD0221 /* TranscriptionService.swift */,
 			);
 			path = Transcription;
+			sourceTree = "<group>";
+		};
+		BB040230 /* TextOutput */ = {
+			isa = PBXGroup;
+			children = (
+				BB040200 /* TextOutputService.swift */,
+			);
+			path = TextOutput;
 			sourceTree = "<group>";
 		};
 		AA000220 /* Audio */ = {
@@ -274,6 +285,7 @@
 				AA000216 /* AudioController.swift in Sources */,
 				AA000218 /* AudioDeviceManager.swift in Sources */,
 				DEAD0220 /* TranscriptionService.swift in Sources */,
+				BB040201 /* TextOutputService.swift in Sources */,
 				AA000210 /* SettingsView.swift in Sources */,
 				AA000212 /* AppDelegate.swift in Sources */,
 			);
