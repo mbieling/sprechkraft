@@ -295,9 +295,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Registriert den toggleOutputMode-Hotkey (⇧⌘V, konfigurierbar).
     /// Wechselt Defaults[.outputMode] zwischen .field und .clipboard (D-07).
     private func setupOutputModeHotkey() {
-        KeyboardShortcuts.onKeyUp(for: .toggleOutputMode) { [weak self] in
-            Task { @MainActor [weak self] in
-                guard self != nil else { return }
+        // REVIEW WR-02: [weak self] entfernt — self wird im Callback nirgends verwendet.
+        // Defaults ist thread-safe, kein Retain-Cycle durch KeyboardShortcuts-Callback.
+        // Konsistent mit setupHotkey()-Muster nur wenn self tatsaechlich benoetigt wird.
+        KeyboardShortcuts.onKeyUp(for: .toggleOutputMode) {
+            Task { @MainActor in
                 // D-07: Toggle zwischen .field und .clipboard
                 Defaults[.outputMode] = Defaults[.outputMode] == .field ? .clipboard : .field
                 // Menü spiegelt neuen Zustand beim nächsten Öffnen (showMenu() baut Menü neu)
