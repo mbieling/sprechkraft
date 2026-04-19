@@ -60,7 +60,7 @@ Identisch zum bestehenden Muster in `SettingsView.swift`:
 | Rolle | Größe | Weight | Line Height | SwiftUI-Ausdruck |
 |-------|-------|--------|-------------|------------------|
 | Body | 13 pt | regular (400) | 1.4 (system default) | `.font(.system(size: 13))` |
-| Label | 13 pt | medium (500) | 1.4 | `.font(.system(size: 13, weight: .medium))` |
+| Label | 13 pt | semibold (600) | 1.4 | `.font(.system(size: 13, weight: .semibold))` |
 | Caption | 11 pt | regular (400) | 1.3 | `.font(.system(size: 11))` |
 | Heading (Sheet-Titel) | 15 pt | semibold (600) | 1.2 | `.font(.system(size: 15, weight: .semibold))` |
 
@@ -68,8 +68,9 @@ Anmerkungen:
 - Keine Display-Größe in dieser Phase — kein Onboarding, keine Leerseite mit großem Titel.
 - `.monospacedDigit()` auf Wertanzeigen (konsistent mit Stille-Slider in SettingsView).
 - Sheet-Navigationstitel verwendet `.navigationTitle()` — Größe liegt bei macOS-Systemdefault (~15 pt semibold).
+- Zwei Weights: `regular (400)` für Body und Caption; `semibold (600)` für Label und Heading.
 
-**Quelle:** `VoiceScribe/SettingsView.swift` Zeilen 38–43 (Banner-Label 13pt medium, Caption 11pt) — identisches Muster.
+**Quelle:** `VoiceScribe/SettingsView.swift` Zeilen 38–43 (Banner-Label 13pt, Caption 11pt) — identisches Muster. Weight `medium (500)` wird nicht verwendet.
 
 ---
 
@@ -108,6 +109,8 @@ Destructive reserviert für:
 
 **Position:** Neue `Section("Prompt-Profile")` unter der bestehenden Textausgabe-Sektion.
 
+**Focal Point (Normalzustand ohne Banner):** Das aktive Standard-Profil in der Profilliste fällt als erstes ins Auge — es trägt das `⭐`-Symbol (U+2B50) in der rechten Hälfte der Zeile. Die Profilliste ist das visuell dominante Element der Sektion; der „Profil hinzufügen"-Button ist visuell zurückgenommen (`.buttonStyle(.borderless)`).
+
 **Struktur:**
 
 ```
@@ -136,7 +139,7 @@ Section("Prompt-Profile") {
 **Groq-API-Key-Banner:** Identisches Layout zum `axPermissionDenied`-Banner:
 - `HStack(spacing: DesignTokens.Spacing.sm)`
 - SF Symbol links: `"key.slash"` (weiß)
-- Titeltext 13 pt medium weiß + Body 11 pt weiß 0.9 Opacity
+- Titeltext 13 pt semibold weiß + Body 11 pt weiß 0.9 Opacity
 - Button `.buttonStyle(.bordered)` rechts: "Schlüssel eingeben"
 - Hintergrund: `Color(.systemRed)`, `.cornerRadius(8)`, `.padding(DesignTokens.Spacing.sm)`
 
@@ -157,7 +160,7 @@ HStack {
     }
     Image(systemName: "chevron.right")        // SF Symbol, secondary color
         .foregroundStyle(.secondary)
-        .font(.system(size: 11, weight: .medium))
+        .font(.system(size: 11, weight: .semibold))
 }
 .contentShape(Rectangle())                   // volle Zeile klickbar
 ```
@@ -233,7 +236,7 @@ NavigationStack {
             Button("Abbrechen") { dismiss() }
         }
         ToolbarItem(placement: .confirmationAction) {
-            Button("Sichern") { save(); dismiss() }
+            Button("Profil sichern") { save(); dismiss() }
                 .disabled(draftName.trimmingCharacters(in: .whitespaces).isEmpty)
         }
     }
@@ -275,7 +278,7 @@ for profile in profiles {
 |---------|---------------|
 | Section-Titel Profilliste | `"Prompt-Profile"` |
 | Primäre CTA Profil anlegen | `"Profil hinzufügen"` |
-| Sheet Sichern-Button | `"Sichern"` |
+| Sheet Sichern-Button | `"Profil sichern"` |
 | Sheet Abbrechen-Button | `"Abbrechen"` |
 | Sheet Löschen-Button | `"Profil löschen"` |
 | Sheet Standard-Button | `"Als Standard markieren"` |
@@ -318,11 +321,11 @@ for profile in profiles {
 |-------------|----------|
 | LLM-Toggle EIN → AUS | Thinking-Toggle und Prompt-Editor werden mit `.transition(.opacity)` ausgeblendet (kein Ruckeln durch Layout-Shift) |
 | LLM-Toggle AUS → EIN | Thinking-Toggle und Prompt-Editor eingeblendet |
-| Name-Feld leer | „Sichern"-Button disabled |
+| Name-Feld leer | „Profil sichern"-Button disabled |
 | „Als Standard markieren" geklickt | `isDefault` auf diesem Profil true, alle anderen false; Button sofort disabled |
 | „Profil löschen" geklickt (≥ 2 Profile) | Profil aus Array entfernt, Sheet dismissed |
 | „Profil löschen" geklickt (1 Profil) | Aktion blockiert — Button disabled (D-06) |
-| „Sichern" geklickt | Draft-Felder in Profil-Array persistiert, Sheet dismissed |
+| „Profil sichern" geklickt | Draft-Felder in Profil-Array persistiert, Sheet dismissed |
 | „Abbrechen" geklickt | Sheet dismissed, keine Änderungen übernommen |
 
 ### NSMenu-Kontextmenü
