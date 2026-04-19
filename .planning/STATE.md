@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
+milestone: v0.18.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 03-transcription-03-05-PLAN.md
-last_updated: "2026-04-18T00:00:00.000Z"
-last_activity: 2026-04-18
+status: active
+last_updated: "2026-04-19T00:00:00.000Z"
+last_activity: 2026-04-19
 progress:
   total_phases: 6
-  completed_phases: 3
-  total_plans: 17
-  completed_plans: 12
-  percent: 71
+  completed_phases: 4
+  total_plans: 16
+  completed_plans: 15
+  percent: 67
 ---
 
 # Project State
@@ -21,16 +20,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** Text per Sprache eingeben, genau wie tippen — schnell, systemweit, ohne Fenster wechseln zu müssen.
-**Current focus:** Phase 04 — text output
+**Current focus:** Phase 05 — LLM + Prompt Profiles
 
 ## Current Position
 
-Phase: 4
+Phase: 5
 Plan: Not started
-Status: Ready to plan
-Last activity: 2026-04-18
+Status: Ready to discuss
+Last activity: 2026-04-19
 
-Progress: [█████░░░░░] 50%
+Progress: [██████░░░░] 67%
 
 ## Performance Metrics
 
@@ -81,6 +80,9 @@ Recent decisions affecting current work:
 - [Phase 02-audio-capture]: CFString-Qualifier in AudioObjectGetPropertyData via withUnsafePointer — vermeidet UnsafeRawPointer-Warning
 - [Phase 02-audio-capture]: onLevelUpdate-Callback in AudioController statt withObservationTracking — konsistent mit Observation-B-Pattern
 - [Phase 02-audio-capture]: AppState.toggleRecording() bricht Demo-Cycle: idle->recording, recording->transcribing; Phase 3 fuellt .transcribing
+- [Phase 04-text-output]: TextOutputService @MainActor, AX-Injektion mit Unicode-Scalar-replaceSubrange, 2040-Zeichen-Guard gegen EXC_BAD_ACCESS
+- [Phase 04-text-output]: OutputMode.field ist Standard (D-06), persistiert via Defaults.Keys.outputMode; toggleOutputMode-Hotkey ⇧⌘V (D-09)
+- [Phase 04-text-output]: AVAudioConverter-Callback muss .endOfStream (nicht .noDataNow) setzen wenn alle Samples übergeben — behebt paramErr -50 / -10877
 
 ### Pending Todos
 
@@ -103,6 +105,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-17T17:03:07.459Z
-Stopped at: Completed 02-audio-capture-02-02-PLAN.md
+Last session: 2026-04-18T14:57:00.598Z
+Stopped at: context exhaustion at 90% (2026-04-18)
 Resume file: None

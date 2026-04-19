@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: App Shell** - Menu bar app skeleton with global hotkey and icon state machine *(completed 2026-04-18)*
 - [x] **Phase 2: Audio Capture** - Microphone recording with silence detection, audio cues, and level meter *(completed 2026-04-18)*
 - [x] **Phase 3: Transcription** - Local WhisperKit/Parakeet integration with async model loading *(completed 2026-04-18)*
-- [ ] **Phase 4: Text Output** - Text injection into active field and clipboard with mode switching
+- [x] **Phase 4: Text Output** - Text injection into active field and clipboard with mode switching *(completed 2026-04-19)*
 - [ ] **Phase 5: LLM + Prompt Profiles** - Groq API integration with named, hotkey-driven prompt profiles
 - [ ] **Phase 6: History** - Persistent, full-text-searchable transcription history with GRDB/FTS5
 
@@ -77,10 +77,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Pressing the output-mode hotkey switches between field injection and clipboard mode and the change persists across app restarts
   4. When Accessibility permission is not granted, the app falls back to clipboard and does not crash silently
 **Plans**: 4 plans
-- [ ] 04-01-PLAN.md — OutputMode-Enum + Defaults.Keys.outputMode + toggleOutputMode-Hotkey-Name + AppState.axPermissionDenied + Info.plist (Wave 1, parallel)
-- [ ] 04-02-PLAN.md — TextOutputService (@MainActor, AX-Injektion, 2040-Guard, Clipboard) + Unit-Tests via Protocol/Mock (Wave 1, parallel)
-- [ ] 04-03-PLAN.md — AppDelegate-Wiring (print()-Stub ersetzen, AX-Check, Hotkey, Menü-Häkchen) + SettingsView (AX-Banner, OutputMode-Section) (Wave 2)
-- [ ] 04-04-PLAN.md — Manuelle Human-Verify-Checkpoints: AX-Injektion Ziel-Apps, Clipboard-Modus, Hotkey-Toggle, Persistenz, Permission-Fallback (Wave 3)
+- [x] 04-01-PLAN.md — OutputMode-Enum + Defaults.Keys.outputMode + toggleOutputMode-Hotkey-Name + AppState.axPermissionDenied + Info.plist (Wave 1, parallel)
+- [x] 04-02-PLAN.md — TextOutputService (@MainActor, AX-Injektion, 2040-Guard, Clipboard) + Unit-Tests via Protocol/Mock (Wave 1, parallel)
+- [x] 04-03-PLAN.md — AppDelegate-Wiring (print()-Stub ersetzen, AX-Check, Hotkey, Menü-Häkchen) + SettingsView (AX-Banner, OutputMode-Section) (Wave 2)
+- [x] 04-04-PLAN.md — Manuelle Human-Verify-Checkpoints: AX-Injektion Ziel-Apps, Clipboard-Modus, Hotkey-Toggle, Persistenz, Permission-Fallback (Wave 3)
 
 ### Phase 5: LLM + Prompt Profiles
 **Goal**: The user can create named prompt profiles with individual hotkeys and LLM toggles; holding a profile hotkey during dictation routes the transcript through Groq before output.
@@ -117,6 +117,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. App Shell | 4/4 | Complete | 2026-04-18 |
 | 2. Audio Capture | 3/3 | Complete | 2026-04-18 |
 | 3. Transcription | 5/5 | Complete | 2026-04-18 |
-| 4. Text Output | 0/4 | Not started | - |
+| 4. Text Output | 4/4 | Complete | 2026-04-19 |
 | 5. LLM + Prompt Profiles | 0/TBD | Not started | - |
 | 6. History | 0/TBD | Not started | - |

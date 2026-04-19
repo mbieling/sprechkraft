@@ -18,9 +18,9 @@
 
 ### OUT — Text-Ausgabe
 
-- [ ] **OUT-01**: Transkription wird ins aktive Textfeld an Cursor-Position eingefügt (via macOS Accessibility API)
-- [ ] **OUT-02**: Alternativ: Transkription in Clipboard kopieren
-- [ ] **OUT-03**: Ausgabemodus (Textfeld vs. Clipboard) per dedizierten Hotkey umschaltbar
+- [x] **OUT-01**: Transkription wird ins aktive Textfeld an Cursor-Position eingefügt (via macOS Accessibility API)
+- [x] **OUT-02**: Alternativ: Transkription in Clipboard kopieren
+- [x] **OUT-03**: Ausgabemodus (Textfeld vs. Clipboard) per dedizierten Hotkey umschaltbar
 
 ### PROF — Prompt-Profile
 
@@ -81,9 +81,9 @@
 | FEED-01 | Phase 1 | Complete |
 | FEED-02 | Phase 2 | Complete |
 | FEED-03 | Phase 2 | Complete |
-| OUT-01 | Phase 4 | pending |
-| OUT-02 | Phase 4 | pending |
-| OUT-03 | Phase 4 | pending |
+| OUT-01 | Phase 4 | Complete |
+| OUT-02 | Phase 4 | Complete |
+| OUT-03 | Phase 4 | Complete |
 | PROF-01 | Phase 5 | pending |
 | PROF-02 | Phase 5 | pending |
 | PROF-03 | Phase 5 | pending |
