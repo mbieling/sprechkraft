@@ -93,10 +93,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. One profile can be marked as default and is used automatically when no profile hotkey is held
   5. The Groq API key is entered once in settings, stored in macOS Keychain, and survives app restarts
 **Plans**: 7 plans
-- [ ] 05-01-PLAN.md — PromptProfileTests RED-Stubs: 5 failing tests (PROF-01, PROF-03, PROF-04) (Wave 0, parallel)
-- [ ] 05-02-PLAN.md — GroqServiceTests RED-Stubs: 4 failing tests (PROF-05, SET-01, D-09, T-5-03) (Wave 0, parallel)
-- [ ] 05-03-PLAN.md — PromptProfile struct + Defaults.Keys.profiles + KeyboardShortcuts.Name.profile(_:) (Wave 1, parallel)
-- [ ] 05-04-PLAN.md — GroqService actor: URLSession POST, encodeIfPresent, HTTPS, 30s Timeout (Wave 1, parallel)
+- [x] 05-01-PLAN.md — PromptProfileTests RED-Stubs: 5 failing tests (PROF-01, PROF-03, PROF-04) (Wave 0, parallel)
+- [x] 05-02-PLAN.md — GroqServiceTests RED-Stubs: 4 failing tests (PROF-05, SET-01, D-09, T-5-03) (Wave 0, parallel)
+- [x] 05-03-PLAN.md — PromptProfile struct + Defaults.Keys.profiles + KeyboardShortcuts.Name.profile(_:) (Wave 1, parallel)
+- [x] 05-04-PLAN.md — GroqService actor: URLSession POST, encodeIfPresent, HTTPS, 30s Timeout (Wave 1, parallel)
 - [ ] 05-05-PLAN.md — AppState-Extensions (activeProfileID, groqKeyMissing) + AppDelegate-Wiring: setupProfileHotkeys, LLM-Routing, Keychain-Init (Wave 2)
 - [ ] 05-06-PLAN.md — ProfileEditorSheet.swift (neu) + SettingsView Section "Prompt-Profile" + Groq-Banner (Wave 3)
 - [ ] 05-07-PLAN.md — Manuelle Human-Verify-Checkpoints: Profil-CRUD, simultaner Hotkey, Groq-Call, Icon-State, Keychain-Persistenz (Wave 4)
@@ -125,5 +125,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Audio Capture | 3/3 | Complete | 2026-04-18 |
 | 3. Transcription | 5/5 | Complete | 2026-04-18 |
 | 4. Text Output | 4/4 | Complete | 2026-04-19 |
-| 5. LLM + Prompt Profiles | 0/7 | Not started | - |
+| 5. LLM + Prompt Profiles | 4/7 | In progress | - |
 | 6. History | 0/TBD | Not started | - |

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v0.18.0
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Phase 5 planned — 7 plans in 5 waves (2026-04-19)
-last_updated: "2026-04-19T09:00:00.000Z"
+status: In progress
+stopped_at: "Phase 05 Plan 04 complete — GroqService GREEN (2026-04-19)"
+last_updated: "2026-04-19T17:30:00.000Z"
 last_activity: 2026-04-19
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 23
-  completed_plans: 15
-  percent: 65
+  completed_plans: 18
+  percent: 78
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 5
-Plan: Not started
-Status: Ready to discuss
+Plan: 04 complete (GroqService GREEN)
+Status: In progress — Wave 1 complete (Plan 03 + 04)
 Last activity: 2026-04-19
 
-Progress: [██████░░░░] 67%
+Progress: [████████░░] 78%
 
 ## Performance Metrics
 
@@ -84,6 +84,8 @@ Recent decisions affecting current work:
 - [Phase 04-text-output]: TextOutputService @MainActor, AX-Injektion mit Unicode-Scalar-replaceSubrange, 2040-Zeichen-Guard gegen EXC_BAD_ACCESS
 - [Phase 04-text-output]: OutputMode.field ist Standard (D-06), persistiert via Defaults.Keys.outputMode; toggleOutputMode-Hotkey ⇧⌘V (D-09)
 - [Phase 04-text-output]: AVAudioConverter-Callback muss .endOfStream (nicht .noDataNow) setzen wenn alle Samples übergeben — behebt paramErr -50 / -10877
+- [Phase 05-llm-prompt-profiles Plan 04]: Custom encode(to:) mit encodeIfPresent statt Standard-JSONEncoder verhindert reasoning_effort:null fuer Thinking-Mode (Pitfall 5)
+- [Phase 05-llm-prompt-profiles Plan 04]: API-Key ausschliesslich als Parameter, kein stored property im actor (T-5-01/T-5-02)
 
 ### Pending Todos
 
@@ -106,6 +108,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-19T07:39:17.632Z
-Stopped at: context exhaustion at 90% (2026-04-19)
+Last session: 2026-04-19T17:30:00.000Z
+Stopped at: Completed 05-04-PLAN.md — GroqService GREEN
 Resume file: None
