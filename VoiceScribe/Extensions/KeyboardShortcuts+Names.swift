@@ -13,4 +13,10 @@ extension KeyboardShortcuts.Name {
         "toggleRecording",
         default: .init(.r, modifiers: [.option, .command])  // ⌥⌘R — SET-02
     )
+
+    /// Wechsel-Hotkey fuer Ausgabemodus (D-09): ⇧⌘V — Mnemonik: V fuer Voice-Paste.
+    static let toggleOutputMode = Self(
+        "toggleOutputMode",
+        default: .init(.v, modifiers: [.shift, .command])
+    )
 }
