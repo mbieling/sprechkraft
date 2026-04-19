@@ -139,7 +139,9 @@ actor TranscriptionService {
         var conversionError: NSError?
         converter.convert(to: outputBuffer, error: &conversionError) { _, outStatus in
             if inputConsumed {
-                outStatus.pointee = .noDataNow
+                // .endOfStream signalisiert dem Converter dass alle Eingabedaten erschoepft sind.
+                // .noDataNow wuerde einen erneuten Callback ausloesen → nil-Buffer → paramErr -50.
+                outStatus.pointee = .endOfStream
                 return nil
             }
             outStatus.pointee = .haveData
