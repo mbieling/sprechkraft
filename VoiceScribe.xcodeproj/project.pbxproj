@@ -20,6 +20,7 @@
 		AA000018 /* DefaultsKeysTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000019 /* DefaultsKeysTests.swift */; };
 		AA000026 /* WaveformViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000027 /* WaveformViewTests.swift */; };
 		CAFE0030 /* TranscriptionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE0029 /* TranscriptionServiceTests.swift */; };
+		BB040231 /* TextOutputServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB040232 /* TextOutputServiceTests.swift */; };
 		AA000210 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000211 /* SettingsView.swift */; };
 		AA000212 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000213 /* AppDelegate.swift */; };
 		AA000010 /* RecordingStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000011 /* RecordingStateTests.swift */; };
@@ -47,6 +48,7 @@
 		AA000019 /* DefaultsKeysTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultsKeysTests.swift; sourceTree = "<group>"; };
 		AA000027 /* WaveformViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformViewTests.swift; sourceTree = "<group>"; };
 		CAFE0029 /* TranscriptionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionServiceTests.swift; sourceTree = "<group>"; };
+		BB040232 /* TextOutputServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOutputServiceTests.swift; sourceTree = "<group>"; };
 		AA000211 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		AA000213 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AA000003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -151,6 +153,7 @@
 				AA000019 /* DefaultsKeysTests.swift */,
 				AA000027 /* WaveformViewTests.swift */,
 				CAFE0029 /* TranscriptionServiceTests.swift */,
+				BB040232 /* TextOutputServiceTests.swift */,
 			);
 			path = VoiceScribeTests;
 			sourceTree = "<group>";
@@ -302,6 +305,7 @@
 				AA000018 /* DefaultsKeysTests.swift in Sources */,
 				AA000026 /* WaveformViewTests.swift in Sources */,
 				CAFE0030 /* TranscriptionServiceTests.swift in Sources */,
+				BB040231 /* TextOutputServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
