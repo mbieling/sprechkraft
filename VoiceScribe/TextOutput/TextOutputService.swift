@@ -6,15 +6,6 @@
 import AppKit
 import ApplicationServices
 
-// MARK: - OutputMode (Forward-Deklaration)
-// Wird nach Plan-01-Merge durch VoiceScribe/Extensions/Defaults+Keys.swift ersetzt.
-// Plan 01 legt den kanonischen OutputMode mit Defaults.Serializable-Konformanz an.
-// TODO: Diese Deklaration nach Plan-01-Merge entfernen.
-enum OutputMode: String {
-    case field
-    case clipboard
-}
-
 // MARK: - Protocol (fuer Unit-Tests via Mock)
 
 /// Testbares Interface fuer Text-Ausgabe.

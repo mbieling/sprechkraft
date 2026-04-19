@@ -16,6 +16,7 @@ final class MockTextOutputService: TextOutputServiceProtocol {
     var lastClipboardText: String? = nil
 
     func output(_ text: String, mode: OutputMode, axPermitted: Bool) {
+        guard !text.isEmpty else { return }
         outputCalls.append((text, mode, axPermitted))
         // Clipboard-Verhalten simulieren
         if mode == .clipboard || !axPermitted {
