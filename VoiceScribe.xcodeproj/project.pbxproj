@@ -22,6 +22,7 @@
 		CAFE0030 /* TranscriptionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE0029 /* TranscriptionServiceTests.swift */; };
 		BB040231 /* TextOutputServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB040232 /* TextOutputServiceTests.swift */; };
 		PP050100 /* PromptProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = PP050101 /* PromptProfileTests.swift */; };
+		PP050300 /* PromptProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = PP050301 /* PromptProfile.swift */; };
 		AA000210 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000211 /* SettingsView.swift */; };
 		AA000212 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000213 /* AppDelegate.swift */; };
 		AA000010 /* RecordingStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000011 /* RecordingStateTests.swift */; };
@@ -60,6 +61,7 @@
 		AA000013 /* AppStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateTests.swift; sourceTree = "<group>"; };
 		AA000015 /* HotkeyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyTests.swift; sourceTree = "<group>"; };
 		PP050101 /* PromptProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptProfileTests.swift; sourceTree = "<group>"; };
+		PP050301 /* PromptProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptProfile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +97,7 @@
 				AA000220 /* Audio */,
 				DEAD0222 /* Transcription */,
 				BB040230 /* TextOutput */,
+				PP050302 /* Models */,
 				AA000206 /* Constants */,
 				AA000209 /* Extensions */,
 				AA000003 /* Info.plist */,
@@ -126,6 +129,14 @@
 				AA000219 /* AudioDeviceManager.swift */,
 			);
 			path = Audio;
+			sourceTree = "<group>";
+		};
+		PP050302 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				PP050301 /* PromptProfile.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		AA000209 /* Extensions */ = {
@@ -292,6 +303,7 @@
 				AA000218 /* AudioDeviceManager.swift in Sources */,
 				DEAD0220 /* TranscriptionService.swift in Sources */,
 				BB040201 /* TextOutputService.swift in Sources */,
+				PP050300 /* PromptProfile.swift in Sources */,
 				AA000210 /* SettingsView.swift in Sources */,
 				AA000212 /* AppDelegate.swift in Sources */,
 			);

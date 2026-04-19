@@ -6,6 +6,7 @@
 // Wird von Plan 02 vorgezogen, da HotkeyTests.swift (RED-Phase) sonst das Test-Target blockiert.
 // Plan 03 integriert diesen Namen in AppDelegate.setupHotkey().
 
+import Foundation
 import KeyboardShortcuts
 
 extension KeyboardShortcuts.Name {
@@ -19,4 +20,13 @@ extension KeyboardShortcuts.Name {
         "toggleOutputMode",
         default: .init(.v, modifiers: [.shift, .command])
     )
+
+    /// Erzeugt einen stabilen Hotkey-Namen fuer ein Profil anhand seiner UUID.
+    /// D-02: UUID-basiert (nicht Index-basiert) — stabil bei Profil-Umsortierung (Phase 6).
+    /// RESEARCH.md Pattern 1: dynamische Name-Instanziierung ohne initial: Parameter.
+    /// Kein initial: Parameter — Profil-Hotkeys haben keinen vordefinierten Default-Shortcut.
+    /// Der String "profile-\(id.uuidString)" ist der Persistence-Key in KeyboardShortcuts UserDefaults.
+    static func profile(_ id: UUID) -> Self {
+        Self("profile-\(id.uuidString)")
+    }
 }
