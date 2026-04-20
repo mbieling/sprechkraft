@@ -155,7 +155,7 @@ Jede Zeile in `HistoryView` folgt diesem Layout:
 | Zeitstempel | 11 pt, regular, `.monospacedDigit()`, `.secondary`, min-width 32 pt, führende Ausrichtung |
 | Vorschautext | 13 pt, regular, max 80 Zeichen + „…", 1 Zeile, `.lineLimit(1)` |
 | Profilname | 11 pt, regular, `.secondary`, erscheint nur wenn `profile_name != nil` |
-| KI-Badge | 10 pt, semibold, weißer Text, `systemPurple`-Hintergrund, `cornerRadius: 4`, Padding 2×4 pt (vertikal × horizontal) — erscheint nur wenn `is_llm_processed == true` |
+| KI-Badge | 10 pt, semibold, weißer Text, `systemPurple`-Hintergrund, `cornerRadius: 4`, Padding 4×4 pt = `DesignTokens.Spacing.xs` (vertikal × horizontal) — erscheint nur wenn `is_llm_processed == true` |
 | Zeilenhöhe | variabel; SwiftUI List bestimmt Höhe nach Inhalt, min ~44 pt (Touch-Target-Konvention) |
 | Klick-Verhalten | gesamte Zeile ist tappable via `.contentShape(Rectangle())` und `.onTapGesture` |
 | Hover-State | System-Standard (List-Row-Highlight automatisch) |
