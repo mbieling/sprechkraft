@@ -17,6 +17,8 @@ import Defaults             // Defaults[.outputMode]
 /// NotificationCenter.Name für die Brücke AppDelegate → VoiceScribeApp.
 extension Notification.Name {
     static let openSettings = Notification.Name("com.voicescribe.openSettings")
+    /// Wird von SettingsView nach Profil-Aenderungen gepostet — AppDelegate registriert Hotkeys neu.
+    static let refreshProfileHotkeys = Notification.Name("com.voicescribe.refreshProfileHotkeys")
 }
 
 @MainActor
@@ -54,6 +56,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // SET-01: Groq API-Key Verfuegbarkeit pruefen — Banner in SettingsView (Phase 5)
         // T-5-02: Key wird nicht gecacht — groqKeyMissing ist nur ein Bool-Flag
         appState?.groqKeyMissing = (keychain["groqApiKey"] == nil || keychain["groqApiKey"]?.isEmpty == true)
+        // Phase 5 Plan 06: Observer fuer Profil-Aenderungen aus SettingsView (Pitfall 2)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleRefreshProfileHotkeys),
+            name: .refreshProfileHotkeys,
+            object: nil
+        )
     }
 
     // MARK: - AudioController Setup
@@ -387,6 +396,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 // Menü spiegelt neuen Zustand beim nächsten Öffnen (showMenu() baut Menü neu)
             }
         }
+    }
+
+    // MARK: - Profil-Hotkey Refresh (Phase 5 Plan 06)
+
+    /// Wird via NotificationCenter von SettingsView nach Profil-Aenderungen aufgerufen.
+    /// Loest setupProfileHotkeys() erneut aus — registriert Hotkeys nach CRUD neu.
+    @objc private func handleRefreshProfileHotkeys() {
+        setupProfileHotkeys()
     }
 
     // MARK: - Profile Hotkeys (PROF-02)

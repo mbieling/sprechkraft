@@ -1,15 +1,17 @@
 // VoiceScribe/SettingsView.swift
-// Zweck: Einstellungsfenster mit Mikrofon-Picker, Stille-Erkennungs-Slider
-//        und Permission-Banner.
+// Zweck: Einstellungsfenster mit Mikrofon-Picker, Stille-Erkennungs-Slider,
+//        Permission-Bannern und Prompt-Profile-Verwaltung.
 // Implementiert: RECORD-03 (Mikrofon-Auswahl), SET-03 (Stille-Konfiguration),
-//                SET-04 (Geraetewahl), D-09 bis D-14, FEED-03 (Permission-Anzeige).
-// Quellen: 02-UI-SPEC.md (Interaction Contract, Copywriting Contract, Accessibility Contract)
-//          02-PATTERNS.md (Defaults.binding-Pattern, SettingsView-Erweiterungsmuster)
+//                SET-04 (Geraetewahl), D-09 bis D-14, FEED-03 (Permission-Anzeige),
+//                PROF-01 (Profilliste), SET-01 (Groq-API-Key + Banner).
+// Quellen: 02-UI-SPEC.md, 05-UI-SPEC.md (Interaction Contract, Copywriting Contract)
+//          02-PATTERNS.md, 05-PATTERNS.md (Defaults.binding-Pattern, SettingsView-Erweiterung)
 
 import SwiftUI
 import Defaults
 import AVFoundation
 import KeyboardShortcuts
+import KeychainAccess
 
 struct SettingsView: View {
     /// Wird via VoiceScribeApp injiziert; benoetigt fuer micPermissionDenied-Banner (D-13).
@@ -21,6 +23,15 @@ struct SettingsView: View {
 
     /// Verfuegbare Mikrofone — wird in onAppear via AudioDeviceManager befuellt (RECORD-03).
     @State private var availableMics: [AVCaptureDevice] = []
+
+    // Phase 5: Profil-Sheet State (PROF-01, SET-01)
+    @State private var editingProfile: PromptProfile? = nil
+    @FocusState private var apiKeyFocused: Bool
+    @State private var groqApiKeyInput: String = ""
+
+    /// Eigene Keychain-Instanz fuer Lese-/Schreibzugriff auf den Groq API-Key (T-5-01).
+    /// Service-Name identisch mit AppDelegate.keychain — gleicher Keychain-Eintrag.
+    private let keychain = Keychain(service: Bundle.main.bundleIdentifier ?? "com.voicescribe")
 
     var body: some View {
         Form {
@@ -161,12 +172,132 @@ struct SettingsView: View {
                 KeyboardShortcuts.Recorder("Modus-Wechsel-Hotkey", name: .toggleOutputMode)
                     .accessibilityLabel("Modus-Wechsel-Hotkey konfigurieren")
             }
+            // MARK: - Prompt-Profile (PROF-01 bis PROF-04, SET-01)
+            Section("Prompt-Profile") {
+                // SET-01: Groq API-Key-Banner — analog axPermissionDenied-Banner (T-5-01)
+                if appState?.groqKeyMissing == true {
+                    HStack(spacing: DesignTokens.Spacing.sm) {
+                        Image(systemName: "key.slash")
+                            .foregroundStyle(.white)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Groq API-Schlüssel fehlt")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(.white)
+                            Text("Ohne API-Schlüssel ist LLM-Verarbeitung nicht möglich. Füge deinen Schlüssel ein.")
+                                .font(.system(size: 11))
+                                .foregroundStyle(.white.opacity(0.9))
+                        }
+                        Spacer()
+                        Button("Schlüssel eingeben") {
+                            apiKeyFocused = true
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    .padding(DesignTokens.Spacing.sm)
+                    .background(Color(.systemRed))
+                    .cornerRadius(8)
+                    .accessibilityLabel("Groq API-Schlüssel fehlt. Füge deinen Schlüssel in das Eingabefeld ein.")
+                }
+
+                // SET-01: API-Key-Eingabe (T-5-01: sofort bei onChange in Keychain schreiben)
+                SecureField("API-Schlüssel", text: $groqApiKeyInput)
+                    .textContentType(.password)
+                    .focused($apiKeyFocused)
+                    .onChange(of: groqApiKeyInput) { _, newValue in
+                        // T-5-01: Key sofort in Keychain schreiben — nie in UserDefaults/AppState
+                        keychain["groqApiKey"] = newValue.isEmpty ? nil : newValue
+                        appState?.groqKeyMissing = newValue.isEmpty
+                    }
+                Text("Schlüssel wird sicher im macOS Keychain gespeichert.")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+
+                // Profilliste (PROF-01, PROF-02, PROF-03, PROF-04)
+                ForEach(Defaults[.profiles]) { profile in
+                    HStack {
+                        Text(profile.name)
+                            .font(.system(size: 13))
+                            .lineLimit(1)
+                        Spacer()
+                        if profile.isDefault {
+                            Text("⭐")
+                                .font(.system(size: 13))
+                                .accessibilityLabel("Standard-Profil")
+                        }
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(.secondary)
+                            .font(.system(size: 11, weight: .semibold))
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture { editingProfile = profile }
+                }
+
+                // Neues Profil anlegen
+                Button {
+                    let newProfile = PromptProfile(
+                        id: UUID(),
+                        name: "",
+                        prompt: "",
+                        isLLMEnabled: false,
+                        isThinkingEnabled: false,
+                        isDefault: false
+                    )
+                    editingProfile = newProfile
+                } label: {
+                    Label("Profil hinzufügen", systemImage: "plus")
+                        .font(.system(size: 13))
+                }
+                .buttonStyle(.borderless)
+            }
         }
         .formStyle(.grouped)
         .padding(DesignTokens.Spacing.xl)
         .onAppear {
             // Mikrofon-Liste beim Oeffnen des Settings-Fensters befuellen (RECORD-03)
             availableMics = AudioDeviceManager.availableMicrophones()
+            // SET-01: Groq API-Key aus Keychain laden (nur zum Befuellen des SecureField)
+            groqApiKeyInput = keychain["groqApiKey"] ?? ""
+        }
+        .sheet(item: $editingProfile) { profile in
+            let profiles = Defaults[.profiles]
+            let isOnlyProfile = profiles.count <= 1
+
+            ProfileEditorSheet(
+                profile: profile,
+                isOnlyProfile: isOnlyProfile,
+                onSave: { updatedProfile in
+                    var current = Defaults[.profiles]
+                    if let idx = current.firstIndex(where: { $0.id == updatedProfile.id }) {
+                        current[idx] = updatedProfile
+                    } else {
+                        // Neues Profil — hinzufuegen
+                        current.append(updatedProfile)
+                    }
+                    Defaults[.profiles] = current
+                    // Profil-Hotkeys neu registrieren nach Aenderung (Pitfall 2)
+                    NotificationCenter.default.post(name: .refreshProfileHotkeys, object: nil)
+                },
+                onDelete: {
+                    var current = Defaults[.profiles]
+                    current.removeAll { $0.id == profile.id }
+                    // T-5-04: Wenn geloeschtes Profil das Default war → erstes verbleibendes als Default
+                    if profile.isDefault, let firstIdx = current.indices.first {
+                        current[firstIdx].isDefault = true
+                    }
+                    Defaults[.profiles] = current
+                    // Profil-Hotkey-Binding loeschen
+                    KeyboardShortcuts.reset(.profile(profile.id))
+                    NotificationCenter.default.post(name: .refreshProfileHotkeys, object: nil)
+                },
+                onSetDefault: {
+                    // PROF-04 isDefault-Invariante: alle anderen auf false, dieses auf true
+                    var current = Defaults[.profiles]
+                    current = current.map { p in
+                        var copy = p; copy.isDefault = (p.id == profile.id); return copy
+                    }
+                    Defaults[.profiles] = current
+                }
+            )
         }
     }
 }
