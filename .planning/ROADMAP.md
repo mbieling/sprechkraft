@@ -97,7 +97,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 05-02-PLAN.md — GroqServiceTests RED-Stubs: 4 failing tests (PROF-05, SET-01, D-09, T-5-03) (Wave 0, parallel)
 - [x] 05-03-PLAN.md — PromptProfile struct + Defaults.Keys.profiles + KeyboardShortcuts.Name.profile(_:) (Wave 1, parallel)
 - [x] 05-04-PLAN.md — GroqService actor: URLSession POST, encodeIfPresent, HTTPS, 30s Timeout (Wave 1, parallel)
-- [ ] 05-05-PLAN.md — AppState-Extensions (activeProfileID, groqKeyMissing) + AppDelegate-Wiring: setupProfileHotkeys, LLM-Routing, Keychain-Init (Wave 2)
+- [x] 05-05-PLAN.md — AppState-Extensions (activeProfileID, groqKeyMissing) + AppDelegate-Wiring: setupProfileHotkeys, LLM-Routing, Keychain-Init (Wave 2)
 - [ ] 05-06-PLAN.md — ProfileEditorSheet.swift (neu) + SettingsView Section "Prompt-Profile" + Groq-Banner (Wave 3)
 - [ ] 05-07-PLAN.md — Manuelle Human-Verify-Checkpoints: Profil-CRUD, simultaner Hotkey, Groq-Call, Icon-State, Keychain-Persistenz (Wave 4)
 **UI hint**: yes
