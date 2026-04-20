@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v0.18.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-05-PLAN.md — AppState + AppDelegate Integration
-last_updated: "2026-04-20T09:00:00.000Z"
+stopped_at: Completed 05-06-PLAN.md — SettingsView Profil-UI + ProfileEditorSheet
+last_updated: "2026-04-20T09:37:00.000Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 23
-  completed_plans: 21
-  percent: 91
+  completed_plans: 22
+  percent: 96
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 5
-Plan: 05 complete (AppState + AppDelegate Integration)
-Status: In progress — Wave 2 Plan 05 complete
+Plan: 06 complete (SettingsView Profil-UI + ProfileEditorSheet)
+Status: In progress — Wave 3 Plan 06 complete
 Last activity: 2026-04-20
 
 Progress: [█████████░] 91%
@@ -88,6 +88,7 @@ Recent decisions affecting current work:
 - [Phase 05-llm-prompt-profiles Plan 04]: API-Key ausschliesslich als Parameter, kein stored property im actor (T-5-01/T-5-02)
 - [Phase 05-llm-prompt-profiles Plan 05]: KeyboardShortcuts.removeHandler(for:) statt disable(_:) — disable() entfernt nur Shortcut-Registrierung, nicht den onKeyDown-Callback
 - [Phase 05-llm-prompt-profiles Plan 05]: pbxproj braucht KeychainAccess in drei Stellen: packageReferences (PBXProject), XCRemoteSwiftPackageReference, packageProductDependencies (Target) — fehlender packageReferences-Eintrag verhindert Xcode-Auflösung
+- [Phase 05-llm-prompt-profiles Plan 06]: ProfileEditorSheet in VoiceScribe/ direkt (kein Views/-Unterverzeichnis); .frame(width:height:) auf NavigationStack statt .frame(width:minHeight:) auf Form; Notification-Bridge für Hotkey-Refresh (SettingsView -> AppDelegate)
 
 ### Pending Todos
 
@@ -110,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-20T09:00:00.000Z
-Stopped at: Completed 05-05-PLAN.md — AppState + AppDelegate Integration
+Last session: 2026-04-20T09:37:00.000Z
+Stopped at: Completed 05-06-PLAN.md — SettingsView Profil-UI + ProfileEditorSheet
 Resume file: None
