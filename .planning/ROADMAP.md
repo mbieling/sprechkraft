@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Audio Capture** - Microphone recording with silence detection, audio cues, and level meter *(completed 2026-04-18)*
 - [x] **Phase 3: Transcription** - Local WhisperKit/Parakeet integration with async model loading *(completed 2026-04-18)*
 - [x] **Phase 4: Text Output** - Text injection into active field and clipboard with mode switching *(completed 2026-04-19)*
-- [ ] **Phase 5: LLM + Prompt Profiles** - Groq API integration with named, hotkey-driven prompt profiles
+- [x] **Phase 5: LLM + Prompt Profiles** - Groq API integration with named, hotkey-driven prompt profiles *(completed 2026-04-19)*
 - [ ] **Phase 6: History** - Persistent, full-text-searchable transcription history with GRDB/FTS5
 
 ## Phase Details
@@ -99,7 +99,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 05-04-PLAN.md — GroqService actor: URLSession POST, encodeIfPresent, HTTPS, 30s Timeout (Wave 1, parallel)
 - [x] 05-05-PLAN.md — AppState-Extensions (activeProfileID, groqKeyMissing) + AppDelegate-Wiring: setupProfileHotkeys, LLM-Routing, Keychain-Init (Wave 2)
 - [x] 05-06-PLAN.md — ProfileEditorSheet.swift (neu) + SettingsView Section "Prompt-Profile" + Groq-Banner (Wave 3)
-- [ ] 05-07-PLAN.md — Manuelle Human-Verify-Checkpoints: Profil-CRUD, simultaner Hotkey, Groq-Call, Icon-State, Keychain-Persistenz (Wave 4)
+- [x] 05-07-PLAN.md — Manuelle Human-Verify-Checkpoints: Profil-CRUD, simultaner Hotkey, Groq-Call, Icon-State, Keychain-Persistenz (Wave 4)
 **UI hint**: yes
 
 ### Phase 6: History
@@ -125,5 +125,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Audio Capture | 3/3 | Complete | 2026-04-18 |
 | 3. Transcription | 5/5 | Complete | 2026-04-18 |
 | 4. Text Output | 4/4 | Complete | 2026-04-19 |
-| 5. LLM + Prompt Profiles | 6/7 | In progress | - |
+| 5. LLM + Prompt Profiles | 7/7 | Complete | 2026-04-19 |
 | 6. History | 0/TBD | Not started | - |
