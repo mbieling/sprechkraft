@@ -9,6 +9,7 @@
 import AppKit
 import SwiftUI
 import KeyboardShortcuts
+import KeychainAccess
 import LaunchAtLogin
 import ApplicationServices  // AXIsProcessTrusted()
 import Defaults             // Defaults[.outputMode]
@@ -29,6 +30,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// TranscriptionService — Download und Transkription. Actor-isoliert.
     private let transcriptionService = TranscriptionService()
 
+    /// Keychain-Instanz fuer Groq API-Key (SET-01, T-5-01).
+    /// Service-Name = Bundle-Identifier fuer Keychain-Isolation zwischen Apps.
+    private let keychain = Keychain(service: Bundle.main.bundleIdentifier ?? "com.voicescribe")
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         // SET-06: .accessory VOR allem anderen — verhindert Dock-Icon auch
         // wenn LSUIElement aus irgendeinem Grund nicht greift.
@@ -45,6 +50,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setupHotkey()
         setupTranscription()
         setupOutputModeHotkey()
+        setupProfileHotkeys()
+        // SET-01: Groq API-Key Verfuegbarkeit pruefen — Banner in SettingsView (Phase 5)
+        // T-5-02: Key wird nicht gecacht — groqKeyMissing ist nur ein Bool-Flag
+        appState?.groqKeyMissing = (keychain["groqApiKey"] == nil || keychain["groqApiKey"]?.isEmpty == true)
     }
 
     // MARK: - AudioController Setup
@@ -71,23 +80,71 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let axGranted = AXIsProcessTrusted()
         appState.axPermissionDenied = !axGranted
 
-        // Phase 3: Transkription nach Aufnahme-Ende (RECORD-04, D-05)
-        // Callback laeuft auf @MainActor (Task { @MainActor } in AudioController.stopRecording())
+        // Phase 5: LLM-Routing nach Transkription (PROF-03, PROF-05)
+        // D-10: Stille Fallback — bei Fehler oder fehlendem Key wird rawText ausgegeben.
         audioController?.onRecordingComplete = { [weak self] samples, sampleRate in
             guard let self else { return }
             Task {
-                // Resampling (D-06) und Transkription (D-07) im actor — kein Main-Thread-Block
                 let text = await self.transcriptionService.transcribeWithResampling(samples, sampleRate: sampleRate)
                 await MainActor.run {
-                    if let text {
-                        // OUT-01/OUT-02: Text ausgeben via TextOutputService (ersetzt Phase-3-Pipeline-Stub)
-                        // axPermissionDenied von AppState — gesetzt in setupAudioController() (D-10)
-                        let mode = Defaults[.outputMode]
-                        let axPermitted = !(self.appState?.axPermissionDenied ?? true)
-                        TextOutputService.shared.output(text, mode: mode, axPermitted: axPermitted)
+                    guard let text else {
+                        self.appState?.resetToIdle()
+                        self.updateIcon()
+                        return
                     }
-                    self.appState?.resetToIdle()  // D-08: .transcribing → .idle
-                    self.updateIcon()
+
+                    // D-02: Profil-ID lesen und sofort zuruecksetzen (naechste Aufnahme sauber)
+                    let profileID = self.appState?.activeProfileID
+                    self.appState?.activeProfileID = nil
+
+                    // Aktives Profil ermitteln: per Hotkey (PROF-02) → Default (PROF-04) → erstes
+                    let profiles = Defaults[.profiles]
+                    let activeProfile = profiles.first { $0.id == profileID }
+                        ?? profiles.first { $0.isDefault }
+                        ?? profiles.first   // Absoluter Fallback: erstes Profil
+
+                    // Ausgabe-Parameter
+                    let mode = Defaults[.outputMode]
+                    let axPermitted = !(self.appState?.axPermissionDenied ?? true)
+
+                    if let activeProfile, activeProfile.isLLMEnabled {
+                        // PROF-05: LLM-Pfad — Icon zu .llmProcessing (FEED-01, lila pulsierend 1.2s)
+                        self.appState?.recordingState = .llmProcessing
+                        self.updateIcon()  // Observation-B: sofort nach State-Mutation
+
+                        Task {
+                            // T-5-02: Key unmittelbar vor Request aus Keychain lesen — nie gecacht
+                            let apiKey = self.keychain["groqApiKey"]
+                            let outputText: String
+
+                            if let key = apiKey, !key.isEmpty {
+                                do {
+                                    outputText = try await GroqService.shared.process(
+                                        transcript: text,
+                                        profile: activeProfile,
+                                        apiKey: key
+                                    )
+                                } catch {
+                                    // D-10: Stille Fallback bei Groq-Fehler (Timeout, API-Fehler, etc.)
+                                    outputText = text
+                                }
+                            } else {
+                                // D-10: Kein Key → Fallback zu Raw-Text (Banner zeigt SET-01-Warnung)
+                                outputText = text
+                            }
+
+                            await MainActor.run {
+                                TextOutputService.shared.output(outputText, mode: mode, axPermitted: axPermitted)
+                                self.appState?.resetToIdle()
+                                self.updateIcon()  // Observation-B: .llmProcessing → .idle
+                            }
+                        }
+                    } else {
+                        // Direkt-Pfad: LLM deaktiviert → Raw-Transkript ausgeben
+                        TextOutputService.shared.output(text, mode: mode, axPermitted: axPermitted)
+                        self.appState?.resetToIdle()
+                        self.updateIcon()
+                    }
                 }
             }
         }
@@ -173,6 +230,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         loginItem.state = LaunchAtLogin.isEnabled ? .on : .off
         menu.addItem(loginItem)
 
+        // PROF-04/D-03: Profil-Auswahl im Menü mit Häkchen (analog OutputMode-Häkchen)
+        let profiles = Defaults[.profiles]
+        let activeProfileID = appState?.activeProfileID
+
+        for profile in profiles {
+            let item = NSMenuItem(
+                title: profile.name,
+                action: #selector(setActiveProfileFromMenu(_:)),
+                keyEquivalent: ""
+            )
+            item.representedObject = profile.id as AnyObject
+            // Häkchen: aktives Profil (via Hotkey) ODER Default-Profil wenn keins aktiv
+            let isActive = (activeProfileID != nil)
+                ? profile.id == activeProfileID
+                : profile.isDefault
+            item.state = isActive ? .on : .off
+            item.target = self
+            menu.addItem(item)
+        }
+
         menu.addItem(.separator())
 
         // OUT-03/D-08: Ausgabemodus-Häkchen — zeigt aktiven Modus und erlaubt Umschalten
@@ -232,6 +309,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func setOutputModeClipboard() {
         Defaults[.outputMode] = .clipboard
+    }
+
+    @objc private func setActiveProfileFromMenu(_ sender: NSMenuItem) {
+        guard let profileID = sender.representedObject as? UUID else { return }
+        appState?.activeProfileID = profileID
     }
 
     // MARK: - Icon-Update
@@ -303,6 +385,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 // D-07: Toggle zwischen .field und .clipboard
                 Defaults[.outputMode] = Defaults[.outputMode] == .field ? .clipboard : .field
                 // Menü spiegelt neuen Zustand beim nächsten Öffnen (showMenu() baut Menü neu)
+            }
+        }
+    }
+
+    // MARK: - Profile Hotkeys (PROF-02)
+
+    /// Registriert globale onKeyDown-Handler fuer alle gespeicherten Profile.
+    /// Pitfall 1 (RESEARCH.md): onKeyDown statt onKeyUp — Profil muss WAEHREND der Aufnahme aktiv sein.
+    /// Pitfall 2 (RESEARCH.md): Vor Neuregistrierung alle alten Handler entfernen.
+    /// Wird nach Profil-Aenderungen (ProfileEditorSheet) erneut aufgerufen.
+    func setupProfileHotkeys() {
+        // Alle bisherigen Profil-Hotkey-Handler zuruecksetzen (Pitfall 2: keine doppelten Handler)
+        let currentProfiles = Defaults[.profiles]
+        for profile in currentProfiles {
+            KeyboardShortcuts.removeHandler(for: .profile(profile.id))
+        }
+
+        // Neue Handler registrieren
+        for profile in currentProfiles {
+            let name = KeyboardShortcuts.Name.profile(profile.id)
+            KeyboardShortcuts.onKeyDown(for: name) { [weak self] in
+                Task { @MainActor [weak self] in
+                    guard let self,
+                          self.appState?.recordingState == .recording,
+                          self.appState?.activeProfileID == nil   // D-02: Erster gewinnt
+                    else { return }
+                    self.appState?.activeProfileID = profile.id
+                }
             }
         }
     }

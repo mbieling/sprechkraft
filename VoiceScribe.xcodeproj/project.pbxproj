@@ -225,6 +225,7 @@
 				AA000023 /* LaunchAtLogin */,
 				AA000025 /* Defaults */,
 				BEEF0028 /* WhisperKit */,
+				KC050501 /* KeychainAccess */,
 			);
 			productName = VoiceScribe;
 			productReference = AA000005 /* VoiceScribe.app */;
@@ -281,6 +282,7 @@
 				AA000101 /* XCRemoteSwiftPackageReference "LaunchAtLogin-modern" */,
 				AA000102 /* XCRemoteSwiftPackageReference "Defaults" */,
 				DEAD0103 /* XCRemoteSwiftPackageReference "argmax-oss-swift" */,
+				KC050500 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 			);
 			productRefGroup = AA000042 /* Products */;
 			projectDirPath = "";
@@ -614,6 +616,14 @@
 				minimumVersion = 0.18.0;
 			};
 		};
+		KC050500 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -636,6 +646,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DEAD0103 /* XCRemoteSwiftPackageReference "argmax-oss-swift" */;
 			productName = WhisperKit;
+		};
+		KC050501 /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = KC050500 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
 		};
 /* End XCSwiftPackageProductDependency section */
 
