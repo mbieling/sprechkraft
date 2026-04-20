@@ -53,10 +53,10 @@ Der Entwickler selbst (Power-User, Mac-Nutzer, der schnelles qualitatives Diktat
 - [ ] Ausgabemodus per Einstellung oder Hotkey wechselbar
 
 **KI-Prompt-Profile**
-- [ ] Mehrere editierbare Prompt-Profile (Name, Prompt-Text, Hotkey)
-- [ ] Groq API (qwen/qwen3-32b) verarbeitet Transkript via aktivem Profil
-- [ ] KI-Verarbeitung pro Profil aktivierbar/deaktivierbar
-- [ ] Groq API-Key sicher speicherbar (macOS Keychain)
+- [x] Mehrere editierbare Prompt-Profile (Name, Prompt-Text, Hotkey) — Validated in Phase 05: llm-prompt-profiles
+- [x] Groq API (qwen/qwen3-32b) verarbeitet Transkript via aktivem Profil — Validated in Phase 05: llm-prompt-profiles
+- [x] KI-Verarbeitung pro Profil aktivierbar/deaktivierbar — Validated in Phase 05: llm-prompt-profiles
+- [x] Groq API-Key sicher speicherbar (macOS Keychain) — Validated in Phase 05: llm-prompt-profiles
 
 **Geschichte & Einstellungen**
 - [ ] Alle Transkriptionen lokal gespeichert
@@ -104,4 +104,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-16 — Phase 01 (app-shell) complete*
+*Last updated: 2026-04-19 — Phase 05 (llm-prompt-profiles) complete*
