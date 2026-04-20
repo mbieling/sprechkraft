@@ -27,6 +27,7 @@
 		GS050402 /* GroqServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = GS050403 /* GroqServiceTests.swift */; };
 		AA000210 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000211 /* SettingsView.swift */; };
 		AA000212 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000213 /* AppDelegate.swift */; };
+		PE050600 /* ProfileEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = PE050601 /* ProfileEditorSheet.swift */; };
 		AA000010 /* RecordingStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000011 /* RecordingStateTests.swift */; };
 		AA000012 /* AppStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000013 /* AppStateTests.swift */; };
 		AA000014 /* HotkeyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000015 /* HotkeyTests.swift */; };
@@ -66,6 +67,7 @@
 		PP050301 /* PromptProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptProfile.swift; sourceTree = "<group>"; };
 		GS050401 /* GroqService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqService.swift; sourceTree = "<group>"; };
 		GS050403 /* GroqServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqServiceTests.swift; sourceTree = "<group>"; };
+		PE050601 /* ProfileEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditorSheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +100,7 @@
 				AA000201 /* AppState.swift */,
 				AA000203 /* StatusBarIconView.swift */,
 				AA000211 /* SettingsView.swift */,
+				PE050601 /* ProfileEditorSheet.swift */,
 				AA000220 /* Audio */,
 				DEAD0222 /* Transcription */,
 				BB040230 /* TextOutput */,
@@ -323,6 +326,7 @@
 				GS050400 /* GroqService.swift in Sources */,
 				AA000210 /* SettingsView.swift in Sources */,
 				AA000212 /* AppDelegate.swift in Sources */,
+				PE050600 /* ProfileEditorSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
