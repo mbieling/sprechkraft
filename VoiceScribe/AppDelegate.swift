@@ -144,27 +144,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                 outputText = text
                             }
 
+                            // D-15: Entry vor MainActor.run bauen — wird danach async inserted (WR-01)
+                            let historyEntry = HistoryEntry(
+                                id: nil,
+                                createdAt: Date(),
+                                originalText: text,
+                                llmText: outputText != text ? outputText : nil,
+                                profileName: activeProfile.name,
+                                isLLMProcessed: true
+                            )
                             await MainActor.run {
                                 TextOutputService.shared.output(outputText, mode: mode, axPermitted: axPermitted)
-                                // D-15: GRDB-Insert nach TextOutputService — letzter Schritt (HIST-01, HIST-02)
-                                // try? — Insert-Fehler darf Transkription nicht blockieren
-                                let historyEntry = HistoryEntry(
-                                    id: nil,
-                                    createdAt: Date(),
-                                    originalText: text,
-                                    llmText: outputText != text ? outputText : nil,
-                                    profileName: activeProfile.name,
-                                    isLLMProcessed: true
-                                )
-                                try? HistoryStore.shared.insert(historyEntry)
                                 self.appState?.resetToIdle()
                                 self.updateIcon()  // Observation-B: .llmProcessing → .idle
+                            }
+                            // Insert nach TextOutput — async, blockiert Main Thread nicht (WR-01)
+                            do {
+                                try await HistoryStore.shared.insert(historyEntry)
+                            } catch {
+                                print("[HistoryStore] Insert failed: \(error)")
                             }
                         }
                     } else {
                         // Direkt-Pfad: LLM deaktiviert → Raw-Transkript ausgeben
                         TextOutputService.shared.output(text, mode: mode, axPermitted: axPermitted)
-                        // D-15: GRDB-Insert — Direkt-Pfad (kein LLM)
+                        self.appState?.resetToIdle()
+                        self.updateIcon()
+                        // D-15: GRDB-Insert — Direkt-Pfad (kein LLM), async (WR-01)
                         let historyEntry = HistoryEntry(
                             id: nil,
                             createdAt: Date(),
@@ -173,9 +179,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                             profileName: activeProfile?.name,
                             isLLMProcessed: false
                         )
-                        try? HistoryStore.shared.insert(historyEntry)
-                        self.appState?.resetToIdle()
-                        self.updateIcon()
+                        Task {
+                            do {
+                                try await HistoryStore.shared.insert(historyEntry)
+                            } catch {
+                                print("[HistoryStore] Insert failed: \(error)")
+                            }
+                        }
                     }
                 }
             }

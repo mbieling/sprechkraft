@@ -84,23 +84,26 @@ final class HistoryStore {
 
     /// Speichert einen neuen HistoryEntry in der Datenbank.
     /// D-15: Wird nach TextOutputService.output() aufgerufen (in AppDelegate.onRecordingComplete).
-    func insert(_ entry: HistoryEntry) throws {
-        try dbQueue.write { db in
+    /// async: suspendiert statt Main Thread zu blockieren (WR-01).
+    func insert(_ entry: HistoryEntry) async throws {
+        try await dbQueue.write { db in
             try entry.insert(db)
         }
     }
 
     /// Löscht einen einzelnen Eintrag.
     /// FTS5-Index wird automatisch via synchronize-Trigger aktualisiert (Pitfall 2).
-    func delete(_ entry: HistoryEntry) throws {
-        try dbQueue.write { db in
+    /// async: suspendiert statt Main Thread zu blockieren (WR-01).
+    func delete(_ entry: HistoryEntry) async throws {
+        try await dbQueue.write { db in
             try entry.delete(db)
         }
     }
 
     /// Löscht alle Einträge (D-12: Gesamt-Löschen mit vorhergehendem Confirm-Dialog in HistoryView).
-    func deleteAll() throws {
-        try dbQueue.write { db in
+    /// async: suspendiert statt Main Thread zu blockieren (WR-01).
+    func deleteAll() async throws {
+        try await dbQueue.write { db in
             try HistoryEntry.deleteAll(db)
         }
     }
@@ -110,8 +113,9 @@ final class HistoryStore {
     /// Sucht Einträge via FTS5.
     /// Leerer Query → alle Einträge ORDER BY created_at DESC.
     /// T6-FTS5-Mitigation: FTS5Pattern(matchingAllTokensIn:) als Binding — kein String-Interpolation.
-    func search(query: String) throws -> [HistoryEntry] {
-        try dbQueue.read { db in
+    /// async: suspendiert statt Main Thread zu blockieren (WR-01).
+    func search(query: String) async throws -> [HistoryEntry] {
+        try await dbQueue.read { db in
             if query.trimmingCharacters(in: .whitespaces).isEmpty {
                 return try HistoryEntry.order(Column("created_at").desc).fetchAll(db)
             }

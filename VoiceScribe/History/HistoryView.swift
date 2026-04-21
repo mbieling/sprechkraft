@@ -59,7 +59,9 @@ struct HistoryView: View {
                                     // T6-DELETE (Einzellöschen): Kontextmenü statt onDelete
                                     // (macOS SwiftUI List.onDelete erfordert Edit-Mode — Pitfall 5)
                                     Button("Eintrag löschen", role: .destructive) {
-                                        try? historyStore.delete(entry)
+                                        Task {
+                                            try? await historyStore.delete(entry)
+                                        }
                                     }
                                 }
                                 .accessibilityLabel(accessibilityLabel(for: entry))
@@ -73,8 +75,10 @@ struct HistoryView: View {
         // T6-DELETE: Confirm-Dialog für Gesamt-Löschen (D-12)
         .alert("Verlauf leeren?", isPresented: $showClearConfirm) {
             Button("Löschen", role: .destructive) {
-                try? historyStore.deleteAll()
-                entries = []
+                Task {
+                    try? await historyStore.deleteAll()
+                    entries = []
+                }
             }
             Button("Abbrechen", role: .cancel) {}
         } message: {
@@ -100,7 +104,7 @@ struct HistoryView: View {
             debounceTask = Task {
                 try? await Task.sleep(for: .milliseconds(200))
                 guard !Task.isCancelled else { return }
-                entries = (try? historyStore.search(query: newValue)) ?? []
+                entries = (try? await historyStore.search(query: newValue)) ?? []
             }
         }
     }

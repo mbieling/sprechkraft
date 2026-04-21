@@ -15,7 +15,7 @@ struct HistoryStoreTests {
     }
 
     // HIST-01: Insert speichert Eintrag mit created_at
-    @Test func testInsertPersists() throws {
+    @Test func testInsertPersists() async throws {
         let store = try makeStore()
         let entry = HistoryEntry(
             id: nil,
@@ -25,14 +25,14 @@ struct HistoryStoreTests {
             profileName: nil,
             isLLMProcessed: false
         )
-        try store.insert(entry)
-        let all = try store.search(query: "")
+        try await store.insert(entry)
+        let all = try await store.search(query: "")
         #expect(all.count == 1)
         #expect(all.first?.originalText == "Hallo Welt")
     }
 
     // HIST-02: Beide Texte (original + LLM) werden gespeichert
-    @Test func testBothTextsStored() throws {
+    @Test func testBothTextsStored() async throws {
         let store = try makeStore()
         let entry = HistoryEntry(
             id: nil,
@@ -42,15 +42,15 @@ struct HistoryStoreTests {
             profileName: "Notizen",
             isLLMProcessed: true
         )
-        try store.insert(entry)
-        let all = try store.search(query: "")
+        try await store.insert(entry)
+        let all = try await store.search(query: "")
         #expect(all.first?.llmText == "Verarbeiteter Text")
         #expect(all.first?.profileName == "Notizen")
         #expect(all.first?.isLLMProcessed == true)
     }
 
     // HIST-03: FTS5-Suche findet Eintrag der den Term enthält
-    @Test func testFTS5SearchFindsMatch() throws {
+    @Test func testFTS5SearchFindsMatch() async throws {
         let store = try makeStore()
         let entry = HistoryEntry(
             id: nil,
@@ -60,14 +60,14 @@ struct HistoryStoreTests {
             profileName: nil,
             isLLMProcessed: false
         )
-        try store.insert(entry)
-        let results = try store.search(query: "Quartalsbericht")
+        try await store.insert(entry)
+        let results = try await store.search(query: "Quartalsbericht")
         #expect(results.count == 1)
         #expect(results.first?.originalText == "Besprechungsnotizen Quartalsbericht")
     }
 
     // HIST-03: FTS5-Suche liefert Ergebnis unter 200ms bei 1000 Einträgen
-    @Test func testSearchPerformance() throws {
+    @Test func testSearchPerformance() async throws {
         let store = try makeStore()
         for i in 0..<1000 {
             let entry = HistoryEntry(
@@ -78,10 +78,10 @@ struct HistoryStoreTests {
                 profileName: nil,
                 isLLMProcessed: i % 2 == 0
             )
-            try store.insert(entry)
+            try await store.insert(entry)
         }
         let start = Date()
-        let results = try store.search(query: "Inhalt")
+        let results = try await store.search(query: "Inhalt")
         let elapsed = Date().timeIntervalSince(start)
         #expect(results.count > 0)
         #expect(elapsed < 0.2, "FTS5-Suche dauerte \(elapsed)s — Limit: 200ms")
