@@ -1,153 +1,258 @@
 # Features Research
 
-**Domain:** macOS push-to-talk dictation app with local transcription and LLM post-processing
-**Researched:** 2026-04-15
-**Confidence:** MEDIUM-HIGH (based on competitive knowledge of VoiceInk, Superwhisper, Whisper Transcription, macOS Dictation as of Aug 2025)
+**Domain:** macOS push-to-talk dictation app mit lokaler Transkription und LLM-Nachbearbeitung
+**Researched:** 2026-04-21
+**Confidence:** MEDIUM-HIGH
 
 ---
 
-## Table Stakes (Users expect these)
+## Kontext: Milestone v0.19.0
 
-Features whose absence makes the product feel broken or incomplete. Every serious competitor has these.
+Dieses Dokument ist ein **Update** zur ursprünglichen Feature-Recherche (2026-04-15).
+Bereits gebaut: WhisperKit-Transkription, Audio-Capture, AX-Text-Injektion, Groq LLM-Profile
+(Keychain, ProfileEditorSheet), GRDB-History-Panel.
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Global hotkey (hold-to-record) | The entire interaction model. No hotkey = no app. | Low | Push-to-talk is the dominant pattern; toggle-to-record is the alternative but PTT is safer (no runaway recordings) |
-| Menu bar presence, no Dock icon | "System tool" expectation. VoiceInk, Superwhisper both do this. Dock icon feels wrong for always-on tools. | Low | LaunchAgent + `LSUIElement = YES` in Info.plist |
-| Visual recording feedback | Users need to know if recording is active. Without it, they re-trigger or miss dictations. | Low | Animated menu bar icon is standard. A subtle audio cue (pop in/out) is also expected. |
-| Text insertion into active field | The core promise. If it only copies to clipboard you've failed the primary use case. | Med | Requires Accessibility API permission; fragile in some apps (Electron apps especially) |
-| Clipboard fallback | Required for apps where Accessibility insertion fails (Terminal, some Electron apps, browser address bars). | Low | Users accept this as a workaround; it must be easy to trigger |
-| Transcription accuracy on English | Users compare to macOS Dictation and expect parity or better. Parakeet v3 exceeds this. | N/A (model quality) | Accuracy for non-English is a separate concern — out of scope per PROJECT.md |
-| Local/offline processing | Privacy-conscious users (the target demographic) explicitly require this. Mentioning "no cloud" in onboarding is expected. | Med | Bundling Parakeet means model management complexity at build time, not runtime |
-| Settings/preferences window | API keys, hotkey config, output mode selection. Without this, power users churn. | Med | Standard SwiftUI Settings scene or custom window |
-| Launch at login option | "Set it and forget it" expectation. If it's not in login items, users lose the tool after restart. | Low | SMAppService API (macOS 13+) preferred over legacy Login Items |
-| Hotkey configurability | Default hotkey conflicts are common. Users must be able to change it. | Low | Use a hotkey recorder component; common conflicts: Option+Space (Spotlight variants), Fn keys |
-| Audio input device selection | Users with external mics expect to choose. Default device works for most but blocking this causes reviews. | Low | Expose AVAudioSession device picker in settings |
-| Transcription history | Users want to retrieve something they said 10 minutes ago. This is load-bearing for trust. | Med | Local SQLite or Core Data store; search is expected |
+**Fokus dieses Updates:** Die drei neuen Feature-Bereiche des Milestones:
+
+1. Parakeet v3 als Transkriptions-Engine (Ersatz für WhisperKit)
+2. Erststart-Modell-Download-Erfahrung
+3. Konsolidiertes Einstellungsfenster
 
 ---
 
-## Differentiators (Competitive advantage)
+## 1. Parakeet v3 als Transkriptions-Engine
 
-Features that exceed baseline expectations. These are why users pick your app over macOS built-in Dictation or a basic Whisper wrapper.
+### API-Verifikation (HIGH confidence — Context7 /senstella/parakeet-mlx)
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| Multiple named prompt profiles with individual hotkeys | No competitor does per-profile hotkeys well. VoiceInk has profiles but hotkey switching is clunky. This is the headline differentiator for power users. | Med | Each profile = a named system-prompt + hotkey binding. Hotkeys must not conflict with each other or with record hotkey. |
-| LLM post-processing with visible prompt editing | Users want to shape output style (email tone, code comments, meeting notes). Seeing and editing the prompt builds trust. | Med | Groq latency (qwen3-32b) is ~1-2s for typical dictation length. Show a processing indicator. |
-| Per-profile LLM toggle | Some contexts want raw transcription (quick notes), others want LLM rewriting (emails). Toggling per profile is a UX win. | Low | Boolean flag on each profile, toggled in profile settings |
-| Instant output mode switching | Toggle between "insert into field" and "clipboard" without opening settings. A quick-key or menu click. | Low | Massive friction reducer. Users often need clipboard mode for one specific app. |
-| Profile-aware output — distinct results per context | E.g., "Email mode" reformats as a proper email; "Code comment mode" wraps in `//`. Power users will discover and love this. | Low (prompt engineering, not code) | Document example prompts in onboarding |
-| Privacy-first messaging in UI | "Transcription never leaves your Mac" shown at first launch and in About. This is table stakes for the privacy-conscious niche but differentiates from cloud tools. | Low | Copy/UI only, no implementation work |
-| History with copy-to-clipboard per entry | Users regularly retrieve past dictations to re-use or correct. One-click copy per row is the UX. | Low | Add to history view |
-| Waveform or level visualizer during recording | Confirms mic is hot and audio is being captured. Reduces "did it hear me?" anxiety. | Low-Med | NSLevelMeterView or a custom SwiftUI waveform; not required but high perceived quality |
-| Processing state distinction (recording vs transcribing vs LLM) | Three distinct states exist. Showing "Transcribing..." vs "Thinking..." lets users know why there's latency. | Low | Three icon states or a tooltip |
-| Keyboard shortcut to re-run last transcription through a different profile | Re-process without re-speaking. High value for power users. | Med | Keep last raw transcript in memory; re-submit to selected profile |
+**Eingabe:** WAV-Datei (kein ffmpeg nötig für WAV; ffmpeg nur für andere Formate).
+Sample Rate wird über `model.preprocessor_config.sample_rate` abgefragt — nicht hardcoden.
+In der Praxis 16 kHz (NVIDIA Parakeet Standard).
 
----
+**Ausgabe:** `result.text` (string), plus `result.sentences[]` mit Zeitstempeln und
+Konfidenzwerten pro Satz, plus `result.sentences[i].tokens[]` mit Wort-Level-Timestamps.
+Für Diktat ist nur `result.text` erforderlich.
 
-## Anti-Features (Deliberately NOT build in v1)
+**High-Level API (empfohlen für Diktat):**
 
-Features that sound useful but add complexity, maintenance burden, or dilute focus. Defer to v2 or never.
+```python
+from parakeet_mlx import from_pretrained
 
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| Real-time streaming transcription (words appear as you speak) | Parakeet runs on push-to-talk completion. Streaming requires a different model architecture and much more complex audio/UI pipeline. High complexity for marginal v1 value. | PTT with fast post-recording transcription (Parakeet is fast). Users adapt quickly. |
-| Custom vocabulary / word correction dictionary | Solves a real problem (proper nouns, jargon) but requires a separate text normalization layer. Parakeet v3 has decent OOV handling. | Let LLM prompt profiles handle context-specific terminology via system prompt instructions. |
-| Multi-language auto-detection | Parakeet v3 supports multiple languages but auto-detection adds a pre-processing step and introduces errors. | Expose a language selector in settings for v2. Pin to English for v1. |
-| Speaker identification / diarization | Irrelevant for solo dictation. This is a meeting transcription feature. | Out of scope entirely for this app's purpose. |
-| Cloud sync of history or profiles | Breaks the local/privacy story. Adds auth, backend, and GDPR surface. | Profiles and history stay local. Export-to-file for backup if needed. |
-| Transcription of audio files / drag-drop | Different use case (podcast editing, meeting notes from recordings). Adds UI complexity and a separate processing pipeline. | Stay focused on real-time dictation. Refer users to MacWhisper for file transcription. |
-| In-app LLM provider management (add your own OpenAI, etc.) | Becomes a mini LLM settings panel. Groq + qwen3-32b is the decided stack; generalizing it in v1 is yak shaving. | Hard-code Groq + qwen3-32b. API key is the only config needed. Add provider choice in v2 if needed. |
-| iOS companion app | Different platform, different tech stack, different distribution. PROJECT.md explicitly excludes this. | macOS only. |
-| Social sharing or export to Notion/Obsidian | These are workflow integrations that require maintaining connectors. High ongoing maintenance. | Clipboard is the universal integration layer. |
-| Dictation within a built-in text editor | The app inserts into wherever the user is working. A built-in editor creates an alternate workflow that competes with the core flow. | Use the active text field as the editor. |
-| Voice commands ("new line", "period") | Requires a command detection layer on top of transcription. Complex to do well; macOS Dictation does this but it's an entire subsystem. | LLM post-processing can normalize punctuation via prompt. |
-| Team features, shared profiles, usage analytics | Explicitly out of scope. Solo tool for a power user. | Never (or a separate product). |
-
----
-
-## Feature Dependencies
-
-```
-Global Hotkey
-  └── Recording Pipeline (AVAudioEngine)
-        └── Parakeet Transcription
-              ├── Raw Text Output
-              │     ├── Active Field Insertion (Accessibility API)
-              │     └── Clipboard Output
-              └── LLM Post-Processing (Groq API)
-                    ├── Active Prompt Profile selection
-                    │     └── Multiple Profiles with hotkeys
-                    └── Processed Text Output
-                          ├── Active Field Insertion
-                          └── Clipboard Output
-
-Transcription History
-  └── Raw Text (always stored)
-  └── Processed Text (stored if LLM ran)
-  └── Profile used (stored for context)
-
-Settings Window
-  └── Groq API Key (required before LLM features work)
-  └── Prompt Profile management (create/edit/delete/assign hotkey)
-  └── Output Mode selection
-  └── Audio device selection
-  └── Launch at login toggle
-
-Menu Bar Icon
-  └── State: Idle / Recording / Transcribing / LLM Processing / Error
+model = from_pretrained("mlx-community/parakeet-tdt-0.6b-v3")
+result = model.transcribe("audio_file.wav")
+print(result.text)  # "Hello world. This is a test."
 ```
 
-**Critical path for v1 MVP:** Global Hotkey → Recording → Parakeet → Active Field Insertion. Everything else adds on top of this spine.
+**Modell-Laden:** `from_pretrained("mlx-community/parakeet-tdt-0.6b-v3")` lädt beim
+ersten Aufruf von Hugging Face Hub in `~/.cache/huggingface/hub/` (oder konfigurierbares
+`cache_dir`). Wenn das Modell bereits lokal vorliegt, kein Download.
 
-**LLM features are gated on:** Groq API key entered in Settings. App must be fully functional without it (raw transcription only).
+**Modellgröße:** Die bfloat16-Version (`mlx-community/parakeet-tdt-0.6b-v3`) hat ca. 1.1–1.3 GB.
+Eine 8-Bit-quantisierte Variante (`animaslabs/parakeet-tdt-0.6b-v3-mlx-8bit`) ist ~909 MB.
+MEDIUM confidence — exakte Zahl nicht in der Doku, aus Community-Daten inferiert.
 
-**History requires:** Transcription to complete (any mode). Store raw transcript; store LLM result if applicable.
+**Subprocess-Bridge-Architektur:** Das etablierte Muster für Swift↔Python ist
+stdin/stdout oder Unix Domain Socket. Der Python-Prozess läuft als Daemon, empfängt
+WAV-Dateipfade (oder rohe PCM-Bytes), gibt JSON mit `.text` zurück.
+Konkret: Swift schreibt PCM-Buffer in eine temporäre WAV-Datei → sendet Pfad via stdin
+an Python-Prozess → Python antwortet mit JSON `{"text": "..."}`.
 
-**Multiple profile hotkeys require:** Profile management UI complete, hotkey conflict detection logic.
+**Alternative: swift-parakeet-mlx** (GitHub: FluidInference/swift-parakeet-mlx) —
+Ein Swift-Wrapper in frühem Stadium. Noch nicht produktionsreif. Nicht empfohlen.
 
----
+### Table Stakes für Parakeet-Integration
 
-## Onboarding Flow
+| Feature | Warum erwartet | Komplexität | Abhängigkeit von Bestehendem |
+|---------|---------------|-------------|------------------------------|
+| WAV-Datei als Übergabeformat | Parakeet-API erwartet Datei oder Mel-Spektrogramm; temporäre WAV-Datei ist der einfachste Weg | Low | AVAudioEngine-Tap bereits vorhanden; buffer → WAV-Datei nötig |
+| Python-Subprocess starten und warm halten | Kalt-Start kostet 2–4 s (MLX-Modell laden). Daemon muss beim App-Start initialisiert werden, nicht beim ersten Diktat | Med | Neuer PythonBridgeManager als Singleton |
+| Fehler-Handling: Python nicht bereit | Modell noch ladend, Prozess abgestürzt, Python-venv fehlt | Med | Error-State im Icon bereits vorhanden |
+| Sample-Rate-Matching | AVAudioEngine muss mit der Sample Rate aufnehmen, die `model.preprocessor_config.sample_rate` zurückgibt (16 kHz) | Low | Bestehender Audio-Capture muss ggf. Resampler vorschalten |
+| WhisperKit ersetzen, nicht parallel betreiben | WhisperKit bleibt als totes Gewicht wenn Parakeet aktiv. Klare Migration, kein doppeltes Backend | Low | Bestehender TranscriptionService-Abstraction-Layer empfohlen |
 
-Typical onboarding for this category follows a "grant permissions then use it" pattern:
+### Differenziator
 
-1. **First launch screen** — One sentence value prop ("Voice to text, everywhere on your Mac") + Privacy statement ("All transcription happens on your device"). Two buttons: Get Started / Quit.
-
-2. **Microphone permission** — Request `NSSpeechRecognitionUsageDescription` and `NSMicrophoneUsageDescription` via standard macOS prompt. If denied, show recovery instructions. Do not proceed without mic permission.
-
-3. **Accessibility permission** — Request for AXUIElement (text insertion). This requires directing user to System Settings > Privacy > Accessibility. Show a screenshot or animation. This step has the highest drop-off; make the benefit clear ("so I can type into any app for you").
-
-4. **Hotkey setup** — Show the default hotkey. Offer to change it now or later. One-line "hold while speaking, release to insert."
-
-5. **Optional: Groq API key** — Frame as optional: "Want AI to rewrite your text? Enter your Groq API key." Link to groq.com to get a key. Skip button is prominent. Users who skip get raw transcription only; they can add it later in Settings.
-
-6. **Demo dictation** — Focus a visible text field, prompt "Try it now — hold [hotkey] and say something." Showing it work in-app builds immediate trust.
-
-7. **Done screen** — "You're set. I'll live in your menu bar." Mention login item if they said yes to autostart.
-
-**Anti-pattern:** Requiring API key before the app works at all. Many users will not have a Groq key at first launch. Raw transcription must work without it — this is also a product differentiator (fallback privacy story).
-
----
-
-## Competitive Landscape Summary
-
-| App | Transcription | LLM Post-Processing | Profiles | Privacy |
-|-----|---------------|---------------------|----------|---------|
-| VoiceInk | Whisper (local) | Yes (OpenAI/custom) | Yes, limited hotkeys | Local option |
-| Superwhisper | Whisper (local or cloud) | Yes | Yes, per-profile | Local option |
-| macOS Dictation | Apple on-device | No | No | On-device |
-| Whisper Transcription (app) | Whisper local | No | No | Local |
-| **This app** | Parakeet v3 (local, bundled) | Groq qwen3-32b | Yes, per-profile hotkeys | Fully local |
-
-**Differentiation angle:** Parakeet v3 is faster than Whisper for English (NVIDIA-optimized, near real-time), fully bundled (no model download step), and per-profile hotkeys are genuinely novel vs competitors.
+| Feature | Wert | Komplexität |
+|---------|------|-------------|
+| Warm-up-Indikator beim App-Start ("Modell wird geladen...") | Verhindert Frustration bei erstem Diktat nach App-Start | Low |
+| Konfidenzwert aus `result.sentences[].confidence` in History speichern | Nutzer sieht bei unsicheren Transkriptionen, warum der Text seltsam klingt | Low |
 
 ---
 
-## Sources
+## 2. Erststart-Modell-Download-Erfahrung
 
-- Competitive analysis based on VoiceInk (tryvoiceink.com), Superwhisper (superwhisper.com), macOS Dictation (Apple docs), Whisper Transcription (App Store) — feature sets known as of August 2025
-- macOS Accessibility API text insertion patterns: Apple Developer Documentation (AXUIElement, kAXFocusedUIElementAttribute)
-- Push-to-talk UX patterns: established in gaming (Discord PTT), voice assistants, and dictation tools
-- Confidence: MEDIUM for competitive feature parity claims (based on training data, not live scraping); HIGH for macOS technical constraints (Accessibility permission, SMAppService, AVAudioEngine patterns)
+### Kontext
+
+Das Modell (~1.1–1.3 GB) wird beim ersten Start von Hugging Face Hub geladen.
+`from_pretrained()` hat keinen nativen Progress-Callback für den HF-Download —
+der Fortschritt muss durch Polling des lokalen Cache-Verzeichnisses oder durch
+einen separaten Download-Manager (z.B. `huggingface_hub.snapshot_download` mit
+`tqdm_class`) ermittelt werden.
+
+Referenz-Implementierungen: WhisperKit (`WhisperKit.download(variant:) { progress in ... }`)
+zeigt, wie macOS-Apps dieses Muster mit einem Progress-Closure lösen.
+LTX-Video macOS App zeigt Download-Fortschritt in 1%-Schritten mit ETA.
+
+### Table Stakes
+
+| Feature | Warum erwartet | Komplexität | Notes |
+|---------|---------------|-------------|-------|
+| Fortschrittsbalken mit MB/Gesamt | Ohne dies wirkt die App eingefroren. Nutzer brechen ab oder force-quiten. | Med | `huggingface_hub` `snapshot_download` mit Progress-Hook; Fortschritt via stdout an Swift-Seite |
+| Größenangabe vor Download-Start | "Parakeet-Modell herunterladen (ca. 1.2 GB)?" — Nutzer muss informiert entscheiden. Mobil-Nutzer auf LTE erwarten dies. | Low | Statisch hardcodiert ist akzeptabel (Größe ändert sich selten) |
+| Klarer Fehlerfall: Kein Netz / unterbrochener Download | Download schlägt fehl ohne Drama; Retry-Button. App muss ohne Modell nicht crashen. | Med | Download-State-Machine: NotStarted → Downloading → Complete → Failed |
+| Lokale Speicherung prüfen beim App-Start | Modell muss nicht jedes Mal neu geladen werden. Prüfe ob Cache-Verzeichnis existiert und Modell intakt ist. | Low | `from_pretrained` macht dies automatisch wenn `cache_dir` gesetzt und persistent |
+| Onboarding blockiert bis Download komplett | App darf keinen Diktat-Versuch erlauben, bevor das Modell da ist. Klarer "Bitte warten"-Zustand im Menu Bar Icon. | Low | Download-Phase als eigener App-State |
+
+### Differenziator
+
+| Feature | Wert | Komplexität |
+|---------|------|-------------|
+| Geschätzter Zeitraum ("ca. 2 Minuten verbleibend") | Reduziert Abbrüche bei langsamen Verbindungen erheblich | Med |
+| Download abbrechen und später fortsetzen | HF Hub unterstützt kein resumable download out-of-the-box; Workaround aufwendig | High — Anti-Feature für v1 |
+| Quantisiertes Modell als Alternative anbieten (8-Bit, ~909 MB) | Kleinerer Download, etwas geringere Qualität | Med — Defer to v2 |
+
+### Anti-Features (Erststart-Download)
+
+| Anti-Feature | Warum vermeiden |
+|--------------|-----------------|
+| Download im Hintergrund ohne Feedback | Führt zu "Warum funktioniert das nicht?"-Fragen; Nutzer deinstallieren |
+| Erzwungenes Konto / E-Mail für Download | Hugging Face Hub braucht keine Auth für öffentliche Modelle. Kein Konto nötig. |
+| Modell mit App bundeln | Macht den App-Download ~1.2 GB schwer. Kein macOS-App-Store nötig, aber unnötig groß. Gegen PROJECT.md-Entscheidung |
+
+---
+
+## 3. Einstellungsfenster
+
+### Table Stakes
+
+Funktionen, die fehlen = Nutzer kann die App nicht sinnvoll konfigurieren.
+
+| Feature | Warum erwartet | Komplexität | Abhängigkeit |
+|---------|---------------|-------------|--------------|
+| Groq API-Key eingeben/ändern | Ohne Key ist kein LLM-Modus verfügbar. Schon in Phase 05 implementiert, aber derzeit in ProfileEditorSheet — gehört in Settings | Low | Keychain-Integration bereits vorhanden |
+| Prompt-Profile verwalten (CRUD) | Schon implementiert. Muss in Settings-Fenster konsolidiert werden. | Low | ProfileEditorSheet bereits vorhanden |
+| Ausgabemodus wählen (Textfeld / Clipboard) | Core-UX-Entscheidung des Nutzers. Steht derzeit nirgendwo? | Low | Defaults-Integration (`sindresorhus/Defaults`) bereits Stack-Entscheidung |
+| Hotkey konfigurieren mit Konflikt-Erkennung | Standardhotkey ⌥⌘R kann mit anderen Apps kollidieren. Nutzer müssen ihn ändern können, und die App muss Konflikte erkennen. | Med | `KeyboardShortcuts`-Library bereits im Stack; Konflikt-Erkennung ist eigene Logik |
+| Mikrofon auswählen (Eingabegerät) | Nutzer mit externen Mics (Podcaster, Headsets) erwarten dies. Ohne diese Option berichten sie Qualitätsprobleme, die eigentlich Gerätekonflikte sind. | Low | AVAudioEngine-Device-Auswahl |
+| Launch at Login Toggle | "Set it and forget it" für ein System-Tool | Low | `LaunchAtLogin-modern` bereits im Stack |
+| Datenschutz-Hinweis sichtbar ("Keine Cloud, alles lokal") | Vertrauen aufbauen, Nutzer beruhigen. In macOS Settings-Pattern oft unter "About" oder als Info-Text sichtbar | Low | Nur UI-Copy |
+
+### Nice-to-Have (Differenziator)
+
+| Feature | Wert | Komplexität | Priorität |
+|---------|------|-------------|-----------|
+| Silence-Detection-Schwellenwert (dB) | Fortgeschrittene Nutzer passen ihn an ihr Mikrofon an. Wichtig für sehr laute oder sehr leise Umgebungen. | Med | Im PROJECT.md explizit gelistet → implementieren |
+| Modell-Status und Re-Download | Zeigt "Parakeet v3 geladen" und erlaubt Re-Download bei Korruption. | Low | Logisch an Download-State-Machine gekoppelt |
+| Tastaturkürzel-Übersicht in Settings | Alle konfigurierten Hotkeys auf einen Blick (Diktat, Profile-Switch) | Low | Gut für Orientierung nach Setup |
+| Automatisches Starten der Aufnahme mit Tastendruck vs. Halten | Toggle zwischen PTT (Halten) und Toggle-Modus (einmal drücken = start, nochmals = stop) | Med | Nische; PTT ist Standard und sicherer |
+
+### Anti-Features (Settings)
+
+| Anti-Feature | Warum vermeiden |
+|--------------|-----------------|
+| Sprach-Selektor für Transkription | Parakeet v3 ist primär für Englisch optimiert. Multi-Language ist Anti-Feature gemäß bestehendem FEATURES.md. |
+| Aussehen/Themes konfigurieren | Menu-Bar-App hat kaum UI. Scheinbar nützlich, aber Pflegelast. |
+| Multiple LLM-Provider (OpenAI, Anthropic etc.) | Groq ist entschieden. Generalisierung ist Yak Shaving in v1. |
+| Export/Import von Profilen als Datei | Nützlich in v2, Overhead in v1. Clipboard-Copy als Workaround reicht. |
+
+### Settings-Fenster-Struktur (empfohlen)
+
+Basierend auf macOS-HIG-Pattern: SwiftUI `Settings`-Scene mit `TabView`.
+Standard-Tab-Struktur für diese App:
+
+```
+Settings
+├── Tab: Allgemein
+│   ├── Ausgabemodus (Textfeld / Clipboard)
+│   ├── Launch at Login
+│   └── Modell-Status + Re-Download
+├── Tab: Aufnahme
+│   ├── Hotkey konfigurieren
+│   ├── Mikrofon auswählen
+│   └── Silence Detection Schwellenwert
+├── Tab: KI & Profile
+│   ├── Groq API-Key
+│   └── Prompt-Profile (CRUD — bestehender ProfileEditorSheet)
+└── Tab: Über
+    ├── Version
+    └── Datenschutz-Statement
+```
+
+Komplexität: Die Tab-Struktur selbst ist Low. Die einzelnen Sektionen sind bereits
+implementiert oder Low-Medium. Die Integration aller bestehenden Settings-Fragmente
+in ein kohärentes Fenster ist der Hauptaufwand.
+
+---
+
+## Feature-Abhängigkeiten (v0.19.0)
+
+```
+Parakeet-Integration
+  ├── Python-venv bundeln (Build-Zeit)
+  │     └── parakeet-mlx + Abhängigkeiten
+  ├── PythonBridgeManager (neu)
+  │     ├── Subprocess-Lifecycle (start, warm-up, crash-recovery)
+  │     └── Audio-zu-WAV-Konvertierung (PCM buffer → temp .wav)
+  ├── Modell-Download-Flow (Erststart)
+  │     ├── DownloadStateManager
+  │     └── SwiftUI Download-Progress-View
+  └── TranscriptionService refactoring (WhisperKit → Parakeet swap)
+
+Settings-Fenster
+  ├── Bestehende Funktionen konsolidieren:
+  │     ├── Groq API-Key (aus ProfileEditorSheet herauslösen)
+  │     ├── Prompt-Profile (ProfileEditorSheet bleibt, wird eingebettet)
+  │     └── Launch-at-Login (ggf. bereits vorhanden)
+  └── Neue Funktionen:
+        ├── Hotkey-Konfiguration mit Konflikt-Erkennung
+        ├── Mikrofon-Auswahl (AVAudioEngine)
+        ├── Ausgabemodus-Toggle
+        ├── Silence Detection Schwellenwert
+        └── Modell-Status-Anzeige
+```
+
+---
+
+## Komplexitäts-Einschätzung Gesamtmilestone
+
+| Bereich | Komplexität | Hauptrisiken |
+|---------|-------------|--------------|
+| Parakeet Python-venv bundeln + signieren (kein App-Store) | Med | Python-Pfade, venv-Isolation, ggf. codesign-Attribute auf Shared Libraries |
+| PythonBridgeManager + Subprocess-Lifecycle | Med | Crash-Recovery, Startup-Timing, IPC-Protokoll |
+| Modell-Download mit Fortschritts-Feedback | Med | HF Hub hat keinen nativen Progress-Callback; Polling oder stdout-Streaming nötig |
+| Sample-Rate-Matching AVAudioEngine ↔ Parakeet | Low-Med | 16 kHz-Resample wenn Gerät anders konfiguriert |
+| Settings-Fenster (Konsolidierung) | Low-Med | SwiftUI Settings-Scene-Pattern ist gut dokumentiert; Hauptarbeit ist UI-Zusammenführung |
+| Hotkey-Konflikt-Erkennung | Med | KeyboardShortcuts-Library hat Basis; Konflikt-Logik ist eigene Implementierung |
+
+---
+
+## Verbleibende offene Fragen
+
+1. **Python-venv-Bundling-Strategie:** Welche Python-Version (3.11? 3.12?)? Wie wird das
+   venv in die App-Bundle-Struktur eingebettet? Wie wird es beim Build automatisiert?
+   Benötigt ggf. eigene Recherche-Phase.
+
+2. **HF-Hub-Download-Progress:** `huggingface_hub.snapshot_download` hat keinen eingebauten
+   Progress-Hook für die gesamte Downloadgröße in allen Versionen. Muss mit `tqdm`-Integration
+   oder manuellem Polling gelöst werden. Verifikation nötig.
+
+3. **Modell-Cache-Verzeichnis:** Soll das Modell in `~/Library/Application Support/VoiceScribe/`
+   liegen (App-kontrolliert) oder in `~/.cache/huggingface/hub/` (HF-Standard)?
+   App-Support-Verzeichnis ist besser für "Modell neu herunterladen"-Feature und Deinstallation.
+
+4. **Sample-Rate:** 16 kHz ist Standard für NVIDIA Parakeet. Verifizieren via
+   `model.preprocessor_config.sample_rate` im laufenden System — nicht hardcoden.
+
+---
+
+## Quellen
+
+- parakeet-mlx API: Context7 `/senstella/parakeet-mlx` (HIGH confidence, Score 84.3)
+  https://github.com/senstella/parakeet-mlx
+- Modellgröße 8-Bit-Variante: https://huggingface.co/animaslabs/parakeet-tdt-0.6b-v3-mlx-8bit
+  (909 MB — MEDIUM confidence für Basesmodell-Größe)
+- WhisperKit Download-Pattern: Context7 `/argmaxinc/argmax-oss-swift`
+  https://github.com/argmaxinc/argmax-oss-swift
+- SwiftUI Settings-Scene: https://eclecticlight.co/2024/04/30/swiftui-on-macos-settings-defaults-and-about/
+- VoiceInk Feature-Set: https://github.com/Beingpax/VoiceInk und https://tryvoiceink.com/
+- swift-parakeet-mlx (nicht empfohlen, frühe Phase): https://github.com/FluidInference/swift-parakeet-mlx
+- Bestehende Feature-Recherche: .planning/research/FEATURES.md (2026-04-15)

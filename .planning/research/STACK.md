@@ -1,7 +1,7 @@
 # Stack Research
 
 **Project:** VoiceScribe — macOS Menu Bar Dictation App
-**Researched:** 2026-04-15
+**Researched:** 2026-04-15 (updated 2026-04-21: Parakeet + Settings Additions)
 **Overall confidence:** HIGH (most claims verified via Context7 official docs)
 
 ---
@@ -89,25 +89,163 @@ This is the most critical architectural decision in the stack.
 
 **Recommended: Python subprocess approach**
 
-Bundle a minimal Python 3.11+ environment (via `python-build-standalone` or embed via PyInstaller/Briefcase) alongside `parakeet-mlx` and model weights. Swift spawns a child process over stdin/stdout or a Unix domain socket.
+Bundle a minimal Python 3.12 environment (via `uv` + `python-build-standalone`) alongside `parakeet-mlx`. Swift spawns a long-lived child process and communicates via stdin/stdout.
 
 Architecture:
 ```
 VoiceScribeApp (Swift)
-    ├─ writes raw PCM audio to temp file or pipe
-    ├─ spawns bundled Python process
-    │      └─ parakeet-mlx: loads model, transcribes, prints JSON to stdout
-    └─ reads JSON transcript from stdout
+    ├─ writes raw PCM audio to temp WAV file
+    ├─ writes WAV path as text line to subprocess stdin
+    │      └─ bundled Python process (persistent daemon):
+    │             - loads parakeet-mlx model once at startup
+    │             - reads path from stdin, transcribes, prints JSON to stdout
+    └─ reads JSON transcript from subprocess stdout
 ```
-
-**Model sizes (parakeet-tdt-0.6b-v3):** ~1.2 GB on disk (bfloat16 weights). The 1.1B variant is ~2.2 GB. Recommend shipping `parakeet-tdt-0.6b-v3` as the default; it is fast enough for short push-to-talk clips on M1+.
-
-**MLX-Swift path (alternative, future):**
-`/ml-explore/mlx-swift` (confirmed in Context7) provides a full Swift ML framework using Metal. The `parakeet-mlx` Python library is ~2000 lines — porting the TDT decoder to MLX Swift is feasible but is a Phase 2+ effort. For a first ship, use the subprocess bridge.
 
 **WhisperKit as a fallback/comparison:** `argmaxinc/whisperkit` is a fully native Swift framework for Whisper models on Apple Silicon (CoreML + Metal). It is drop-in usable from Swift. If Parakeet integration proves brittle, WhisperKit is the best native Swift alternative, accepting the model change. Keep this in your back pocket.
 
 **Confidence: MEDIUM** — parakeet-mlx confirmed Python/MLX-only (Context7). Subprocess pattern is standard macOS practice but exact bundling mechanics need hands-on validation.
+
+---
+
+#### Python Environment Bundling (Milestone v0.19.0 Addition)
+
+**Kein System-Python. Kein Homebrew-Python. Alles im .app-Bundle.**
+
+**Empfohlener Bundling-Ansatz: `uv` + `py-app-standalone`**
+
+| Tool | Rolle | Version |
+|------|-------|---------|
+| `uv` (Astral) | Build-Zeit-Tool; laedt CPython 3.12 aus `python-build-standalone` runter, erstellt relocatable venv | >= 0.6 (nicht mitliefern) |
+| `py-app-standalone` | Wrapper-Script; automatisiert `install_name_tool`-Fix fuer macOS `.dylib`-absolute-Pfade | aktuell (GitHub: jlevy/py-app-standalone) |
+| `python-build-standalone` (CPython) | Selbststaendige, portable CPython-Distribution ohne externe Abhaengigkeiten | Python 3.12.x (via uv python install) |
+
+**Warum nicht direkt `uv venv --relocatable` allein:** uv's `--relocatable`-Flag loest venv-interne Symlinks auf, behebt aber NICHT die absoluten Pfade, die `install_name_tool` in den `.dylib`-Shared-Libraries eincodiert. `py-app-standalone` uebernimmt diesen Fix automatisch und erzeugt ein Bundle-Verzeichnis ohne absolute Pfade.
+
+**Ziel-Layout im .app-Bundle:**
+
+```
+VoiceScribe.app/
+  Contents/
+    Resources/
+      py-runtime/                  <- kopierte venv (Python-Binary + site-packages)
+        bin/
+          python3
+        lib/
+          python3.12/
+            site-packages/
+              parakeet_mlx/
+              mlx/
+              numpy/
+              ...
+      transcribe.py                <- Bridge-Script
+```
+
+**Python-Abhaengigkeiten in der gebundelten venv:**
+
+| Paket | Zweck | Hinweis |
+|-------|-------|---------|
+| `parakeet-mlx` (latest) | Parakeet v3 Inferenz auf MLX | Zieht mlx, numpy, soundfile transitiv |
+| `mlx` (via parakeet-mlx) | Apple Silicon Metal-Backend | Transitive Abhaengigkeit |
+| `numpy` (via parakeet-mlx) | Array-Verarbeitung | Transitive Abhaengigkeit |
+
+**Nicht explizit installieren:** `ffmpeg` (nur fuer parakeet-mlx CLI), `sounddevice`, `pyaudio` (Audio-Capture passiert in Swift).
+
+**Modell-Gewichte:**
+
+- Modell-ID: `mlx-community/parakeet-tdt-0.6b-v3`
+- Groesse: **~2.5 GB** (MLX quantisiertes Format; bestaetigt via Hugging Face Model Card)
+- 8-Bit-Variante: `animaslabs/parakeet-tdt-0.6b-v3-mlx-8bit` (kleiner, Qualitaet ungetestet)
+- Download-Strategie: **NICHT im .app-Bundle** — beim Erststart via `from_pretrained(..., cache_dir=...)` in `~/Library/Application Support/VoiceScribe/models/` laden
+- `cache_dir`-Parameter von parakeet-mlx unterstuetzt (Context7 bestaetigt)
+
+**Build-Phase-Script (Xcode Shell Script Build Phase):**
+
+```bash
+#!/bin/bash
+RUNTIME_DIR="${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/py-runtime"
+if [ ! -d "$RUNTIME_DIR" ]; then
+  # py-app-standalone kapselt uv + install_name_tool-Fix
+  py-app-standalone create --python 3.12 --output "$RUNTIME_DIR"
+  uv pip install --python "${RUNTIME_DIR}/bin/python3" parakeet-mlx
+fi
+```
+
+**Confidence: MEDIUM** — Grundprinzip gut belegt; `install_name_tool`-Schritt benoetigt hands-on-Validierung im ersten Build.
+
+---
+
+#### Python-Bridge: Swift → Subprocess-Kommunikation
+
+**Empfehlung: Foundation `Process` + `Pipe` (kein externes Swift-Paket noetig)**
+
+| Option | Bewertung | Begruendung |
+|--------|-----------|-------------|
+| Foundation `Process` + `Pipe` | **EMPFOHLEN** | In Foundation enthalten; async/await via `Task`/`withCheckedContinuation`; fuer Push-to-Talk (ein Request, eine Response) voellig ausreichend |
+| `swiftlang/swift-subprocess` | Optionale Verbesserung | Neu (Sept 2025), async-native, Context7 verifiziert; Mehrwert gegenueber Foundation fuer dieses simple Pattern minimal — vermeidet zusaetzliche Abhaengigkeit |
+| Unix Domain Socket | Overkill | Benoetigt persistenten Daemon mit Socket-Verwaltung; fuer batchweise Transkription nicht noetig |
+
+**Kommunikationsprotokoll:**
+
+Das Python-Script laeuft als Daemon-Prozess (einmal starten, Modell laden, dann auf Anfragen warten).
+
+- **Swift schreibt:** Pfad zur temporaeren WAV-Datei als UTF-8-Zeile + `\n` auf stdin
+- **Python antwortet:** JSON-Zeile `{"text": "..."}` auf stdout
+- **Warum WAV-Datei statt Raw-Bytes:** `parakeet_mlx.audio.load_audio()` erwartet einen Dateipfad (Context7-Docs bestaetigt); Serialisierung von numpy-Arrays via stdin ist fragiler; WAV-Datei in `NSTemporaryDirectory()` ist einfach zu debuggen
+
+**Bridge-Script (`Resources/transcribe.py`):**
+
+```python
+import sys, json
+from parakeet_mlx import from_pretrained
+
+# cache_dir = erstes Argument (~/Library/Application Support/VoiceScribe/models/)
+model = from_pretrained("mlx-community/parakeet-tdt-0.6b-v3",
+                        cache_dir=sys.argv[1])
+
+for line in sys.stdin:
+    wav_path = line.strip()
+    if not wav_path:
+        continue
+    result = model.transcribe(wav_path)
+    print(json.dumps({"text": result.text}), flush=True)
+```
+
+**Swift-Seite (Foundation Process, vereinfacht):**
+
+```swift
+class TranscriptionBridge {
+    private let process = Process()
+    private let stdinPipe = Pipe()
+    private let stdoutPipe = Pipe()
+
+    func start() throws {
+        let pythonURL = Bundle.main.url(
+            forResource: "py-runtime/bin/python3", withExtension: nil)!
+        let scriptURL = Bundle.main.url(
+            forResource: "transcribe", withExtension: "py")!
+        let modelCacheDir = /* ~/Library/Application Support/VoiceScribe/models */
+
+        process.executableURL = pythonURL
+        process.arguments = [scriptURL.path, modelCacheDir]
+        process.standardInput = stdinPipe
+        process.standardOutput = stdoutPipe
+        try process.run()
+    }
+
+    func transcribe(wavPath: String) async throws -> String {
+        // WAV-Pfad an Python schreiben
+        let line = (wavPath + "\n").data(using: .utf8)!
+        stdinPipe.fileHandleForWriting.write(line)
+        // JSON-Antwort lesen (eine Zeile)
+        let data = stdoutPipe.fileHandleForReading.availableData
+        let response = try JSONDecoder().decode(TranscriptResponse.self, from: data)
+        return response.text
+    }
+}
+```
+
+**Confidence: HIGH** fuer das Grundmuster; **MEDIUM** fuer Daemon-Lebensdauer-Management (Crash-Recovery, App-Termination-Handler).
 
 ---
 
@@ -207,50 +345,81 @@ KeyboardShortcuts.onKeyUp(for: .startDictation) { stopRecordingAndTranscribe() }
 
 ---
 
-## What NOT to Use
+### Settings-Window (Milestone v0.19.0 Addition)
 
-| Technology | Why Avoid |
-|------------|-----------|
-| **Electron / web tech** | Mentioned for completeness: no reason to consider it; Swift/SwiftUI is the correct choice |
-| **CoreML for Parakeet** | Conversion from NeMo weights to CoreML loses model-specific optimizations; NVIDIA does not publish a CoreML export path for Parakeet v3. High conversion effort, uncertain quality. |
-| **Cloud transcription** | Explicitly out of scope per PROJECT.md; privacy requirement |
-| **SwiftData for history** | Weak full-text search; GRDB has FTS5 built in which is needed for the searchable history feature |
-| **Third-party OpenAI Swift SDK** | Only 2 API calls needed; a whole SDK dependency adds complexity for no gain. Use URLSession directly. |
-| **AVAudioRecorder** | Writes to disk; adds a file roundtrip before ML inference. AVAudioEngine tap pattern is cleaner. |
-| **Python Django/FastAPI server** | Don't run a local HTTP server for the Parakeet bridge. A subprocess with stdin/stdout or a Unix domain socket is lighter and doesn't require port management. |
-| **WhisperKit as primary** | Whisper is a different (weaker) model than Parakeet for English. Use WhisperKit only as a fallback if Parakeet integration is blocked. |
+**Keine neuen SPM-Pakete benoetigt.** Alle benoetigten Libraries sind bereits im Stack.
+
+| Bestandteil | Implementierung | Details |
+|-------------|----------------|---------|
+| Settings-Scene | `Settings { SettingsView() }` in `@main App` | SwiftUI-nativ seit macOS 13; oeffnet via Cmd+, aus dem App-Menue |
+| Sidebar-Navigation | `NavigationSplitView` mit `columnVisibility` | Zweispaltig: Sidebar (Icons + Label) + Detail; macOS-konventes Look-and-Feel; bestaetigt via Apple Docs |
+| Hotkey-Recorder | `KeyboardShortcuts.Recorder("Label:", name: .myShortcut)` | Bereits im Stack; Conflict-Detection eingebaut (Context7 bestaetigt) |
+| Mikrofon-Auswahl | `Picker` mit `AVCaptureDevice.DiscoverySession` | Listet alle Audio-Input-Geraete auf; kein externes Paket |
+| API-Key-Eingabe | `SecureField` + `KeychainAccess` | Bereits im Stack |
+| Profil-Verwaltung | bestehende GRDB-Implementierung | Kein neues Paket; Profile-Editor wie in Phase 05 |
+| Ausgabemodus-Toggle | `Defaults` + `Picker` | Bereits im Stack |
+| Silence-Threshold | `Slider` + `Defaults` | Standard SwiftUI |
+| Autostart | `LaunchAtLogin.Toggle()` | Bereits im Stack |
+
+**Settings-Fenster-Sizing:** `.frame(minWidth: 520, idealWidth: 580)` auf dem Settings-RootView + `windowResizability(.contentSize)` auf der Settings-Scene.
+
+**Sidebar-Sidebar-Toggle ausblenden:** `.toolbar(removing: .sidebarToggle)` auf dem List-View, da Settings-Fenster keine collapsible Sidebar braucht.
+
+**Confidence: HIGH** — alles Standard-SwiftUI; `KeyboardShortcuts.Recorder` vollstaendig in Context7 dokumentiert.
 
 ---
 
-## Confidence Notes
+## Was NICHT hinzufuegen (Milestone v0.19.0)
 
-| Area | Confidence | Basis |
-|------|------------|-------|
+| Kandidat | Warum nicht |
+|----------|-------------|
+| `PythonKit` | Bindet Python-Interpreter via C-API ein; unnoetige Komplexitaet wenn nur ein Script ausgefuehrt wird. Foundation `Process` ist leichter. |
+| `swiftlang/swift-subprocess` | Bringt nichts Wesentliches gegenueber Foundation `Process` fuer dieses einfache Request/Response-Pattern |
+| `Caerbannog` (Swift Package) | Veroeffentlichungsstatus unklar; fuer Subprocess-Kommunikation ueberdimensioniert |
+| `py2app` | Erzeugt Python-.app-Bundles — hilft nicht wenn Python ein Subprocess in einer Swift-.app ist |
+| `ffmpeg` (systemweit/gebundelt) | Nicht benoetigt fuer parakeet-mlx Python API; nur fuer CLI-Modus |
+| `sounddevice` / `pyaudio` Python-Pakete | Audio-Capture passiert in Swift via AVAudioEngine; Python bekommt fertige WAV-Datei |
+| `Electron / web tech` | Mentioned for completeness: no reason to consider it |
+| **CoreML for Parakeet** | Conversion from NeMo weights to CoreML loses model-specific optimizations |
+| **Cloud transcription** | Explicitly out of scope per PROJECT.md; privacy requirement |
+| **SwiftData for history** | Weak full-text search; GRDB has FTS5 built in |
+| **Third-party OpenAI Swift SDK** | Only 2 API calls needed; URLSession is sufficient |
+| **AVAudioRecorder** | Writes to disk; AVAudioEngine tap pattern is cleaner |
+
+---
+
+## Confidence-Uebersicht
+
+| Bereich | Confidence | Basis |
+|---------|------------|-------|
 | SwiftUI MenuBarExtra + LSUIElement | HIGH | Apple SwiftUI official docs (Context7) |
-| AVFoundation audio capture | HIGH | Standard macOS pattern; no exotic APIs |
-| Parakeet = Python/MLX only (no Swift binary) | HIGH | Context7: parakeet-mlx is Python; MLX Swift is separate |
-| Subprocess bridge for Parakeet | MEDIUM | Pattern is sound; exact Python bundling in a signed/notarized app needs hands-on validation |
-| MLX Swift direct port feasibility | LOW | Technically possible but effort is unverified; no prior art in Context7 |
-| Groq REST API / no official Swift SDK | HIGH | Context7 Groq docs confirm Python + JS only; REST is standard |
-| AXUIElement text injection | HIGH | Documented macOS API; widely used by dictation tools (VoiceInk, Whisper transcription apps) |
-| KeyboardShortcuts / KeychainAccess / GRDB | HIGH | All verified in Context7 with high benchmark scores |
-| LaunchAtLogin-modern | HIGH | Context7 verified; macOS 13+ only which matches target |
-| Parakeet-tdt-0.6b-v3 model size ~1.2GB | MEDIUM | Inferred from MLX community model naming; exact size needs verification at download time |
+| AVFoundation audio capture | HIGH | Standard macOS pattern |
+| parakeet-mlx API (`transcribe`, `cache_dir`) | HIGH | Context7-Docs vollstaendig |
+| Modell-Groesse ~2.5 GB (MLX quantisiert) | HIGH | Hugging Face mlx-community Model Card bestaetigt |
+| Python-Bundling via uv + py-app-standalone | MEDIUM | Prinzip gut belegt; `install_name_tool`-Fix benoetigt hands-on-Validierung |
+| Foundation Process + Pipe Bridge | HIGH | Standard macOS Pattern; Apple Developer Docs |
+| WAV-Datei als Bridge-Format | HIGH | Direkte Unterstuetzung durch `load_audio()` in parakeet-mlx |
+| Daemon-Prozess Lebensdauer-Management | MEDIUM | Pattern bekannt; Fehlerbehandlung / App-Termination braucht Validierung |
+| Settings SwiftUI (NavigationSplitView) | HIGH | Apple Docs + KeyboardShortcuts Context7 |
+| Groq REST API / kein offizielles Swift SDK | HIGH | Context7 Groq Docs bestaetigt |
+| AXUIElement text injection | HIGH | Dokumentiertes macOS-Framework |
+| KeyboardShortcuts / KeychainAccess / GRDB | HIGH | Context7-verifiziert |
 
 ---
 
 ## Installation (Swift Package Manager)
 
 ```swift
-// Package.swift dependencies
+// Package.swift dependencies — unveraendert
 .package(url: "https://github.com/sindresorhus/KeyboardShortcuts", from: "2.0.0"),
 .package(url: "https://github.com/kishikawakatsumi/KeychainAccess", from: "4.2.2"),
 .package(url: "https://github.com/sindresorhus/LaunchAtLogin-modern", from: "1.0.0"),
 .package(url: "https://github.com/groue/GRDB.swift", from: "7.5.0"),
 .package(url: "https://github.com/sindresorhus/Defaults", from: "8.0.0"),
+// Kein neues SPM-Paket fuer Parakeet/Settings benoetigt
 ```
 
-Python runtime and parakeet-mlx are NOT Swift packages — they are bundled as a pre-built directory in the app's Resources folder. See ARCHITECTURE.md for the bundling strategy.
+Python-Runtime und parakeet-mlx sind KEINE Swift Packages — sie werden als vorbereitetes Verzeichnis in `Resources/py-runtime/` des App-Bundles eingebettet.
 
 ---
 
@@ -260,9 +429,15 @@ Python runtime and parakeet-mlx are NOT Swift packages — they are bundled as a
 - parakeet-mlx Python library: `https://github.com/senstella/parakeet-mlx` (Context7: `/senstella/parakeet-mlx`)
 - MLX Swift framework: `https://github.com/ml-explore/mlx-swift` (Context7: `/ml-explore/mlx-swift`)
 - KeyboardShortcuts: `https://github.com/sindresorhus/KeyboardShortcuts` (Context7: `/sindresorhus/keyboardshortcuts`)
-- KeychainAccess: `https://github.com/kishikawakatsumi/KeychainAccess` (Context7: `/kishikawakatsumi/keychainaccess`)
+- KeychainAccess: `https://github.com/kishikawakatsuki/KeychainAccess` (Context7: `/kishikawakatsuki/keychainaccess`)
 - LaunchAtLogin-modern: `https://github.com/sindresorhus/LaunchAtLogin-modern` (Context7: `/sindresorhus/launchatlogin-modern`)
 - GRDB.swift: `https://github.com/groue/GRDB.swift` (Context7: `/groue/grdb.swift`)
 - Defaults: `https://github.com/sindresorhus/defaults` (Context7: `/sindresorhus/defaults`)
 - Groq API reference: `https://console.groq.com/docs/api-reference` (Context7: `/websites/console_groq`)
 - WhisperKit (noted as alternative): `https://github.com/argmaxinc/whisperkit` (Context7: `/argmaxinc/whisperkit`)
+- mlx-community/parakeet-tdt-0.6b-v3: `https://huggingface.co/mlx-community/parakeet-tdt-0.6b-v3`
+- py-app-standalone: `https://github.com/jlevy/py-app-standalone`
+- uv Python versions: `https://docs.astral.sh/uv/concepts/python-versions/`
+- Foundation Process Apple Docs: `https://developer.apple.com/documentation/foundation/process/1411576-standardinput`
+- SwiftUI NavigationSplitView: `https://developer.apple.com/documentation/swiftui/navigationsplitview`
+- swift-subprocess (Swift Forums): `https://github.com/swiftlang/swift-subprocess` (Context7: `/swiftlang/swift-subprocess`)

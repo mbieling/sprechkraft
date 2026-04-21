@@ -2,7 +2,7 @@
 
 **Project:** VoiceScribe — macOS Menu Bar Dictation App
 **Domain:** Native macOS, local ASR, Accessibility text injection, global hotkey
-**Researched:** 2026-04-15
+**Researched:** 2026-04-15 (initial); 2026-04-21 (v0.19.0 supplement: Python/MLX subprocess + Settings UI)
 **Overall confidence:** HIGH for macOS/Swift/CoreML specifics; MEDIUM for Parakeet-specific behavior (limited public docs)
 
 ---
@@ -137,6 +137,122 @@ CoreML's synchronous `MLModel(contentsOf:)` initializer blocks until the model i
 - For Parakeet specifically: if using whisper.cpp or ONNX runtime instead of CoreML, load on a background thread and use `DispatchQueue` or `async`/`await` with proper actor isolation
 
 **Phase:** Phase 2 (model integration). The async loading architecture must be the initial design.
+
+---
+
+### C5: SIP Strips DYLD_LIBRARY_PATH Before Python Subprocess Starts
+
+**What goes wrong:**
+macOS System Integrity Protection (SIP) removes all `DYLD_*` environment variables before launching any child process spawned by a hardened runtime app. This means `DYLD_LIBRARY_PATH` and `DYLD_FALLBACK_LIBRARY_PATH` — which many Python venv setups rely on to find bundled `.dylib` files — are silently stripped and never reach the Python interpreter.
+
+The subprocess appears to launch but immediately crashes with `Library not loaded: @rpath/libpython3.x.dylib` or similar. The error is written to stderr, which is often not monitored, so the Swift side receives an empty stdout and interprets it as a transcription failure.
+
+**Why it happens:**
+`DYLD_*` variables are a documented attack vector for bypassing code signature validation. SIP strips them unconditionally for any process launched from a hardened-runtime parent, regardless of the variables' intended use. This is not a bug — it is intentional security policy.
+
+**Consequences:**
+- Python subprocess crashes on launch; Swift receives empty transcription result
+- Error is invisible unless stderr is explicitly read
+- Works perfectly in development (where SIP may be partially relaxed, Xcode injects entitlements) but fails in production distribution
+
+**Warning signs:**
+- `libpython*.dylib` not found errors in the system log
+- Python process exits with code 1 immediately after `launch()`
+- Transcription silently returns empty string in production builds only
+
+**Prevention:**
+- Use `@rpath`-relative linkage baked into the Python binary at build time rather than `DYLD_LIBRARY_PATH`. Embed the Python framework at `Contents/Frameworks/` and rewrite install names with `install_name_tool -change` and `install_name_tool -rpath` before signing.
+- Include the entitlement `com.apple.security.cs.disable-library-validation` — for local-distribution-only apps (no notarization required) this is acceptable.
+- Alternatively, use a fully self-contained Python binary (e.g., from `python-build-standalone`) where all stdlib `.dylib` dependencies are statically linked or co-located with correct rpath baked in.
+- Test the production build outside Xcode, from a standard user account without SIP disabled.
+
+**Phase:** v0.19.0 (Parakeet integration). Must be resolved before any production testing.
+
+---
+
+### C6: Python Subprocess Pipe Deadlock Under Buffered Output
+
+**What goes wrong:**
+When Swift reads from the Python subprocess's stdout `Pipe`, a deadlock occurs if:
+1. The Python process writes more data to stderr than the OS pipe buffer can hold (~64 KB on macOS) while Swift is only reading from stdout.
+2. The Python process writes to both stdout and stderr, Swift reads from one sequentially — the unread pipe fills up, blocking the Python process, which cannot write to the other pipe, causing both sides to wait forever.
+
+Foundation's `Process` API with `standardOutput = Pipe()` and `standardError = Pipe()` requires both pipes to be drained concurrently. Reading one then the other sequentially is the most common mistake.
+
+**Why it happens:**
+OS pipe buffers are finite (64 KB). When the buffer fills, the writing process blocks until the reader drains it. MLX outputs verbose progress and Metal compilation logs to stderr during model load, which can easily exceed 64 KB.
+
+**Consequences:**
+- App hangs indefinitely on first transcription (or on every transcription if MLX is verbose)
+- Deadlock is non-deterministic — works for short audio, fails for longer recordings that produce more output
+- No timeout fires because the process never exits; it is blocked in a write syscall
+
+**Warning signs:**
+- Transcription hangs for audio clips longer than ~15 seconds
+- `process.waitUntilExit()` never returns
+- Python process shows as running but not consuming CPU in Activity Monitor
+
+**Prevention:**
+- Drain stdout and stderr on separate concurrent tasks/threads simultaneously:
+
+```swift
+let stdoutData = try await Task.detached {
+    pipe.fileHandleForReading.readDataToEndOfFile()
+}.value
+
+// WRONG — reading stderr after stdout may deadlock if stderr filled first
+```
+
+```swift
+// CORRECT — drain both pipes concurrently
+async let stdout = Task.detached { stdoutPipe.fileHandleForReading.readDataToEndOfFile() }
+async let stderr = Task.detached { stderrPipe.fileHandleForReading.readDataToEndOfFile() }
+let (out, err) = await (stdout.value, stderr.value)
+```
+
+- Alternatively, redirect Python's stderr to `/dev/null` if verbose logs are not needed (acceptable for production).
+- Set a timeout: if the subprocess has not exited within N seconds (e.g., 30), `terminate()` and report an error.
+
+**Phase:** v0.19.0 (Parakeet subprocess bridge). The concurrent drain pattern must be the initial implementation.
+
+---
+
+### C7: All Bundled .so and .dylib Files Must Be Individually Code-Signed
+
+**What goes wrong:**
+When distributing a macOS app that embeds a Python environment, every binary file inside the bundle (`.dylib`, `.so`, the Python interpreter itself, compiled extension modules) must be individually code-signed with the same developer certificate. If any are unsigned or signed with a different identity, Gatekeeper blocks the app on launch with a generic "can't be opened" error.
+
+The specific failure mode for Python bundles: extension modules (e.g., `numpy`, `mlx`, `soundfile`) ship as `.so` files. These are treated as Mach-O binaries by Gatekeeper and must each be signed with `codesign --timestamp -o runtime`.
+
+**Why it happens:**
+Apple's hardened runtime requirement mandates that every executable Mach-O in the bundle carry a valid code signature. The check is recursive — signing only the `.app` wrapper does not sign nested binaries.
+
+**Consequences:**
+- App is blocked by Gatekeeper on first launch on any machine other than the developer's
+- Error message gives no indication of which binary is unsigned
+- Signing each binary manually after adding new Python packages is tedious and easy to forget
+
+**Warning signs:**
+- `codesign --verify --deep --strict VoiceScribe.app` reports unsigned binaries
+- App opens on developer machine (where Gatekeeper may be relaxed) but not on other machines
+- System log contains `AMFI: ... not valid`
+
+**Prevention:**
+- Write a build script that signs every file matching `**/*.so` and `**/*.dylib` inside the bundle before the final app signing step.
+- Sign leaf binaries first (innermost), then the outer `.app` wrapper last.
+- Use `--timestamp` and `-o runtime` flags on every `codesign` invocation.
+- For local-only distribution (no notarization), `xattr -r -d com.apple.quarantine VoiceScribe.app` removes the quarantine flag that triggers Gatekeeper for the developer's own use.
+
+```bash
+# Sign all Python extension modules and dylibs
+find VoiceScribe.app -name "*.so" -o -name "*.dylib" | while read f; do
+  codesign --force --timestamp -o runtime --sign "Developer ID Application: ..." "$f"
+done
+# Sign the app bundle last
+codesign --force --deep --timestamp -o runtime --sign "Developer ID Application: ..." VoiceScribe.app
+```
+
+**Phase:** v0.19.0 (Parakeet bundling). Must be automated in the build process, not a manual step.
 
 ---
 
@@ -321,6 +437,214 @@ Missing `Info.plist` key is caught immediately (crash), but missing explicit per
 
 ---
 
+### I6: Python venv Symlinks Are Relative — They Break When the App Is Moved
+
+**What goes wrong:**
+A standard Python `venv` at `Contents/Resources/venv/` contains symlinks to the Python interpreter (e.g., `venv/bin/python3 -> /usr/local/bin/python3`). These symlinks point to the system Python used at creation time, which:
+- May not exist on the user's machine
+- Points outside the `.app` bundle, violating bundle self-containment
+
+When the Python interpreter path embedded in the venv is absolute and points to a system location, the subprocess fails with `python3: command not found` or a `Library not loaded` error on any machine where that exact Python version is not installed at that exact path.
+
+**Why it happens:**
+The `venv` module creates relative or absolute symlinks depending on how `python -m venv` is invoked. If created against a Homebrew or pyenv Python, the symlink is absolute to that installation. The `.app` bundle cannot carry that external dependency.
+
+**Consequences:**
+- App works on developer machine (has the right Python) but not on any other machine
+- Error is not obvious — Python appears to be present but the wrong version is found
+
+**Warning signs:**
+- `venv/bin/python3` is a symlink to `/usr/local/...` or `/opt/homebrew/...`
+- App works in development but fails for any other user
+- `python3 --version` inside the subprocess returns the wrong version or fails
+
+**Prevention:**
+- Use `python-build-standalone` (Gregory Szorc's builds) as the base interpreter. These are fully self-contained, portable, and not Homebrew-dependent.
+- Embed the Python interpreter at `Contents/Frameworks/Python.framework/` or `Contents/Resources/python/`. Replace venv symlinks with actual copies or use `--copies` flag: `python -m venv --copies venv`.
+- After building the venv, verify: `file venv/bin/python3` should be a Mach-O binary, not a symlink.
+- Use `otool -L venv/bin/python3` to verify all dylib dependencies are either within the bundle or in `/usr/lib/` (system-provided, always present).
+
+**Phase:** v0.19.0 (Parakeet bundling). Foundation decision — cannot be changed incrementally.
+
+---
+
+### I7: MLX Memory Pressure Causes Kernel Panic or App Kill on Low-RAM Macs
+
+**What goes wrong:**
+MLX wires GPU memory for loaded models. On Apple Silicon, CPU and GPU share the same physical memory pool. When `parakeet-mlx` loads its model weights into the MLX cache, it allocates a large contiguous chunk of wired (non-swappable) GPU memory. On Macs with 8 GB unified memory, loading a 1.2 GB model plus MLX's operational buffers plus the rest of the OS can exhaust available memory, causing:
+- macOS Jetsam OOM killer to terminate the Python subprocess
+- In severe cases: IOGPUMemory crash → kernel panic (documented in `mlx-lm` issue #883)
+
+The subprocess is terminated silently; the Swift parent receives an unexpected process exit.
+
+**Why it happens:**
+MLX by default does not limit its GPU memory pool. Metal memory is wired, meaning macOS cannot reclaim it by paging to disk. Unlike CPU memory pressure (which causes slowdowns), GPU memory exhaustion causes hard termination.
+
+**Consequences:**
+- Transcription silently fails on low-RAM machines (8 GB)
+- Repeated failures may destabilize the system
+- The failure is not a Swift-side bug, making it hard to diagnose from logs
+
+**Warning signs:**
+- Python subprocess exits with non-zero code during model load (not during inference)
+- Activity Monitor shows memory pressure going red during first transcription
+- Console.app shows IOGPUMemory allocation failures
+
+**Prevention:**
+- Set `MLX_METAL_MEMORY_LIMIT` (or use `mx.metal.set_cache_limit()` in Python) before loading the model to leave headroom for the OS.
+- Recommend at least 16 GB RAM in user-facing documentation; show a warning on first launch if `sysctl hw.memsize` returns < 16 GB.
+- Implement subprocess exit code monitoring in Swift: if the Python process exits unexpectedly, show an actionable error ("Transcription engine ran out of memory") rather than a generic failure.
+- Call `mx.clear_cache()` in Python after each transcription to release the MLX activation cache.
+
+**Phase:** v0.19.0 (Parakeet integration). Add the memory check and exit-code monitoring before first use.
+
+---
+
+### I8: MLX First-Inference Warmup Takes 5–15 Seconds (Metal Shader Compilation)
+
+**What goes wrong:**
+MLX (and Metal in general) compiles GPU shaders on first use and caches them in `~/Library/Caches/`. On the very first run after installation, or after a macOS update that invalidates the cache, the first call to the model incurs a one-time compilation penalty of 5–15 seconds where the app appears frozen.
+
+For `parakeet-mlx` specifically, the model uses custom Metal kernels. If the Python process is short-lived (one inference per subprocess invocation), this compilation overhead occurs on every first cold start. Community benchmarks note MLX initialization at ~31 seconds for large LLMs; for parakeet's ASR model the overhead is lower but still significant on first use.
+
+**Why it happens:**
+Metal shader compilation is deferred to first use (not at app install time). The compiled pipeline objects are stored in the Metal cache, which is version-keyed to the macOS + GPU combination. Any OS update can invalidate the entire cache.
+
+**Consequences:**
+- First dictation after install takes 10–20 seconds with no visible progress
+- User assumes the app is broken and force-quits before compilation completes
+- If the subprocess is started fresh for each recording, the compilation overhead repeats on each launch (no caching benefit across process restarts)
+
+**Warning signs:**
+- First recording takes much longer than subsequent recordings
+- Python subprocess CPU usage spikes but no audio processing is happening (shader compilation is CPU-bound)
+- No loading indicator during the compilation phase
+
+**Prevention:**
+- Keep the Python subprocess running persistently (keep-alive mode) rather than spawning it per-recording. This amortizes the compilation cost across the app's lifetime.
+- Send a "warmup" inference request (silent, zero-length or dummy audio) at app startup immediately after model load. This forces Metal compilation before the user makes their first real request.
+- Show a "Warming up transcription engine..." status during this phase — do not silently block.
+- On macOS updates (detect via `os.systemVersion` comparison against a stored value), proactively show "First run may be slower due to shader recompilation" warning.
+
+**Phase:** v0.19.0 (Parakeet integration). Warmup must be built into the startup sequence, not added later.
+
+---
+
+### I9: Zombie Python Subprocesses Accumulate Without Explicit Wait
+
+**What goes wrong:**
+When Swift's `Process` object is not explicitly `.waitUntilExit()` or the `terminationHandler` is not set, the child Python process becomes a zombie after it exits. Zombie processes hold a PID and process table entry but no resources — except that they accumulate. In a long-running menu bar app that spawns a Python subprocess per recording, thousands of zombies can accumulate over days of use, eventually exhausting the process table.
+
+Additionally, if `mlx` spawns its own worker processes internally (multiprocessing, thread pools), these grandchild processes can hold file descriptors open even after the direct child exits, preventing `readDataToEndOfFile()` from returning EOF and causing the Swift side to hang indefinitely.
+
+**Why it happens:**
+POSIX: a child process remains in the process table as a zombie until the parent calls `wait()` (Swift: `waitUntilExit()`). Foundation's `Process` does this automatically if `terminationHandler` is set, but not if the handler is nil and `waitUntilExit()` is never called.
+
+**Consequences:**
+- Process table fills up over multiple days of use
+- `readDataToEndOfFile()` hangs if grandchild processes hold the pipe's write end open
+- Activity Monitor shows accumulating zombie Python processes
+
+**Warning signs:**
+- `ps aux | grep defunct` shows growing count of zombie processes
+- `process.terminationStatus` is never read
+- `terminationHandler` is nil
+
+**Prevention:**
+- Always set `process.terminationHandler` or call `process.waitUntilExit()` from an `async` context.
+- For persistent subprocess mode (recommended for warmup): use a keep-alive process with a simple JSON protocol over stdin/stdout rather than spawning per-recording.
+- In Python: ensure MLX does not spawn persistent background threads by using `mx.disable_compile()` or appropriate MLX config before inference if multiprocessing is not needed.
+
+**Phase:** v0.19.0 (Parakeet subprocess bridge). Required from day one; not easily retrofitted.
+
+---
+
+### I10: Defaults Library Causes MenuBarExtra Freeze State Loop
+
+**What goes wrong:**
+Using `@Default` (from `sindresorhus/Defaults`) as a state source inside a SwiftUI view rendered by `MenuBarExtra` with the `.menu` style causes an infinite re-render loop. The console is spammed with "Publishing changes from within view updates is not allowed" and the menu freezes. This is a confirmed issue (Defaults issue #144).
+
+The root cause is that SwiftUI's `.menu`-style `MenuBarExtra` blocks the main runloop while the menu is open, and the Defaults library's `@ObservationIgnored` + Combine-based observation triggers a state update during a view update, which SwiftUI forbids.
+
+**Why it happens:**
+SwiftUI's `.menu` MenuBarExtra style is synchronous and blocks the runloop. Any reactive state update that fires during rendering creates a re-entry that SwiftUI cannot handle correctly.
+
+**Consequences:**
+- Menu bar menu freezes and must be force-quit
+- All `@Default` bindings in MenuBarExtra views are affected
+- The bug is intermittent (depends on timing of Defaults notification delivery)
+
+**Warning signs:**
+- "Publishing changes from within view updates is not allowed" in console
+- MenuBarExtra menu hangs on open
+- Only happens with `.menu` style, not `.window` style
+
+**Prevention:**
+- Use `.window` style for the MenuBarExtra, not `.menu` — this avoids the runloop blocking issue entirely.
+- If `.menu` style is required, wrap `@Default` accesses in `DispatchQueue.main.async {}` to defer state updates out of the render cycle.
+- Alternatively, use `@AppStorage` (SwiftUI's own UserDefaults wrapper) for values displayed in the menu, and `@Default` only in Settings views rendered in separate windows.
+- Do not use `@Default` directly in menu body views — use a local `@State` that is populated from Defaults outside the view update.
+
+**Phase:** v0.19.0 (Settings UI). Address in the MenuBarExtra content refactor.
+
+---
+
+### I11: SwiftUI Settings Scene Cannot Be Opened Programmatically (MenuBarExtra Context)
+
+**What goes wrong:**
+Apple removed the ability to open the SwiftUI `Settings` scene via `NSApp.sendAction(#selector(showSettingsWindow:), ...)` — the legacy approach no longer works on macOS 14+. The only supported way to open the Settings window is via `SettingsLink` (a SwiftUI view) or via the app's main menu "Settings..." item.
+
+For a `MenuBarExtra`-only app (no menu bar, no `WindowGroup`), there is no built-in "Settings..." menu item. The app must add a `Button("Settings") { openSettings() }` inside the MenuBarExtra content and use the `@Environment(\.openSettings)` action introduced in macOS 14. On macOS 13, this API does not exist.
+
+**Why it happens:**
+Apple's SwiftUI team removed the AppKit bridge for settings window presentation in macOS 14 as part of tightening SwiftUI scene management.
+
+**Consequences:**
+- "Settings" button in the menu does nothing on macOS 13
+- Custom Settings window can't be opened from hotkeys or notifications
+- App feels broken on macOS 13 if the only entry to settings is a non-functional button
+
+**Warning signs:**
+- `NSApp.sendAction(#selector(showSettingsWindow:), ...)` returns `false`
+- Settings window never opens from menu button on macOS 13
+- `@Environment(\.openSettings)` causes compile error on macOS 13 target
+
+**Prevention:**
+- Use `@Environment(\.openSettings)` with `#available(macOS 14, *)` guard.
+- For macOS 13 fallback: use `sindresorhus/Settings` package or `orchetect/SettingsAccess` which wrap the AppKit bridge reliably.
+- Since the project targets macOS 14+ (per CLAUDE.md stack), `@Environment(\.openSettings)` is the correct approach — verify the deployment target is enforced in the Xcode project settings.
+
+**Phase:** v0.19.0 (Settings UI). Confirm the macOS 14 deployment target is set before implementing.
+
+---
+
+### I12: KeyboardShortcuts Recorder Shows "First Responder" Warnings in MenuBarExtra Context
+
+**What goes wrong:**
+When embedding `KeyboardShortcuts.Recorder` in a Settings window that is opened from a `MenuBarExtra`-based app, Xcode console shows warnings about first responder not being set across windows. The recorder component uses `NSResponder` under the hood. When the Settings window is opened while the MenuBarExtra window is active, NSResponder chain resolution can be confused, causing the recorder to occasionally not receive key events for recording a new shortcut.
+
+**Why it happens:**
+`MenuBarExtra` manages its own window hierarchy, which is separate from the main app window hierarchy. When a Settings window is opened, NSApp's key window state may not correctly transfer, leaving the recorder without key event focus.
+
+**Consequences:**
+- Shortcut recorder does not respond to key presses intermittently
+- User cannot record a new shortcut without clicking away and back
+- Console warning spam in development builds
+
+**Warning signs:**
+- Console: "... first responder ... across different windows"
+- Recorder works in isolation but not when opened from MenuBarExtra
+- Issue disappears when tested without a MenuBarExtra scene
+
+**Prevention:**
+- Call `NSApp.activate(ignoringOtherApps: true)` and `window.makeKeyAndOrderFront(nil)` when opening the Settings window to explicitly transfer key focus.
+- Wrap the `KeyboardShortcuts.Recorder` in an `NSViewRepresentable` that calls `becomeFirstResponder()` in `makeNSView`.
+- File: this is a known integration quirk, not a blocking bug. The workaround (explicit `makeKeyAndOrderFront`) is two lines and reliable.
+
+**Phase:** v0.19.0 (Settings UI / Hotkey configuration). Low severity; fix during Settings implementation.
+
+---
+
 ## Minor Pitfalls (Worth knowing)
 
 ---
@@ -436,13 +760,31 @@ Additionally, even on Groq's fast inference, `qwen3-32b` adds 1–3 seconds of l
 
 ---
 
+### M6: Python Subprocess Audio Format Mismatch (Sample Rate, Bit Depth)
+
+**What goes wrong:**
+`AVAudioEngine` captures audio in the hardware's native format, which on most Macs is 32-bit float at 44.1 kHz or 48 kHz. Parakeet-mlx expects audio at 16 kHz, 16-bit int (the NeMo standard). If the Swift side sends raw PCM buffers without converting, parakeet will either error or produce garbage transcription silently.
+
+**Why it happens:**
+Format conversion is not automatic when sending audio over a pipe. Developers often send raw buffer bytes without accounting for format differences.
+
+**Prevention:**
+- Install an `AVAudioConverter` between the capture tap and the pipe, targeting 16 kHz mono float32 (then convert to int16 before sending, or let Python handle the float32-to-int16 conversion).
+- Or write audio to a temporary WAV file with proper headers before passing to Python — simpler but adds a file I/O roundtrip.
+- Validate format assumptions in the Python script: assert `sample_rate == 16000` at script startup with a clear error message.
+
+**Phase:** v0.19.0 (Parakeet integration). Format contract must be established before implementing the bridge.
+
+---
+
 ## Phase Mapping Summary
 
-| Phase | Critical Pitfall to Address |
-|-------|-----------------------------|
-| Phase 1 (Setup) | C1 — No sandbox, direct distribution only. C2 — Accessibility permission check architecture. I3 — Keychain with `AfterFirstUnlock`. I5 — Info.plist microphone key. M2 — `LSUIElement`, `MenuBarExtra` scene. |
-| Phase 2 (Core: Audio + Transcription + Injection) | C3 — `AVAudioEngineConfigurationChangeNotification`. C4 — Async model loading at startup. I1 — Two-tier text injection (AX + CGEvent fallback). I2 — Hotkey safety timeout for hold-to-talk. I4 — Single shared model instance, memory profiling. I5 — Permission request UX. M1 — Compute unit selection. M4 — Recording state feedback. |
-| Phase 3 (LLM + History) | I3 — Confirmed Keychain implementation. M3 — SQLite WAL for history. M5 — Groq error handling, latency UX. |
+| Phase | Pitfalls to Address |
+|-------|---------------------|
+| Phase 1 (Setup) | C1 — No sandbox. C2 — Accessibility permission check architecture. I3 — Keychain with `AfterFirstUnlock`. I5 — Info.plist microphone key. M2 — `LSUIElement`, `MenuBarExtra` scene. |
+| Phase 2 (Core: Audio + Transcription + Injection) | C3 — `AVAudioEngineConfigurationChangeNotification`. C4 — Async model loading. I1 — Two-tier text injection. I2 — Hotkey safety timeout. I4 — Single shared model instance. I5 — Permission request UX. M1 — Compute unit selection. M4 — Recording state feedback. |
+| Phase 3 (LLM + History) | I3 — Confirmed Keychain implementation. M3 — SQLite WAL. M5 — Groq error handling. |
+| v0.19.0 (Parakeet + Settings) | **C5** — SIP strips DYLD. **C6** — Pipe deadlock (concurrent drain). **C7** — Sign all .so/.dylib. **I6** — venv symlinks broken on other machines. **I7** — MLX memory pressure / kernel panic. **I8** — Metal shader warmup latency. **I9** — Zombie subprocess accumulation. **I10** — Defaults + MenuBarExtra freeze loop. **I11** — Settings scene programmatic open. **I12** — KeyboardShortcuts first responder in MenuBarExtra. **M6** — Audio format mismatch (16 kHz). |
 
 ---
 
@@ -451,10 +793,19 @@ Additionally, even on Groq's fast inference, `qwen3-32b` adds 1–3 seconds of l
 - Apple CoreML documentation: `MLComputeUnits`, `MLModel.load` async API — HIGH confidence
 - Apple coremltools docs: quantization, model size — HIGH confidence (Context7 /apple/coremltools)
 - whisper.cpp: Metal backend CMake options — HIGH confidence (Context7 /ggml-org/whisper.cpp)
-- Apple Developer Forums thread on Keychain `kSecAttrAccessibleAfterFirstUnlock` background behavior — MEDIUM confidence (content from documentation proxy)
-- AVAudioEngine `AVAudioEngineConfigurationChangeNotification` — HIGH confidence (Apple documented API, author knowledge)
-- Sandbox restrictions on global event monitoring — HIGH confidence (NSEvent documentation, widely confirmed in developer community)
-- Electron Accessibility API limitations — MEDIUM confidence (widely reported in dictation app communities, including VoiceInk and similar projects; no single authoritative source)
-- Carbon `RegisterEventHotKey` silent failure on conflict — HIGH confidence (Carbon API documented behavior, widely observed)
+- Apple Developer Forums thread on Keychain `kSecAttrAccessibleAfterFirstUnlock` background behavior — MEDIUM confidence
+- AVAudioEngine `AVAudioEngineConfigurationChangeNotification` — HIGH confidence (Apple documented API)
+- Sandbox restrictions on global event monitoring — HIGH confidence (NSEvent documentation)
+- Electron Accessibility API limitations — MEDIUM confidence (widely reported in dictation app communities)
+- Carbon `RegisterEventHotKey` silent failure on conflict — HIGH confidence (Carbon API documented behavior)
 - HotKey library (`soffes/HotKey`) basics — HIGH confidence (Context7 /soffes/hotkey)
 - `LSUIElement` Menu Bar app requirements — HIGH confidence (standard macOS app lifecycle docs)
+- SIP stripping `DYLD_*` environment variables: https://hynek.me/articles/macos-dyld-env/ — HIGH confidence (documented macOS security behavior; Apple Developer Forums)
+- Python subprocess pipe deadlock (64 KB buffer): https://discuss.python.org/t/details-of-process-wait-deadlock/69481 — HIGH confidence (Python docs, POSIX behavior)
+- Code-signing all Mach-O binaries in bundle: Apple Developer Forums, PyInstaller docs — HIGH confidence
+- Python venv symlinks / portable Python: `python-build-standalone` project — MEDIUM confidence (WebSearch, author knowledge)
+- MLX memory pressure / kernel panic: https://github.com/ml-explore/mlx-lm/issues/883 and https://medium.com/@michael.hannecke/... — MEDIUM confidence (GitHub issue, community post)
+- MLX warmup latency / Metal cache: https://deepwiki.com/huggingface/speech-to-speech/7.3-mac-os-and-mlx-optimizations — MEDIUM confidence (community benchmark)
+- Defaults + MenuBarExtra freeze: https://github.com/sindresorhus/Defaults/issues/144 — HIGH confidence (confirmed library issue)
+- `@Environment(\.openSettings)` macOS 14+: Apple Developer Forums, https://github.com/orchetect/SettingsAccess — HIGH confidence
+- KeyboardShortcuts first responder in MenuBarExtra context: https://github.com/sindresorhus/KeyboardShortcuts/issues/127 — MEDIUM confidence (GitHub issue)

@@ -1,485 +1,551 @@
 # Architecture Research
 
 **Project:** VoiceScribe — macOS Menu Bar Dictation App
-**Researched:** 2026-04-15
-**Overall confidence:** HIGH (all major claims verified against official Apple docs or authoritative library sources)
+**Researched:** 2026-04-15 (urspruenglich) / 2026-04-21 (aktualisiert fuer Milestone v0.19.0)
+**Overall confidence:** HIGH (alle wesentlichen Befunde aus Context7, GitHub-Quellen und Codebase-Analyse)
 
 ---
 
-## Component Overview
+## UPDATE: Milestone v0.19.0 — Integration Architecture
 
-### 1. App Shell — `MenuBarApp`
+Dieser Abschnitt erweitert die urspruengliche Architektur-Research (unten) um spezifische
+Integrationsentscheidungen fuer die zwei neuen Funktionen von Milestone v0.19.0:
 
-**Responsibility:** Entry point, NSStatusItem lifecycle, top-level state coordinator.
+1. Parakeet v3 als Python/MLX-Subprocess, der WhisperKit ersetzt
+2. Konsolidiertes Einstellungsfenster
 
-**Decision: Use `NSApplicationDelegate` + `NSStatusItem` directly, not SwiftUI `MenuBarExtra`.**
+---
 
-Rationale: `MenuBarExtra` (introduced macOS 13) is convenient for simple menus, but it has constraints that conflict with this app's needs: it cannot easily host animated icons driven by external state (recording in progress), and it offers no `onKeyDown`/`onKeyUp` hooks for push-to-talk. `NSStatusItem` + `NSStatusBarButton` gives full control over icon animation, click handling, and menu attachment.
+## Frage 1: Python Subprocess Bridge -- Architekturoptionen
 
-Pattern:
-```swift
-@main
-struct VoiceScribeApp: App {
-    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    var body: some Scene { Settings { SettingsView() } }
+### Uebersicht der IPC-Methoden
+
+Drei Mechanismen stehen zur Wahl fuer die Kommunikation zwischen Swift-Host und Python-Kindprozess:
+
+| Kriterium | stdin/stdout Pipes | Unix Domain Socket | Temp-Datei |
+|-----------|-------------------|-------------------|------------|
+| **Latenz** | ~0ms Overhead, kernel-gepuffert | ~0ms, etwas hoeher bei Setup | 10-100ms (Disk-I/O) |
+| **Throughput fuer Audio** | Gut fuer <100 MB | Sehr gut, bidirektional | Schlecht (WAV-Roundtrip) |
+| **Prozess-Lifecycle** | Eng gekoppelt -- Pipe-EOF beendet Kind | Entkoppelt moeglich | Vollstaendig entkoppelt |
+| **Fehlerbehandlung** | EOF-Signal bei Crash ist deterministisch | TCP-aehnliches Reconnect moeglich | Race conditions moeglich |
+| **Komplexitaet** | Gering (Swift `Process`, Foundation Pipe) | Mittel (POSIX socket API) | Gering, aber unzuverlaessig |
+| **Eignung fuer Push-to-Talk** | HOCH -- eine Transkription pro Aufruf | MITTEL -- Overhead lohnt nicht | NIEDRIG |
+
+**Empfehlung: stdin/stdout Pipe mit JSON-Envelopes und binaeren Audio-Daten.**
+
+Begruendung:
+- Push-to-talk produziert eine Aufnahme, die einmal transkribiert wird; kein dauerhafter
+  bidirektionaler Stream noetig
+- Unix Domain Sockets haben keinen Latenz-Vorteil fuer diesen Ein-Anfrage-pro-Aufnahme-Modus
+- stdin/stdout-EOF ist das natuerlichste Crash-Signal: Kindprozess stirbt -> Pipe bricht -> Swift
+  erkennt sofort; kein Zombie-Socket
+- Implementierung mit Foundation `Process` + `Pipe` ist in Swift direkt verfuegbar, ohne
+  Drittbibliotheken
+- Das neue `swift-subprocess`-Paket (September 2025, swiftlang/swift-subprocess) loest das
+  bekannte Deadlock-Problem bei grossen Daten, ist aber optional -- Foundation `Process` mit
+  asynchronem Drain reicht fuer diesen Anwendungsfall
+
+**Achtung (HIGH-confidence Pitfall): Naives Lesen von `pipe.fileHandleForReading.readDataToEndOfFile()`
+blockiert den Main Thread und deadlockt sobald der Pipe-Buffer voll ist (typisch 64 KB auf macOS).
+Stattdessen: `readabilityHandler` oder `AsyncBytes`-Drain verwenden.**
+
+### Protokolldesign: JSON-Envelope + Raw PCM
+
+```
+Swift -> Python (stdin):
+{
+  "cmd": "transcribe",
+  "sample_rate": 16000,
+  "samples_count": 48000,
+  "audio_follows_bytes": 192000
 }
+\n
+<192000 raw bytes: Float32 LE PCM, 16 kHz mono>
 
-final class AppDelegate: NSObject, NSApplicationDelegate {
-    var statusItem: NSStatusItem?
-
-    func applicationDidFinishLaunching(_ notification: Notification) {
-        // Hide from Dock — set LSUIElement in Info.plist
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        // attach menu or popover
-    }
+Python -> Swift (stdout):
+{
+  "status": "ok",
+  "text": "Transkribierter Text hier",
+  "duration_ms": 340
 }
+\n
 ```
 
-`LSUIElement = YES` in `Info.plist` keeps the app out of the Dock and App Switcher.
-Confidence: HIGH (Apple NSStatusItem docs, confirmed pattern)
+Alternativ: WAV-Header voranstellen und Parakeet `model.transcribe(file)` mit tempfile nutzen --
+aber das erzeugt einen Datei-Roundtrip. Die Raw-PCM-Route mit direktem `model.transcribe(samples)`
+ist sauberer und schneller.
 
----
+### Prozess-Lifecycle-Strategie
 
-### 2. Hotkey Engine — `HotkeyManager`
+**Warm-Start-Modell (empfohlen):** Python-Prozess wird beim App-Start gestartet, haelt das Modell
+im Speicher, wartet in einer `while True: ...`-Schleife auf stdin-Requests. Keine Neuladezeit
+pro Diktat (~340ms cold load entfaellt).
 
-**Responsibility:** Intercept global key-down and key-up events; translate to `startRecording` / `stopRecording` signals.
+```
+App-Start:
+  LaunchPythonBridge() -> Process laeuft, Modell geladen (3-8s)
+  -> isModelReady = true
 
-**Decision: Use `KeyboardShortcuts` Swift package (sindresorhus/keyboardshortcuts).**
+Diktat:
+  sendTranscribeRequest([Float], sampleRate) -> JSON + PCM auf stdin
+  receiveResponse() -> JSON von stdout
+  -> String zurueck (~ 300-500ms Inferenz)
 
-Rationale:
-- Pure Swift, SwiftUI + Cocoa support, Mac App Store + sandboxed-app compatible.
-- `onKeyDown` for push-to-talk start, `onKeyUp` for stop — both are available.
-- Stores shortcut preferences automatically in `UserDefaults`.
-- Provides a `Recorder` UI component for the settings screen.
-- Alternative (Carbon `RegisterEventHotKey`) is deprecated-in-spirit and not sandbox-safe.
-- Alternative (`NSEvent.addGlobalMonitorForEvents`) requires Accessibility permission and cannot prevent the key event from reaching other apps.
-
-```swift
-extension KeyboardShortcuts.Name {
-    static let pushToTalk = Self("pushToTalk")
-    static let profileA   = Self("profileA")
-}
-
-// In AppState init:
-KeyboardShortcuts.onKeyDown(for: .pushToTalk) { startRecording() }
-KeyboardShortcuts.onKeyUp(for: .pushToTalk)   { stopRecording() }
+App-Beenden:
+  stdin.close() -> Python exit(0) via EOF-Guard -> kein Zombie
 ```
 
-Confidence: HIGH (KeyboardShortcuts Context7 docs, GitHub README)
+**Kalt-Start-Modell (Alternative):** Neuer Prozess pro Diktat. Einfacher aber ~3-8s Latenz
+pro Aufruf -- inakzeptabel fuer Push-to-Talk. Nicht empfohlen.
 
 ---
 
-### 3. Audio Pipeline — `AudioRecorder`
+## Frage 2: TranscriptionService -- Umbau zu pluggablem Backend
 
-**Responsibility:** Capture microphone input, accumulate PCM buffers, deliver `[Float]` array on stop.
-
-**Stack: `AVAudioEngine` with `installTap` on the input node.**
-
-Pattern:
-```swift
-final class AudioRecorder {
-    private let engine = AVAudioEngine()
-    private var samples: [Float] = []
-
-    func startRecording() throws {
-        let inputNode = engine.inputNode
-        let format = inputNode.outputFormat(forBus: 0)
-
-        inputNode.installTap(onBus: 0, bufferSize: 4096, format: format) { buffer, _ in
-            // append mono float32 samples
-            if let channelData = buffer.floatChannelData?[0] {
-                self.samples.append(contentsOf:
-                    Array(UnsafeBufferPointer(start: channelData,
-                                             count: Int(buffer.frameLength))))
-            }
-        }
-        try engine.start()
-    }
-
-    func stopRecording() -> [Float] {
-        engine.inputNode.removeTap(onBus: 0)
-        engine.stop()
-        defer { samples = [] }
-        return samples
-    }
-}
-```
-
-WhisperKit expects 16 kHz mono `[Float]`. AVAudioEngine typically delivers the hardware's native format. A resampling step via `AVAudioConverter` is needed if the hardware sample rate differs from 16 000 Hz. WhisperKit's `AudioProcessor.convertBufferToArray` handles this internally if raw buffers are passed directly.
-
-Confidence: HIGH (AVAudioEngine is the standard macOS audio capture path; WhisperKit docs confirm float array input)
-
----
-
-### 4. Transcription Engine — `TranscriptionService`
-
-**Responsibility:** Accept `[Float]` PCM audio, return transcript string via async/await.
-
-**Decision: Use WhisperKit (argmaxinc/whisperkit), NOT parakeet-mlx.**
-
-Critical finding: `parakeet-mlx` is a Python-only library. It cannot be imported into a Swift app without a subprocess bridge (fragile, requires bundled Python runtime, unacceptable for a polished native app). WhisperKit is a native Swift package that:
-- Runs on-device using CoreML + Neural Engine
-- Has a clean async Swift API
-- Supports model download, local model folder, and memory unload
-- Accepts raw `[Float]` samples at 16 kHz
-
-If NVIDIA Parakeet accuracy is specifically required, the only viable path in Swift is: (a) export the Parakeet model to CoreML via `coremltools` and load with `MLModel`, or (b) wrap the parakeet-mlx Python library in a bundled subprocess — which is complex and fragile. WhisperKit with `large-v3` or the device-recommended model is the pragmatic choice.
+### Ist-Zustand (WhisperKit-spezifisch)
 
 ```swift
 actor TranscriptionService {
-    private var pipe: WhisperKit?
+    private var whisperKit: WhisperKit?
 
-    func load() async throws {
-        let config = WhisperKitConfig(
-            model: "large-v3-v20240930",
-            download: false,                      // model bundled at build time
-            load: true,
-            prewarm: true
-        )
-        pipe = try await WhisperKit(config)
+    func downloadAndLoad(progressHandler: @MainActor @escaping (Double) -> Void) async { ... }
+    func transcribeWithResampling(_ samples: [Float], sampleRate: Double) async -> String? { ... }
+    func transcribe(_ samples: [Float]) async -> String? { ... }
+    func resampleTo16kHz(...) -> [Float] { ... }
+}
+```
+
+Das WhisperKit-Objekt und alle WhisperKit-spezifischen APIs liegen direkt im Actor.
+
+### Soll-Architektur: Protokoll + zwei Implementierungen
+
+**Schritt 1: Protokoll `TranscriptionBackend` definieren**
+
+```swift
+/// Konformitaetsprotokoll fuer austauschbare Transkriptions-Backends.
+/// Alle Implementierungen muessen @MainActor-sicher sein (da als actor implementiert).
+protocol TranscriptionBackend: Sendable {
+    /// Laedt Modell herunter / initialisiert. progressHandler auf @MainActor.
+    func downloadAndLoad(progressHandler: @MainActor @escaping (Double) -> Void) async
+
+    /// Transkribiert PCM-Samples. Samples koennen beliebige Samplerate haben.
+    func transcribeWithResampling(_ samples: [Float], sampleRate: Double) async -> String?
+
+    /// true nach erfolgreichem downloadAndLoad()
+    var isModelReady: Bool { get async }
+}
+```
+
+**Schritt 2: `ParakeetBackend` actor implementieren**
+
+```swift
+actor ParakeetBackend: TranscriptionBackend {
+    private var bridge: PythonSubprocessBridge?
+    private(set) var isModelReady: Bool = false
+
+    func downloadAndLoad(progressHandler: @MainActor @escaping (Double) -> Void) async {
+        // 1. Check ob bundled Python + Modell vorhanden (venv in app bundle)
+        // 2. Python-Kindprozess starten
+        // 3. Warten auf "ready"-Signal von Python (stdout JSON)
+        // 4. progressHandler(1.0), isModelReady = true
     }
 
-    func transcribe(_ samples: [Float]) async throws -> String {
-        guard let pipe else { throw ServiceError.notLoaded }
-        let results = try await pipe.transcribe(audioArray: samples)
-        return results.map(\.text).joined(separator: " ").trimmingCharacters(in: .whitespaces)
-    }
-
-    func unload() async {
-        await pipe?.unloadModels()
-        pipe = nil
+    func transcribeWithResampling(_ samples: [Float], sampleRate: Double) async -> String? {
+        let samples16k = resampleTo16kHz(samples, fromSampleRate: sampleRate)
+        return await bridge?.transcribe(samples16k, sampleRate: 16000)
     }
 }
 ```
 
-**Lazy loading:** Call `load()` on first use or on app launch in a background Task. Keep loaded while app is active; call `unload()` only if memory pressure is critical.
+**Schritt 3: `WhisperKitBackend` -- bestehender Code refaktoriert**
 
-Confidence: HIGH for WhisperKit approach (Context7 docs). MEDIUM for Parakeet CoreML path (feasible but requires a separate export step not documented in the parakeet-mlx repo).
+```swift
+actor WhisperKitBackend: TranscriptionBackend {
+    // Bisheriger TranscriptionService-Code mit minimalem Renaming
+    private var whisperKit: WhisperKit?
+    private(set) var isModelReady: Bool = false
+    // ... (identisch zum bestehenden TranscriptionService)
+}
+```
+
+**Schritt 4: `TranscriptionService` als Facade**
+
+```swift
+actor TranscriptionService {
+    private var backend: any TranscriptionBackend
+
+    /// Wechsel via Defaults[.transcriptionBackend] -- aktuell nur .parakeet
+    init(backend: any TranscriptionBackend = ParakeetBackend()) {
+        self.backend = backend
+    }
+
+    var isModelReady: Bool {
+        get async { await backend.isModelReady }
+    }
+
+    func downloadAndLoad(progressHandler: @MainActor @escaping (Double) -> Void) async {
+        await backend.downloadAndLoad(progressHandler: progressHandler)
+    }
+
+    func transcribeWithResampling(_ samples: [Float], sampleRate: Double) async -> String? {
+        await backend.transcribeWithResampling(samples, sampleRate: sampleRate)
+    }
+}
+```
+
+**AppDelegate-Aenderungen: minimal.** Der bestehende Code in `AppDelegate.swift` ruft
+`transcriptionService.downloadAndLoad(...)` und `transcriptionService.transcribeWithResampling(...)`
+auf -- diese Signaturen bleiben identisch. AppDelegate muss nicht veraendert werden.
+
+### Wichtige Anmerkung: FluidAudio als Alternative zu Python-Bridge
+
+**HIGH-confidence Neuentdeckung (2025):** FluidInference hat Parakeet TDT v3 in CoreML portiert
+und als Swift Package veroeffentlicht: `FluidInference/FluidAudio` (v0.12.4, 1500+ GitHub Stars,
+bereits in VoiceInk und 20+ Production-Apps im Einsatz).
+
+```swift
+// FluidAudio API (aus Context7-Dokumentation):
+let models = try await AsrModels.downloadAndLoad(version: .v3) // auto-HuggingFace-Download
+let asrManager = AsrManager(config: .default)
+try await asrManager.loadModels(models)
+let result = try await asrManager.transcribe(samples) // samples: [Float] 16kHz mono
+print(result.text)
+```
+
+FluidAudio-Vorteile gegenueber Python-Bridge:
+- Natives Swift, kein Python-Prozess, kein venv-Bundling
+- Neural Engine statt MLX/GPU: 66 MB Arbeitsspeicher vs. ~2 GB MLX
+- ~110x RTF auf M4 Pro (1 Minute Audio = 0,5 Sekunden)
+- SPM-Integration: `https://github.com/FluidInference/FluidAudio.git`
+- Progress-Handler bei Download (`progressHandler: { progress in }`)
+
+**Empfehlung fuer Milestone v0.19.0:** FluidAudio als `ParakeetBackend`-Implementierung
+statt Python-Bridge verwenden. Das Protokoll-Design bleibt identisch -- nur die Implementierung
+von `ParakeetBackend` aendert sich.
+
+```swift
+actor ParakeetBackend: TranscriptionBackend {
+    private var asrManager: AsrManager?
+    private(set) var isModelReady: Bool = false
+
+    func downloadAndLoad(progressHandler: @MainActor @escaping (Double) -> Void) async {
+        do {
+            // FluidAudio: Modell-Download mit optionalem progressHandler
+            let models = try await AsrModels.downloadAndLoad(version: .v3)
+            let manager = AsrManager(config: .default)
+            try await manager.loadModels(models)
+            self.asrManager = manager
+            self.isModelReady = true
+            await progressHandler(1.0)
+        } catch {
+            print("[ParakeetBackend] Download/Load fehlgeschlagen: \(error)")
+        }
+    }
+
+    func transcribeWithResampling(_ samples: [Float], sampleRate: Double) async -> String? {
+        guard let manager = asrManager, isModelReady else { return nil }
+        let samples16k = resampleTo16kHz(samples, fromSampleRate: sampleRate)
+        guard samples16k.count >= 1600 else { return nil }
+        do {
+            let result = try await manager.transcribe(samples16k)
+            return result.text.trimmingCharacters(in: .whitespaces)
+        } catch {
+            return nil
+        }
+    }
+}
+```
+
+Falls FluidAudio nicht ausreicht (z.B. Sprachunterstuetzung, Lizenz), ist die Python-Bridge-Option
+mit identischer Backend-Protokoll-Schnittstelle als Fallback weiterhin realisierbar.
 
 ---
 
-### 5. LLM Post-Processor — `GroqService`
+## Frage 3: Modell-Download beim Erststart
 
-**Responsibility:** Accept transcript + active prompt profile, call Groq REST API, return processed text.
+### Integration in den App-Lifecycle
 
-**Stack: `URLSession` async/await, no third-party HTTP library needed.**
+**Wo:** `AppDelegate.setupTranscription()` -- bereits vorhanden, handhabt WhisperKit-Download.
+Kein neues Konzept noetig, nur Austausch der Backend-Implementierung.
 
-Groq API is OpenAI-compatible. A single `POST /v1/chat/completions` call suffices.
-
+**Aktueller Code:**
 ```swift
-actor GroqService {
-    private let apiKey: String   // loaded from Keychain on init
-
-    func process(transcript: String, profile: PromptProfile) async throws -> String {
-        var request = URLRequest(url: URL(string: "https://api.groq.com/openai/v1/chat/completions")!)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let body = ChatRequest(
-            model: "qwen/qwen3-32b",
-            messages: [
-                .init(role: "system", content: profile.systemPrompt),
-                .init(role: "user",   content: transcript)
-            ]
-        )
-        request.httpBody = try JSONEncoder().encode(body)
-
-        let (data, _) = try await URLSession.shared.data(for: request)
-        let response  = try JSONDecoder().decode(ChatResponse.self, from: data)
-        return response.choices.first?.message.content ?? transcript
+private func setupTranscription() {
+    Task {
+        await transcriptionService.downloadAndLoad { [weak self] fraction in
+            let pct = Int(fraction * 100)
+            self?.statusItem.button?.title = pct < 100 ? "down \(pct)%" : ""
+        }
+        statusItem.button?.title = ""
+        appState?.isModelReady = await transcriptionService.isModelReady
+        updateIcon()
     }
 }
 ```
 
-Skip LLM entirely if the active profile has AI disabled — return the transcript directly.
+Dieser Code funktioniert unveraendert fuer FluidAudio/ParakeetBackend, sofern `downloadAndLoad`
+regelmaessige `progressHandler`-Aufrufe liefert.
 
+**Fortschrittsanzeige:** Aktuell NSStatusItem-Title mit Prozentwert. Fuer FluidAudio muss der
+Progress-Callback aus der `AsrModels.downloadAndLoad`-API gemappt werden. Die FluidAudio-Doku
+zeigt `progressHandler: { progress in }` in `LSEENDModelDescriptor.loadFromHuggingFace` --
+fuer `AsrModels.downloadAndLoad` muss geprueft werden ob ein vergleichbarer Handler existiert.
+
+**AppState.isModelReady** bleibt die einzige Guard-Variable: Aufnahme-Start in
+`startRecordingWithCue()` prueft bereits `appState?.isModelReady == true`. Keine weiteren
+UI-Aenderungen noetig.
+
+**Fehlerfall:** Wenn Download scheitert, bleibt `isModelReady = false`. Aufnahmen sind blockiert.
+Bestehender Kommentar "D-13: stille Rueckkehr" bleibt die Strategie. Fuer Milestone v0.19.0
+empfiehlt sich ein einmaliger Retry-Button in der SettingsView (neues UI-Element).
+
+---
+
+## Frage 4: Settings-Fenster Integration
+
+### Ist-Zustand
+
+Das Settings-Fenster existiert bereits:
+- `Window("VoiceScribe -- Einstellungen", id: "settings")` in `VoiceScribeApp.swift`
+- Oeffnung via `NotificationCenter.post(.openSettings)` -> `HiddenActivationView.onReceive` ->
+  `openWindow(id: "settings")` mit Activation-Policy-Workaround (300ms)
+- `SettingsView.swift` enthaelt vollstaendige SwiftUI-Form mit Mikrofon, Stille-Erkennung,
+  Textausgabe, Groq-API-Key und Prompt-Profile-Sektionen
+
+### Neue Sektionen fuer Milestone v0.19.0
+
+Folgende Einstellungen muessen hinzugefuegt werden (aus PROJECT.md):
+- Hotkey-Konfiguration UI mit Konflikt-Erkennung (bereits teilweise via KeyboardShortcuts.Recorder)
+- Mikrofon-Auswahl (bereits vorhanden via `AudioDeviceManager.availableMicrophones()`)
+- Silence Detection Threshold (bereits vorhanden)
+
+Noch fehlend in SettingsView:
+- **Transkriptions-Engine Auswahl** (wenn mehrere Backends unterstuetzt): `Picker`
+- **Modell-Status / Retry-Button** wenn Download fehlschlug
+- **Hotkey-Sektion** fuer Haupthotkey (`.toggleRecording`) -- fehlt noch
+
+### Empfehlung: Keine Architektur-Aenderung an Settings-Oeffnung
+
+Das bestehende `Window`-Scene-Pattern mit NotificationCenter-Bruecke funktioniert stabil und
+ist bereits fuer History und Settings validiert. Kein Wechsel zu:
+- `NSWindowController` (mehr AppKit-Boilerplate, kein Vorteil gegenueber bestehendem Pattern)
+- `sindresorhus/Settings` (zusaetzliche Abhaengigkeit, nicht noetig da native SwiftUI Form ausreicht)
+- `.settings` SwiftUI Scene (bekanntes Problem mit `.accessory`-Policy auf macOS -- bereits
+  dokumentiert in VoiceScribeApp.swift Kommentar)
+
+**Bestehende Architektur beibehalten:** `Window(id: "settings")` + NotificationCenter-Bruecke
++ `SettingsView` als SwiftUI Form. Neue Einstellungs-Sektionen als zusaetzliche `Section()`-Bloecke
+in die bestehende `SettingsView.swift` einfuegen.
+
+### SettingsView-Erweiterungen konkret
+
+```swift
+// Neue Sektion in SettingsView (Reihenfolge nach bestehenden Sektionen):
+Section("Transkription") {
+    // Modell-Status
+    HStack {
+        if appState?.isModelReady == true {
+            Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+            Text("Parakeet-Modell bereit")
+        } else {
+            Image(systemName: "arrow.down.circle").foregroundStyle(.secondary)
+            Text("Modell wird geladen...")
+        }
+    }
+    // Ggf. Retry-Button wenn isModelReady == false nach x Minuten
+}
+
+Section("Hotkeys") {
+    KeyboardShortcuts.Recorder("Diktat-Hotkey", name: .toggleRecording)
+    // Profil-Hotkeys werden im Profil-Editor konfiguriert (bereits vorhanden)
+}
+```
+
+---
+
+## Neue Komponenten: Uebersicht
+
+| Komponente | Status | Prioritaet | Abhaengigkeiten |
+|------------|--------|------------|----------------|
+| `TranscriptionBackend` Protokoll | Neu | P0 | -- |
+| `WhisperKitBackend` | Refaktor (aus TranscriptionService) | P0 | WhisperKit |
+| `ParakeetBackend` (FluidAudio) | Neu | P0 | FluidAudio SPM |
+| `TranscriptionService` als Facade | Refaktor | P0 | TranscriptionBackend |
+| SettingsView neue Sektionen | Erweiterung | P1 | TranscriptionService.isModelReady |
+| Python Subprocess Bridge | Alternativ-Option | Optional | Nur wenn FluidAudio nicht ausreicht |
+
+---
+
+## Build-Reihenfolge fuer Milestone v0.19.0
+
+### Wave 1 -- Protokoll + FluidAudio Backend (Blockiert alles andere)
+
+1. `TranscriptionBackend`-Protokoll definieren (neue Datei `TranscriptionBackend.swift`)
+2. Bestehenden `TranscriptionService`-Code zu `WhisperKitBackend` extrahieren
+3. `TranscriptionService` als Facade mit Backend-Property
+4. `ParakeetBackend` mit FluidAudio `AsrModels.downloadAndLoad` + `AsrManager.transcribe`
+5. AppDelegate: `transcriptionService = TranscriptionService(backend: ParakeetBackend())`
+
+Verifikation: `setupTranscription()` in AppDelegate laeuft ohne Aenderungen durch.
+WhisperKit als Fallback bleibt ueber `WhisperKitBackend` erreichbar.
+
+### Wave 2 -- Settings-Erweiterungen (Unabhaengig von Wave 1)
+
+6. Neue `Section("Hotkeys")` in SettingsView (toggleRecording Recorder)
+7. Neue `Section("Transkription")` mit Modell-Status in SettingsView
+8. AppState: Ggf. `downloadProgress: Double` als Observable-Property hinzufuegen
+   (fuer ProgressView in Settings statt nur StatusItem-Title)
+
+### Wave 3 -- Integration & Validierung
+
+9. End-to-End-Test: Diktat -> ParakeetBackend -> TextOutput -> HistoryStore
+10. Vergleich WhisperKit vs. Parakeet Transkriptionsqualitaet auf Deutsch
+11. Download-Fortschritt-UX pruefen (StatusItem-Title bleibt die primaere Anzeige)
+
+---
+
+## Datenfluß-Aenderungen
+
+### Vorher (WhisperKit direkt in TranscriptionService)
+
+```
+onRecordingComplete -> transcriptionService.transcribeWithResampling()
+                           |
+                      WhisperKit.transcribe()
+                           |
+                      String?
+```
+
+### Nachher (Backend-Protokoll)
+
+```
+onRecordingComplete -> transcriptionService.transcribeWithResampling()
+                           |
+                      backend.transcribeWithResampling()  // ParakeetBackend
+                           |
+                      AsrManager.transcribe()  // FluidAudio
+                           |
+                      String?
+```
+
+AppDelegate `onRecordingComplete` bleibt **unveraendert** -- das ist der entscheidende
+Vorteil der Facade-Schicht.
+
+---
+
+## Integrations-Risiken
+
+| Risiko | Wahrscheinlichkeit | Mitigierung |
+|--------|-------------------|-------------|
+| FluidAudio Download-API hat keinen Progress-Handler fuer `.v3` | MEDIUM | Fake-Progress (0% -> 100%) oder DownloadUtils direkt; akzeptabel da StatusItem-Title nur grob anzeigt |
+| FluidAudio Deutsch-Qualitaet schlechter als WhisperKit | LOW | Parakeet TDT v3 trainiert auf 85k Stunden Englisch + 25 EU-Sprachen; Deutsch enthalten |
+| FluidAudio API-Aenderungen (v0.12.4, noch nicht 1.0) | MEDIUM | Protokoll-Facade isoliert AppDelegate von API-Aenderungen; nur ParakeetBackend muss angepasst werden |
+| Model-Downloadgroesse > erwartet | LOW | FluidAudio cached in ~/Library/Application Support/FluidAudio/Models -- App-Bundle bleibt klein |
+| Swift 6 Concurrency-Konformitaet von FluidAudio | MEDIUM | Context7-Doku zeigt actor-basiertes API-Design; bei Problemen `@preconcurrency import FluidAudio` wie bestehend bei WhisperKit |
+
+---
+
+## Komponenten-Grenzen nach Milestone v0.19.0
+
+```
+VoiceScribeApp (SwiftUI @main)
++-- AppDelegate (NSStatusItem, Hotkeys, Callbacks)
+|   +-- AudioController (AVAudioEngine)
+|   +-- TranscriptionService (Facade, actor)
+|   |   +-- ParakeetBackend (actor)  <-- NEU
+|   |   |   +-- AsrManager (FluidAudio)
+|   |   +-- WhisperKitBackend (actor)  <-- Fallback
+|   +-- GroqService (URLSession)
+|   +-- TextOutputService (AXUIElement + NSPasteboard)
+|   +-- HistoryStore (GRDB)
++-- Window Scenes
+    +-- "hidden" (HiddenActivationView -- Notifications)
+    +-- "settings" (SettingsView -- ERWEITERT)
+    +-- "history" (HistoryView)
+```
+
+---
+
+## Quellen
+
+- FluidAudio (Context7): `/fluidinference/fluidaudio` -- HIGH confidence, 89.75 Benchmark Score
+- FluidAudio GitHub: https://github.com/FluidInference/FluidAudio (v0.12.4, ~1500 stars, Production-ready)
+- parakeet-mlx (Context7): `/senstella/parakeet-mlx` -- Python-only, Swift-Bridge-Option dokumentiert
+- swift-subprocess (swiftlang): https://github.com/swiftlang/swift-subprocess -- moderne Alternative zu Process, September 2025
+- TypeWhisper pluggable backend pattern: https://github.com/TypeWhisper/typewhisper-mac
+- steipete.me Settings from Menu Bar: https://steipete.me/posts/2025/showing-settings-from-macos-menu-bar-items
+- IPC Performance (Baeldung): https://www.baeldung.com/linux/ipc-performance-comparison
+- Bestehende Codebase: VoiceScribe/AppDelegate.swift, VoiceScribe/Transcription/TranscriptionService.swift, VoiceScribe/VoiceScribeApp.swift, VoiceScribe/SettingsView.swift
+
+---
+
+## URSPRUENGLICHE ARCHITEKTUR-RESEARCH (Phase 1-6)
+
+*(Bewahrt als Referenz -- gilt weiterhin fuer alle bereits implementierten Komponenten)*
+
+### 1. App Shell -- MenuBarApp
+
+**Responsibility:** Entry point, NSStatusItem lifecycle, top-level state coordinator.
+
+**Decision: Use NSApplicationDelegate + NSStatusItem directly, not SwiftUI MenuBarExtra.**
+
+Rationale: MenuBarExtra (introduced macOS 13) is convenient for simple menus, but it has
+constraints that conflict with this app's needs: it cannot easily host animated icons driven
+by external state (recording in progress), and it offers no onKeyDown/onKeyUp hooks for
+push-to-talk. NSStatusItem + NSStatusBarButton gives full control over icon animation,
+click handling, and menu attachment.
+
+LSUIElement = YES in Info.plist keeps the app out of the Dock and App Switcher.
+Confidence: HIGH (Apple NSStatusItem docs, confirmed pattern)
+
+### 2. Hotkey Engine
+
+**Decision: Use KeyboardShortcuts Swift package (sindresorhus/keyboardshortcuts).**
+Confidence: HIGH (KeyboardShortcuts Context7 docs, GitHub README)
+
+### 3. Audio Pipeline
+
+**Stack: AVAudioEngine with installTap on the input node.**
+Confidence: HIGH
+
+### 4. LLM Post-Processor
+
+**Stack: URLSession async/await, no third-party HTTP library needed.**
 Confidence: HIGH (Groq API is OpenAI-compatible; standard URLSession pattern)
 
----
+### 5. Output Engine
 
-### 6. Output Engine — `TextOutputService`
+Two modes: AXUIElement injection (preferred) + NSPasteboard + CGEvent fallback.
+Confidence: MEDIUM (AXUIElement injection works for most apps)
 
-**Responsibility:** Inject processed text into the focused input field, or write to clipboard.
-
-Two modes:
-
-**Mode A — Accessibility injection (preferred)**
-Uses `AXUIElement` to write to the focused element's `AXValue` or simulate paste.
-```swift
-func injectViaAccessibility(_ text: String) {
-    let systemWide = AXUIElementCreateSystemWide()
-    var focusedElement: AnyObject?
-    AXUIElementCopyAttributeValue(systemWide, kAXFocusedUIElementAttribute as CFString, &focusedElement)
-    guard let element = focusedElement else { return }
-    // Set kAXValueAttribute or use kAXSelectedTextAttribute for insertion at cursor
-    AXUIElementSetAttributeValue(element as! AXUIElement,
-                                 kAXSelectedTextAttribute as CFString,
-                                 text as CFTypeRef)
-}
-```
-Requires Accessibility permission (prompted at runtime, listed in entitlements).
-
-**Mode B — Clipboard paste (fallback)**
-```swift
-func injectViaClipboard(_ text: String) {
-    NSPasteboard.general.clearContents()
-    NSPasteboard.general.setString(text, forType: .string)
-    // Simulate Cmd+V — only works in apps that accept paste
-    let source = CGEventSource(stateID: .hidSystemState)
-    let vDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true)
-    vDown?.flags = .maskCommand
-    vDown?.post(tap: .cghidEventTap)
-    // key up...
-}
-```
-
-Clipboard paste also requires Accessibility permission (for `CGEvent.post`).
-
-Confidence: MEDIUM (AXUIElement injection works for most apps; `kAXSelectedTextAttribute` is not supported by every app — some accept only simulated keystroke paste)
-
----
-
-### 7. Keychain Manager — `KeychainService`
-
-**Responsibility:** Store and retrieve Groq API key securely.
-
-```swift
-struct KeychainService {
-    static let service = "com.yourname.voicescribe"
-
-    static func save(apiKey: String) throws {
-        let data = Data(apiKey.utf8)
-        let query: [CFString: Any] = [
-            kSecClass:       kSecClassGenericPassword,
-            kSecAttrService: service,
-            kSecAttrAccount: "groq_api_key",
-            kSecValueData:   data
-        ]
-        SecItemDelete(query as CFDictionary)   // remove old if exists
-        let status = SecItemAdd(query as CFDictionary, nil)
-        guard status == errSecSuccess else { throw KeychainError.saveFailed(status) }
-    }
-
-    static func load() throws -> String {
-        let query: [CFString: Any] = [
-            kSecClass:       kSecClassGenericPassword,
-            kSecAttrService: service,
-            kSecAttrAccount: "groq_api_key",
-            kSecReturnData:  true,
-            kSecMatchLimit:  kSecMatchLimitOne
-        ]
-        var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-        guard status == errSecSuccess, let data = result as? Data,
-              let key = String(data: data, encoding: .utf8) else {
-            throw KeychainError.notFound
-        }
-        return key
-    }
-}
-```
-
-Confidence: HIGH (Apple Keychain Services docs pattern)
-
----
-
-### 8. History Store — `HistoryStore`
-
-**Responsibility:** Persist transcription records locally; support full-text search.
+### 6. History Store
 
 **Decision: Use GRDB.swift (v7.5.0) over SwiftData.**
-
-Rationale:
-- SwiftData requires macOS 14+. GRDB works from macOS 10.15+.
-- GRDB has built-in FTS5 full-text search — trivial to add searchable history.
-- SwiftData's FTS story is incomplete and requires dropping to raw SQLite anyway.
-- GRDB's async API (`DatabasePool`) integrates cleanly with Swift concurrency.
-
-```swift
-@Model  // GRDB record struct, not SwiftData macro
-struct TranscriptionRecord: Codable, FetchableRecord, PersistableRecord {
-    var id: UUID
-    var rawText: String
-    var processedText: String?
-    var profileName: String?
-    var createdAt: Date
-    var durationSeconds: Double
-}
-```
-
-FTS5 virtual table synced with `transcription_record` table enables substring search across all text fields.
-
+FTS5 full-text search, GRDB async DatabasePool.
 Confidence: HIGH (GRDB Context7 docs, FTS documentation confirmed)
 
----
+### Key Architecture Decisions (original)
 
-### 9. Settings + Profile Store — `SettingsManager`
+1. AppDelegate + NSStatusItem over pure SwiftUI MenuBarExtra
+2. WhisperKit initially (now replaced by Parakeet/FluidAudio in v0.19.0)
+3. Actor isolation for ML services
+4. GRDB over SwiftData for history
+5. Two-mode text output with graceful fallback
+6. Lazy model loading with explicit unload
 
-**Responsibility:** Persist app preferences and prompt profiles.
+### macOS Permissions Required
 
-- Simple preferences (output mode, autostart): `UserDefaults` via `@AppStorage`
-- Prompt profiles (structured, multiple): GRDB alongside history, or `Codable` + `UserDefaults` for small payloads. Given GRDB is already a dependency, store profiles in a `prompt_profile` table.
+| Permission | Why Needed |
+|---|---|
+| Microphone (NSMicrophoneUsageDescription) | AVAudioEngine captures mic input |
+| Accessibility | AXUIElement text injection and CGEvent keyboard simulation |
 
----
+Additional Info.plist keys: LSUIElement = YES, SMAppService.mainApp.register() fuer Login Item.
 
-## Data Flow
+### Sources (original)
 
-```
-[User presses hotkey]
-        |
-        v
-HotkeyManager.onKeyDown
-        |
-        v
-AppState.startRecording()
-  - StatusItem icon → animated recording state
-  - AudioRecorder.startRecording() → starts AVAudioEngine tap
-        |
-[User holds key, speaks]
-        |
-[User releases hotkey]
-        |
-        v
-HotkeyManager.onKeyUp
-        |
-        v
-AppState.stopRecording()
-  - AudioRecorder.stopRecording() → [Float] PCM buffer
-  - StatusItem icon → "processing" state
-        |
-        v
-TranscriptionService.transcribe([Float])
-  - WhisperKit inference (CoreML, Neural Engine)
-  - Returns: String (raw transcript)
-        |
-        v
-[Active profile has AI enabled?]
-    YES → GroqService.process(transcript, profile)
-            - URLSession POST to Groq API
-            - Returns: String (processed text)
-    NO  → pass raw transcript through
-        |
-        v
-HistoryStore.save(record)
-  - Writes to SQLite via GRDB
-        |
-        v
-TextOutputService.inject(text, mode: .accessibility | .clipboard)
-  - AXUIElement write OR NSPasteboard + simulated Cmd+V
-        |
-        v
-StatusItem icon → idle state
-```
-
-**Async boundary:** Everything from `stopRecording()` onwards runs in a Swift `Task` on the cooperative thread pool. `TranscriptionService` and `GroqService` are `actor`-isolated to prevent concurrent model access. The main thread is only touched for icon state updates and UI.
-
----
-
-## Key Architecture Decisions
-
-### Decision 1: AppDelegate + NSStatusItem over pure SwiftUI MenuBarExtra
-
-`MenuBarExtra` is simpler but cannot animate the status bar icon in response to recording state changes with fine-grained control, and does not integrate with push-to-talk key events. `NSApplicationDelegateAdaptor` lets the app retain a SwiftUI `Settings` scene while keeping full AppKit control of the menu bar item.
-
-### Decision 2: WhisperKit instead of parakeet-mlx
-
-`parakeet-mlx` is Python-only. Integrating it into a native Swift bundle requires a bundled Python runtime and subprocess communication — unacceptable complexity for a polished Mac app. WhisperKit provides equivalent quality transcription via CoreML with a clean Swift async API. If the user later validates a specific need for Parakeet quality, the path is: export Parakeet to CoreML and load via `CoreML.MLModel` directly.
-
-### Decision 3: Actor isolation for ML services
-
-Both `TranscriptionService` and `GroqService` are Swift `actor` types. This prevents re-entrant calls if the user triggers recording again before the previous pipeline finishes. The `AppState` should reject new recordings while a pipeline is in flight and surface a "busy" state in the icon.
-
-### Decision 4: GRDB over SwiftData for history
-
-GRDB's FTS5 support and broader macOS version compatibility make it the right choice. SwiftData is limited to macOS 14+ and has no first-class full-text search.
-
-### Decision 5: Two-mode text output with graceful fallback
-
-Accessibility injection (`kAXSelectedTextAttribute`) is the ideal path — it inserts at the cursor position without disturbing clipboard contents. However, not all apps expose this attribute. The fallback is clipboard-replace + simulated Cmd+V. The user can configure which mode is preferred in Settings; the app should auto-detect injection failure and fall back silently.
-
-### Decision 6: Lazy model loading with explicit unload
-
-WhisperKit models (large-v3) are ~1.5 GB. Load once at app startup in a background `Task`. Keep loaded. Expose an "unload" option if the user wants to reclaim memory. Do not load/unload on every dictation cycle.
-
----
-
-## macOS Permissions Required
-
-| Permission | Why Needed | How Requested |
-|---|---|---|
-| **Microphone** (`NSMicrophoneUsageDescription`) | AVAudioEngine captures mic input | System prompt on first use; `NSMicrophoneUsageDescription` in Info.plist |
-| **Accessibility** (`NSAppleEventsUsageDescription` / AX entitlement) | AXUIElement text injection and CGEvent keyboard simulation | System prompt directing user to System Settings → Privacy → Accessibility |
-| **App Sandbox** | Required for Mac App Store distribution | Must use `com.apple.security.device.audio-input` and `com.apple.security.temporary-exception.apple-events` entitlements |
-
-Additional Info.plist keys:
-- `LSUIElement = YES` — hides Dock icon
-- `LSBackgroundOnly` — do not set this (prevents Settings window from appearing)
-- `SMLoginItemAgentType` or `ServiceManagement` framework for Login Item autostart (macOS 13+ uses `SMAppService.mainApp.register()`)
-
-Confidence: HIGH (Apple entitlement docs, standard menu bar app pattern)
-
----
-
-## Suggested Build Order
-
-The pipeline has strict data dependencies. Build in this order to enable end-to-end testing at each stage before adding the next layer.
-
-### Phase 1 — Shell + Hotkey
-Build: `AppDelegate`, `NSStatusItem` setup, `LSUIElement`, `KeyboardShortcuts` integration with `onKeyDown`/`onKeyUp`.
-Gate: Key press/release logs to console; icon changes color.
-Why first: Everything downstream depends on the hotkey triggering state changes. Validates the app can receive global events.
-
-### Phase 2 — Audio Capture
-Build: `AudioRecorder` with `AVAudioEngine`, microphone permission request.
-Gate: Stop returns a non-empty `[Float]` array; save to `.wav` file and verify audio quality.
-Why second: Transcription cannot be tested without audio. Simple to isolate.
-
-### Phase 3 — Transcription
-Build: `TranscriptionService` wrapping WhisperKit, model bundling/download on first launch.
-Gate: Pass saved `.wav` samples; get back correct transcript string.
-Why third: Largest single complexity spike. Isolate it before adding LLM and output.
-
-### Phase 4 — Text Output
-Build: `TextOutputService` with both accessibility injection and clipboard fallback.
-Gate: Hardcoded string successfully appears in a text editor with cursor focus.
-Why fourth: Output doesn't depend on transcription correctness; can be developed against a hardcoded string.
-
-### Phase 5 — End-to-End Pipeline
-Wire: hotkey → audio → transcription → output. No AI processing yet.
-Gate: Full push-to-talk dictation works without any settings UI.
-
-### Phase 6 — History Store
-Build: GRDB setup, `TranscriptionRecord` model, FTS5 table, `HistoryStore` actor.
-Gate: After dictation, records appear in a debug query.
-Why here: Not on the critical path of the core UX; add after the main loop works.
-
-### Phase 7 — Groq / Prompt Profiles
-Build: `PromptProfile` model, `GroqService`, profile selection in menu bar.
-Gate: With a real API key, transcript is transformed by a prompt and output correctly.
-Why here: Requires a working transcript; depends on Phase 5.
-
-### Phase 8 — Keychain + Settings UI
-Build: `KeychainService`, `SettingsView` (SwiftUI), profile editor, hotkey recorder UI, history browser.
-Gate: API key survives app restart; profiles are editable; history is searchable.
-Why last: Settings UI can be done at any point but it's polish — do it after all features work.
-
-### Phase 9 — Polish
-- Login item autostart (`SMAppService`)
-- Status icon animation during recording/processing states
-- Error states (microphone denied, Groq API failure, model not loaded)
-- Onboarding flow (first-launch permission requests)
-
----
-
-## Sources
-
-- NSStatusItem: https://developer.apple.com/documentation/appkit/nsstatusitem (MEDIUM — page confirmed, details from training)
-- KeyboardShortcuts: Context7 `/sindresorhus/keyboardshortcuts` (HIGH)
-- WhisperKit: Context7 `/argmaxinc/whisperkit` (HIGH)
-- GRDB.swift: Context7 `/groue/grdb.swift` (HIGH)
-- SwiftData: Context7 `/websites/developer_apple_swiftdata` (HIGH)
-- Keychain Services: Apple Developer Documentation (HIGH — confirmed via WebFetch)
-- NSPasteboard: Apple Developer Documentation (HIGH — confirmed via WebFetch)
-- parakeet-mlx: Context7 `/senstella/parakeet-mlx` — Python-only, not usable directly from Swift (HIGH)
-- NSEvent global monitor: Apple Developer Documentation (MEDIUM — confirmed via WebFetch, accessibility requirement confirmed)
+- NSStatusItem: https://developer.apple.com/documentation/appkit/nsstatusitem
+- KeyboardShortcuts: Context7 /sindresorhus/keyboardshortcuts (HIGH)
+- WhisperKit: Context7 /argmaxinc/whisperkit (HIGH)
+- GRDB.swift: Context7 /groue/grdb.swift (HIGH)
+- parakeet-mlx: Context7 /senstella/parakeet-mlx -- Python-only (HIGH)
