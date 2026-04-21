@@ -123,7 +123,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                         self.appState?.recordingState = .llmProcessing
                         self.updateIcon()  // Observation-B: sofort nach State-Mutation
 
-                        Task {
+                        Task { [weak self] in
+                            guard let self else { return }
                             // T-5-02: Key unmittelbar vor Request aus Keychain lesen — nie gecacht
                             let apiKey = self.keychain["groqApiKey"]
                             let outputText: String
