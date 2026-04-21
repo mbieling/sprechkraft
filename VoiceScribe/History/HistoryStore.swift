@@ -14,7 +14,16 @@ final class HistoryStore {
     // MARK: - Singleton (Produktion)
 
     static let shared: HistoryStore = {
-        try! HistoryStore(productionDB: true)
+        do {
+            return try HistoryStore(productionDB: true)
+        } catch {
+            // Produktion-DB nicht erreichbar (Sandbox, Disk full, Permission).
+            // In-Memory-Fallback: History geht verloren beim Neustart, aber App bleibt funktionsfähig.
+            // Fehler sichtbar in Console.app mit Subsystem-Filter "VoiceScribe".
+            print("[HistoryStore] Fehler beim Öffnen der Produktions-DB: \(error)")
+            // Falls auch In-Memory fehlschlägt, ist das ein Programmierfehler → crash ist korrekt.
+            return try! HistoryStore(inMemory: true)
+        }
     }()
 
     private let dbQueue: DatabaseQueue
