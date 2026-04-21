@@ -27,6 +27,15 @@ struct VoiceScribeApp: App {
                 .frame(minWidth: 400, minHeight: 300)
         }
         .windowResizability(.contentSize)
+
+        // D-01: Dediziertes History-Fenster (nicht Popover, nicht Settings-Tab)
+        // UI-SPEC §4: 640×480 initial, minWidth 480, minHeight 320
+        Window("VoiceScribe — Verlauf", id: "history") {
+            HistoryView()
+                .frame(minWidth: 480, minHeight: 320)
+        }
+        .defaultSize(width: 640, height: 480)
+        .windowResizability(.contentSize)
     }
 }
 
@@ -71,6 +80,23 @@ private struct HiddenActivationView: View {
                     //       ersetzen (One-Shot-Observer), um die Activation-Policy erst dann
                     //       zurückzusetzen, wenn das Fenster tatsächlich Key ist. Der feste
                     //       300ms-Sleep ist ein pragmatischer Workaround für Phase 1.
+                    try? await Task.sleep(for: .milliseconds(300))
+                    NSApp.setActivationPolicy(.accessory)
+                }
+            }
+            // D-02: History-Fenster öffnen via NotificationCenter-Brücke (analog .openSettings)
+            // Pitfall 4: .accessory-Policy-Workaround — exakt identisch zum openSettings-Muster
+            .onReceive(NotificationCenter.default.publisher(for: .openHistory)) { _ in
+                Task { @MainActor in
+                    NSApp.setActivationPolicy(.regular)
+                    NSApp.activate(ignoringOtherApps: true)
+                    openWindow(id: "history")
+                    if let win = NSApp.windows.first(where: {
+                        $0.identifier?.rawValue == "history"
+                    }) {
+                        win.makeKeyAndOrderFront(nil)
+                    }
+                    // Pitfall 4: 300ms Workaround — identisch zu openSettings (STATE.md)
                     try? await Task.sleep(for: .milliseconds(300))
                     NSApp.setActivationPolicy(.accessory)
                 }
