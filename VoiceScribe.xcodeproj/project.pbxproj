@@ -24,6 +24,7 @@
 		PP050100 /* PromptProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = PP050101 /* PromptProfileTests.swift */; };
 		PP050300 /* PromptProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = PP050301 /* PromptProfile.swift */; };
 		HT060603 /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = HT060602 /* HistoryStore.swift */; };
+		HT060611 /* HistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = HT060610 /* HistoryEntry.swift */; };
 		GS050400 /* GroqService.swift in Sources */ = {isa = PBXBuildFile; fileRef = GS050401 /* GroqService.swift */; };
 		GS050402 /* GroqServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = GS050403 /* GroqServiceTests.swift */; };
 		HT060601 /* HistoryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = HT060600 /* HistoryStoreTests.swift */; };
@@ -68,6 +69,7 @@
 		PP050101 /* PromptProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptProfileTests.swift; sourceTree = "<group>"; };
 		PP050301 /* PromptProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptProfile.swift; sourceTree = "<group>"; };
 		HT060602 /* HistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
+		HT060610 /* HistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntry.swift; sourceTree = "<group>"; };
 		GS050401 /* GroqService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqService.swift; sourceTree = "<group>"; };
 		GS050403 /* GroqServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqServiceTests.swift; sourceTree = "<group>"; };
 		HT060600 /* HistoryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStoreTests.swift; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 				BB040230 /* TextOutput */,
 				GS050410 /* Services */,
 				PP050302 /* Models */,
+				HT060620 /* History */,
 				AA000206 /* Constants */,
 				AA000209 /* Extensions */,
 				AA000003 /* Info.plist */,
@@ -155,9 +158,17 @@
 			isa = PBXGroup;
 			children = (
 				PP050301 /* PromptProfile.swift */,
-				HT060602 /* HistoryStore.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		HT060620 /* History */ = {
+			isa = PBXGroup;
+			children = (
+				HT060610 /* HistoryEntry.swift */,
+				HT060602 /* HistoryStore.swift */,
+			);
+			path = History;
 			sourceTree = "<group>";
 		};
 		AA000209 /* Extensions */ = {
@@ -332,6 +343,7 @@
 				BB040201 /* TextOutputService.swift in Sources */,
 				PP050300 /* PromptProfile.swift in Sources */,
 				HT060603 /* HistoryStore.swift in Sources */,
+				HT060611 /* HistoryEntry.swift in Sources */,
 				GS050400 /* GroqService.swift in Sources */,
 				AA000210 /* SettingsView.swift in Sources */,
 				AA000212 /* AppDelegate.swift in Sources */,
