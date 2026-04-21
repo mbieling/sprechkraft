@@ -87,6 +87,40 @@ struct HistoryStoreTests {
         #expect(elapsed < 0.2, "FTS5-Suche dauerte \(elapsed)s — Limit: 200ms")
     }
 
+    // WR-05: delete() entfernt Eintrag und bereinigt FTS5-Index
+    @Test func testDeleteRemovesEntry() async throws {
+        let store = try makeStore()
+        let entry = HistoryEntry(
+            id: nil, createdAt: Date(),
+            originalText: "Zu löschen", llmText: nil,
+            profileName: nil, isLLMProcessed: false
+        )
+        try await store.insert(entry)
+        let inserted = try await store.search(query: "")
+        guard let toDelete = inserted.first else { Issue.record("Insert fehlgeschlagen"); return }
+        try await store.delete(toDelete)
+        let remaining = try await store.search(query: "")
+        #expect(remaining.isEmpty)
+        // FTS5-Index muss ebenfalls bereinigt sein (synchronize-Trigger bei DELETE)
+        let ftsResults = try await store.search(query: "löschen")
+        #expect(ftsResults.isEmpty)
+    }
+
+    // WR-05: deleteAll() leert Tabelle und FTS5-Index vollständig
+    @Test func testDeleteAllClearsStore() async throws {
+        let store = try makeStore()
+        for i in 0..<5 {
+            try await store.insert(HistoryEntry(
+                id: nil, createdAt: Date(),
+                originalText: "Eintrag \(i)", llmText: nil,
+                profileName: nil, isLLMProcessed: false
+            ))
+        }
+        try await store.deleteAll()
+        let remaining = try await store.search(query: "")
+        #expect(remaining.isEmpty)
+    }
+
     // HIST-04: copyText liefert LLM-Text wenn vorhanden, sonst Original (D-09)
     @Test func testCopyPreference() throws {
         let withLLM = HistoryEntry(
