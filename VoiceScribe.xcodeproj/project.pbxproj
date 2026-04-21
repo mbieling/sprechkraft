@@ -229,6 +229,7 @@
 				AA000025 /* Defaults */,
 				BEEF0028 /* WhisperKit */,
 				KC050501 /* KeychainAccess */,
+				GR060601 /* GRDB */,
 			);
 			productName = VoiceScribe;
 			productReference = AA000005 /* VoiceScribe.app */;
@@ -286,6 +287,7 @@
 				AA000102 /* XCRemoteSwiftPackageReference "Defaults" */,
 				DEAD0103 /* XCRemoteSwiftPackageReference "argmax-oss-swift" */,
 				KC050500 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				GR060600 /* XCRemoteSwiftPackageReference "GRDB.swift" */,
 			);
 			productRefGroup = AA000042 /* Products */;
 			projectDirPath = "";
@@ -628,6 +630,14 @@
 				minimumVersion = 4.0.0;
 			};
 		};
+		GR060600 /* XCRemoteSwiftPackageReference "GRDB.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/groue/GRDB.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.5.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -655,6 +665,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = KC050500 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
+		};
+		GR060601 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = GR060600 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
 		};
 /* End XCSwiftPackageProductDependency section */
 
