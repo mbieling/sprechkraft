@@ -59,8 +59,8 @@ Der Entwickler selbst (Power-User, Mac-Nutzer, der schnelles qualitatives Diktat
 - [x] Groq API-Key sicher speicherbar (macOS Keychain) — Validated in Phase 05: llm-prompt-profiles
 
 **Geschichte & Einstellungen**
-- [ ] Alle Transkriptionen lokal gespeichert
-- [ ] Durchsuchbare Historie im Einstellungsfenster
+- [x] Alle Transkriptionen lokal gespeichert — Validated in Phase 06: history
+- [x] Durchsuchbare Historie (FTS5, Copy-Flash, Löschen) — Validated in Phase 06: history
 - [ ] Einstellungsfenster: API-Key, Profile, Hotkeys, Ausgabemodus
 
 **App-Verhalten**
