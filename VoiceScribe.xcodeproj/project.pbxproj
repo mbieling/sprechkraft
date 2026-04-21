@@ -25,6 +25,7 @@
 		PP050300 /* PromptProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = PP050301 /* PromptProfile.swift */; };
 		HT060603 /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = HT060602 /* HistoryStore.swift */; };
 		HT060611 /* HistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = HT060610 /* HistoryEntry.swift */; };
+		HT060613 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HT060612 /* HistoryView.swift */; };
 		GS050400 /* GroqService.swift in Sources */ = {isa = PBXBuildFile; fileRef = GS050401 /* GroqService.swift */; };
 		GS050402 /* GroqServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = GS050403 /* GroqServiceTests.swift */; };
 		HT060601 /* HistoryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = HT060600 /* HistoryStoreTests.swift */; };
@@ -70,6 +71,7 @@
 		PP050301 /* PromptProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptProfile.swift; sourceTree = "<group>"; };
 		HT060602 /* HistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
 		HT060610 /* HistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntry.swift; sourceTree = "<group>"; };
+		HT060612 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		GS050401 /* GroqService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqService.swift; sourceTree = "<group>"; };
 		GS050403 /* GroqServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqServiceTests.swift; sourceTree = "<group>"; };
 		HT060600 /* HistoryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStoreTests.swift; sourceTree = "<group>"; };
@@ -167,6 +169,7 @@
 			children = (
 				HT060610 /* HistoryEntry.swift */,
 				HT060602 /* HistoryStore.swift */,
+				HT060612 /* HistoryView.swift */,
 			);
 			path = History;
 			sourceTree = "<group>";
@@ -344,6 +347,7 @@
 				PP050300 /* PromptProfile.swift in Sources */,
 				HT060603 /* HistoryStore.swift in Sources */,
 				HT060611 /* HistoryEntry.swift in Sources */,
+				HT060613 /* HistoryView.swift in Sources */,
 				GS050400 /* GroqService.swift in Sources */,
 				AA000210 /* SettingsView.swift in Sources */,
 				AA000212 /* AppDelegate.swift in Sources */,
