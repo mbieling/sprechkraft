@@ -19,6 +19,8 @@ extension Notification.Name {
     static let openSettings = Notification.Name("com.voicescribe.openSettings")
     /// Wird von SettingsView nach Profil-Aenderungen gepostet — AppDelegate registriert Hotkeys neu.
     static let refreshProfileHotkeys = Notification.Name("com.voicescribe.refreshProfileHotkeys")
+    /// D-02: Brücke für Menüpunkt "Verlauf…" → History-Window-Scene in VoiceScribeApp.
+    static let openHistory = Notification.Name("com.voicescribe.openHistory")
 }
 
 @MainActor
@@ -144,6 +146,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
                             await MainActor.run {
                                 TextOutputService.shared.output(outputText, mode: mode, axPermitted: axPermitted)
+                                // D-15: GRDB-Insert nach TextOutputService — letzter Schritt (HIST-01, HIST-02)
+                                // try? — Insert-Fehler darf Transkription nicht blockieren
+                                let historyEntry = HistoryEntry(
+                                    id: nil,
+                                    createdAt: Date(),
+                                    originalText: text,
+                                    llmText: outputText != text ? outputText : nil,
+                                    profileName: activeProfile.name,
+                                    isLLMProcessed: true
+                                )
+                                try? HistoryStore.shared.insert(historyEntry)
                                 self.appState?.resetToIdle()
                                 self.updateIcon()  // Observation-B: .llmProcessing → .idle
                             }
@@ -151,6 +164,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     } else {
                         // Direkt-Pfad: LLM deaktiviert → Raw-Transkript ausgeben
                         TextOutputService.shared.output(text, mode: mode, axPermitted: axPermitted)
+                        // D-15: GRDB-Insert — Direkt-Pfad (kein LLM)
+                        let historyEntry = HistoryEntry(
+                            id: nil,
+                            createdAt: Date(),
+                            originalText: text,
+                            llmText: nil,
+                            profileName: activeProfile?.name,
+                            isLLMProcessed: false
+                        )
+                        try? HistoryStore.shared.insert(historyEntry)
                         self.appState?.resetToIdle()
                         self.updateIcon()
                     }
@@ -219,6 +242,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(titleItem)
 
         menu.addItem(.separator())
+
+        // D-02: Verlauf-Menüpunkt — vor "Einstellungen…" (analog zu openSettingsMenu)
+        let historyItem = NSMenuItem(
+            title: "Verlauf\u{2026}",  // U+2026 ELLIPSIS
+            action: #selector(openHistoryMenu),
+            keyEquivalent: ""
+        )
+        historyItem.target = self
+        menu.addItem(historyItem)
 
         // Einstellungen…
         let settingsItem = NSMenuItem(
@@ -306,6 +338,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Siehe RESEARCH.md Pitfall 2: openSettings Environment-Action ist
         // auf macOS 26 Tahoe mit .accessory-Policy unzuverlässig.
         NotificationCenter.default.post(name: .openSettings, object: nil)
+    }
+
+    @objc private func openHistoryMenu() {
+        NotificationCenter.default.post(name: .openHistory, object: nil)
     }
 
     @objc private func toggleLoginItem() {
