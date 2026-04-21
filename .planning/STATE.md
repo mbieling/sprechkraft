@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v0.18.0
 milestone_name: milestone
-status: Milestone complete
-stopped_at: Phase 6 complete — History (2026-04-21)
+status: Defining requirements
+stopped_at: Milestone v0.19.0 gestartet — Requirements wird definiert (2026-04-21)
 last_updated: "2026-04-21T00:00:00.000Z"
 last_activity: 2026-04-21
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 28
-  completed_plans: 28
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** Text per Sprache eingeben, genau wie tippen — schnell, systemweit, ohne Fenster wechseln zu müssen.
-**Current focus:** Phase 06 — History
+**Current focus:** Milestone v0.19.0 — Parakeet + Settings
 
 ## Current Position
 
-Phase: 6 planned — ready to execute
-Plan: 5/5 plans ready (06-01 bis 06-05, 5 Waves)
-Status: Phase 6 planning complete — verification passed
-Last activity: 2026-04-20
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-21 — Milestone v0.19.0 gestartet
 
 Progress: [██████████] 100%
 

@@ -1,5 +1,19 @@
 # VoiceScribe: Lokale Diktat-App für macOS
 
+## Current Milestone: v0.19.0 Parakeet + Settings
+
+**Ziel:** Parakeet v3 ersetzt WhisperKit als lokale Transkriptions-Engine, und ein vollständiges Einstellungsfenster konsolidiert alle App-Konfiguration.
+
+**Target Features:**
+- Parakeet v3 via gebundeltem Python/MLX-venv (kein System-Python, kein Cloud-Zugriff)
+- Modell-Download beim Erststart mit Fortschrittsanzeige
+- Konsolidiertes Einstellungsfenster (API-Key, Profile, Ausgabemodus)
+- Hotkey-Konfiguration UI mit Konflikt-Erkennung
+- Mikrofon-Auswahl (Dropdown für Eingabegerät)
+- Silence Detection Threshold (einstellbar)
+
+---
+
 ## What This Is
 
 Eine native macOS Menu-Bar-App für systemweites Diktat. Der Nutzer hält einen globalen Hotkey gedrückt, spricht, lässt los — und der Text erscheint entweder direkt im aktiven Textfeld oder im Clipboard. Transkription läuft vollständig lokal via Parakeet v3 (gebundelt in der App). Optional durchläuft das Transkript eines von mehreren KI-Prompt-Profilen via Groq API (qwen/qwen3-32b), bevor der Text ausgegeben wird.
@@ -104,4 +118,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-19 — Phase 05 (llm-prompt-profiles) complete*
+*Last updated: 2026-04-21 — Milestone v0.19.0 gestartet*
