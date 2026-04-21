@@ -112,10 +112,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Clicking a history entry copies its text to the clipboard with a visible confirmation
   4. History persists across app restarts and is stored entirely on-device with no cloud dependency
 **Plans**: 5 plans
-- [ ] 06-01-PLAN.md — GRDB SPM-Dependency (project.pbxproj 3 Pflichtstellen) + HistoryStoreTests RED-Stubs (Wave 1, Build-Gate)
-- [ ] 06-02-PLAN.md — HistoryEntry struct + HistoryStore @MainActor (Schema, Migration v1, FTS5, CRUD, Observation) — alle 5 Tests GREEN (Wave 2)
-- [ ] 06-03-PLAN.md — HistoryView SwiftUI (Liste, Datum-Sektionen, Suche 200ms, Copy-Flash, Leer-Zustände, Löschen mit Confirm-Alert) (Wave 3)
-- [ ] 06-04-PLAN.md — AppDelegate + VoiceScribeApp Wiring (Menüpunkt "Verlauf…", Window-Scene "history", GRDB-Insert in onRecordingComplete D-15) (Wave 4)
+- [x] 06-01-PLAN.md — GRDB SPM-Dependency (project.pbxproj 3 Pflichtstellen) + HistoryStoreTests RED-Stubs (Wave 1, Build-Gate)
+- [x] 06-02-PLAN.md — HistoryEntry struct + HistoryStore @MainActor (Schema, Migration v1, FTS5, CRUD, Observation) — alle 5 Tests GREEN (Wave 2)
+- [x] 06-03-PLAN.md — HistoryView SwiftUI (Liste, Datum-Sektionen, Suche 200ms, Copy-Flash, Leer-Zustände, Löschen mit Confirm-Alert) (Wave 3)
+- [x] 06-04-PLAN.md — AppDelegate + VoiceScribeApp Wiring (Menüpunkt "Verlauf…", Window-Scene "history", GRDB-Insert in onRecordingComplete D-15) (Wave 4)
 - [ ] 06-05-PLAN.md — Manuelle Human-Verify-Checkpoints: Menü, Fenster, Diktat→Eintrag, Suche, Copy-Flash, Löschen (Wave 5)
 **UI hint**: yes
 
