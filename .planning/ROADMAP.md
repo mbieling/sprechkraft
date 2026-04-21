@@ -116,7 +116,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 06-02-PLAN.md — HistoryEntry struct + HistoryStore @MainActor (Schema, Migration v1, FTS5, CRUD, Observation) — alle 5 Tests GREEN (Wave 2)
 - [x] 06-03-PLAN.md — HistoryView SwiftUI (Liste, Datum-Sektionen, Suche 200ms, Copy-Flash, Leer-Zustände, Löschen mit Confirm-Alert) (Wave 3)
 - [x] 06-04-PLAN.md — AppDelegate + VoiceScribeApp Wiring (Menüpunkt "Verlauf…", Window-Scene "history", GRDB-Insert in onRecordingComplete D-15) (Wave 4)
-- [ ] 06-05-PLAN.md — Manuelle Human-Verify-Checkpoints: Menü, Fenster, Diktat→Eintrag, Suche, Copy-Flash, Löschen (Wave 5)
+- [x] 06-05-PLAN.md — Manuelle Human-Verify-Checkpoints: Menü, Fenster, Diktat→Eintrag, Suche, Copy-Flash, Löschen (Wave 5)
 **UI hint**: yes
 
 ## Progress
