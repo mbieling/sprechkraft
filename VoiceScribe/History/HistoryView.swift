@@ -8,6 +8,20 @@ import SwiftUI
 import AppKit  // NSPasteboard
 import Accessibility  // AccessibilityNotification
 
+// MARK: - Gecachte DateFormatter (WR-04: nicht bei jedem Render neu allokieren)
+
+private let historyDateFormatter: DateFormatter = {
+    let f = DateFormatter()
+    f.dateFormat = "dd.MM.yyyy"
+    return f
+}()
+
+private let historyTimeFormatter: DateFormatter = {
+    let f = DateFormatter()
+    f.dateFormat = "HH:mm"
+    return f
+}()
+
 // MARK: - HistoryView
 
 struct HistoryView: View {
@@ -153,9 +167,7 @@ struct HistoryView: View {
         let grouped = Dictionary(grouping: entries) { entry -> String in
             if calendar.isDateInToday(entry.createdAt) { return "HEUTE" }
             if calendar.isDateInYesterday(entry.createdAt) { return "GESTERN" }
-            let formatter = DateFormatter()
-            formatter.dateFormat = "dd.MM.yyyy"
-            return formatter.string(from: calendar.startOfDay(for: entry.createdAt))
+            return historyDateFormatter.string(from: calendar.startOfDay(for: entry.createdAt))
         }
         // Sektionen nach neuestem Eintrag in der Gruppe sortieren (D-05: neueste zuerst)
         return grouped.sorted { a, b in
@@ -186,9 +198,7 @@ struct HistoryView: View {
     // MARK: - Accessibility
 
     private func accessibilityLabel(for entry: HistoryEntry) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        let time = formatter.string(from: entry.createdAt)
+        let time = historyTimeFormatter.string(from: entry.createdAt)
         let llm = entry.isLLMProcessed ? ", KI-verarbeitet" : ""
         let profile = entry.profileName.map { ", Profil: \($0)" } ?? ""
         return "\(time), \(entry.preview)\(profile)\(llm). Tippen zum Kopieren."
@@ -248,8 +258,6 @@ struct HistoryRowView: View {
     }
 
     private var timeString: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter.string(from: entry.createdAt)
+        historyTimeFormatter.string(from: entry.createdAt)
     }
 }
