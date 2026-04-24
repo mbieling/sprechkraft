@@ -6,11 +6,13 @@
 
 import SwiftUI
 import AppKit
+import Defaults
 
 @main
 struct VoiceScribeApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @State private var appState = AppState()
+    @Default(.hasCompletedOnboarding) var hasCompletedOnboarding
 
     var body: some Scene {
         // Verstecktes Aktivierungsfenster — MUSS vor 'settings' stehen!
@@ -36,6 +38,13 @@ struct VoiceScribeApp: App {
         }
         .defaultSize(width: 640, height: 480)
         .windowResizability(.contentSize)
+
+        // ONB-02: Onboarding-Fenster (Welcome Window)
+        Window("Willkommen bei VoiceScribe", id: "onboarding") {
+            OnboardingView()
+        }
+        .windowStyle(.hiddenTitleBar)
+        .windowResizability(.contentSize)
     }
 }
 
@@ -58,6 +67,11 @@ private struct HiddenActivationView: View {
                 appDelegate.setupAudioController()
                 // Icon nach AppState-Injection aktualisieren.
                 appDelegate.updateIcon()
+                
+                // ONB-01: First Launch Check
+                if !hasCompletedOnboarding {
+                    openOnboarding()
+                }
             }
             .onReceive(NotificationCenter.default.publisher(for: .openSettings)) { _ in
                 Task { @MainActor in
@@ -66,22 +80,24 @@ private struct HiddenActivationView: View {
                     NSApp.setActivationPolicy(.regular)
                     NSApp.activate(ignoringOtherApps: true)
 
-                    // 2. Einstellungsfenster öffnen bzw. vordergrundieren.
+                    // 2. Einstellungsfenster öffnen.
                     openWindow(id: "settings")
-                    if let win = NSApp.windows.first(where: {
-                        $0.identifier?.rawValue == "settings"
-                    }) {
-                        win.makeKeyAndOrderFront(nil)
+                    
+                    // 3. One-Shot Observer für die Aktivierung (UX-01)
+                    // Sobald das Fenster Key wird, setzen wir die Policy zurück.
+                    // Das verhindert, dass das Dock-Icon zu früh verschwindet.
+                    let _ = NotificationCenter.default.addObserver(
+                        forName: NSWindow.didBecomeKeyNotification,
+                        object: nil,
+                        queue: .main
+                    ) { notification in
+                        if let window = notification.object as? NSWindow,
+                           window.identifier?.rawValue == "settings" {
+                            NSApp.setActivationPolicy(.accessory)
+                            // Observer selbst entfernen (One-Shot)
+                            NotificationCenter.default.removeObserver(notification.name)
+                        }
                     }
-
-                    // 3. Zurück auf .accessory, damit Dock-Icon verschwindet,
-                    //    sobald Fenster geschlossen wird.
-                    // TODO: Vor Produktion durch NSWindow.didBecomeKeyNotification-Beobachtung
-                    //       ersetzen (One-Shot-Observer), um die Activation-Policy erst dann
-                    //       zurückzusetzen, wenn das Fenster tatsächlich Key ist. Der feste
-                    //       300ms-Sleep ist ein pragmatischer Workaround für Phase 1.
-                    try? await Task.sleep(for: .milliseconds(300))
-                    NSApp.setActivationPolicy(.accessory)
                 }
             }
             // D-02: History-Fenster öffnen via NotificationCenter-Brücke (analog .openSettings)
@@ -90,16 +106,39 @@ private struct HiddenActivationView: View {
                 Task { @MainActor in
                     NSApp.setActivationPolicy(.regular)
                     NSApp.activate(ignoringOtherApps: true)
+                    
                     openWindow(id: "history")
                     if let win = NSApp.windows.first(where: {
                         $0.identifier?.rawValue == "history"
                     }) {
                         win.makeKeyAndOrderFront(nil)
                     }
-                    // Pitfall 4: 300ms Workaround — identisch zu openSettings (STATE.md)
+                    
                     try? await Task.sleep(for: .milliseconds(300))
                     NSApp.setActivationPolicy(.accessory)
                 }
             }
+    }
+
+    private func openOnboarding() {
+        Task { @MainActor in
+            NSApp.setActivationPolicy(.regular)
+            NSApp.activate(ignoringOtherApps: true)
+            
+            openWindow(id: "onboarding")
+            
+            // UX-01: One-Shot Observer für Onboarding
+            let _ = NotificationCenter.default.addObserver(
+                forName: NSWindow.didBecomeKeyNotification,
+                object: nil,
+                queue: .main
+            ) { notification in
+                if let window = notification.object as? NSWindow,
+                   window.identifier?.rawValue == "onboarding" {
+                    NSApp.setActivationPolicy(.accessory)
+                    NotificationCenter.default.removeObserver(notification.name)
+                }
+            }
+        }
     }
 }

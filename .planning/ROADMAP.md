@@ -119,10 +119,44 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 06-05-PLAN.md — Manuelle Human-Verify-Checkpoints: Menü, Fenster, Diktat→Eintrag, Suche, Copy-Flash, Löschen (Wave 5)
 **UI hint**: yes
 
+### Phase 7: Parakeet Backend
+**Goal**: WhisperKit durch FluidAudio/Parakeet TDT v3 ersetzen — natives Swift-SPM-Paket, CoreML/ANE-beschleunigt, kein Python-Subprocess. TranscriptionBackend-Protokoll als Facade einführen, WhisperKitBackend als dokumentierten Fallback erhalten.
+**Depends on**: Phase 6
+**Requirements**: RECORD-04, RECORD-05
+**Success Criteria** (what must be TRUE):
+  1. App transkribiert Sprache via FluidAudio/Parakeet TDT v3 statt WhisperKit
+  2. Modell-Download beim Erststart mit Fortschrittsanzeige (oder Fake-Progress als Fallback)
+  3. Warmup-Inferenz nach Model-Load beendet Metal-Shader-Kompilierung vor erster Diktat-Sitzung
+  4. `TranscriptionBackend`-Protokoll isoliert Backend-Wechsel von AppDelegate und AppState
+  5. WhisperKitBackend bleibt als Fallback erhalten (auskommentiert oder feature-geflaggt)
+**Plans**: TBD
+
+### Phase 8: Settings
+**Goal**: Konsolidiertes Settings-Fenster mit allen Konfigurationsoptionen — Hotkey-Konfiguration, Mikrofon-Auswahl, Ausgabemodus, Groq API-Key, Profil-Verwaltung, Launch at Login, Modell-Status und Retry.
+**Depends on**: Phase 7
+**Requirements**: SET-02, SET-03, SET-04, SET-05
+**Success Criteria** (what must be TRUE):
+  1. Alle bisherigen Settings-Fragmente (SettingsView, ProfileEditorSheet) in einem kohärenten Fenster konsolidiert
+  2. Hotkey-Konfiguration mit Konflikt-Erkennung via KeyboardShortcuts.Recorder
+  3. Transkriptions-Engine-Status (Model bereit / lädt / Fehler) mit Retry-Button sichtbar
+  4. Keine Defaults+MenuBarExtra-Freeze-Regression (I10 aus SUMMARY.md)
+**Plans**: TBD
+
+### Phase 9: Integration & Validierung
+**Goal**: End-to-End-Validierung des vollständigen v0.19.0-Stacks — Diktat → Parakeet → TextOutput → HistoryStore — inkl. Qualitätsvergleich WhisperKit vs. Parakeet auf Deutsch und Memory-Profil.
+**Depends on**: Phase 8
+**Requirements**: RECORD-04, RECORD-05
+**Success Criteria** (what must be TRUE):
+  1. Vollständiger Diktat-Zyklus läuft stabil durch: Aufnahme → Parakeet-Transkription → Text-Ausgabe → History-Eintrag
+  2. Download-Fortschritt-UX ist verständlich und zeigt korrekten Zustand
+  3. Memory-Profil auf 8 GB Mac zeigt keine Speicher-Regression gegenüber WhisperKit
+  4. Qualitätsbaseline für Parakeet auf Deutsch dokumentiert
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -132,3 +166,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 4. Text Output | 4/4 | Complete | 2026-04-19 |
 | 5. LLM + Prompt Profiles | 7/7 | Complete | 2026-04-19 |
 | 6. History | 5/5 | Complete | 2026-04-21 |
+| 7. Parakeet Backend | TBD | Not started | — |
+| 8. Settings | TBD | Not started | — |
+| 9. Integration & Validierung | TBD | Not started | — |
