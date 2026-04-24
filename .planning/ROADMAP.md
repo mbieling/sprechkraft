@@ -120,7 +120,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **UI hint**: yes
 
 ### Phase 7: Parakeet Backend
-**Goal**: WhisperKit durch FluidAudio/Parakeet TDT v3 ersetzen — natives Swift-SPM-Paket, CoreML/ANE-beschleunigt, kein Python-Subprocess. TranscriptionBackend-Protokoll als Facade einführen, WhisperKitBackend als dokumentierten Fallback erhalten.
+**Goal**: WhisperKit durch FluidAudio/Parakeet TDT v3 ersetzen — natives Swift-SPM-Paket, CoreML/ANE-beschleunigt, kein Python-Subprocess. TranscriptionBackend-Protokoll als Facade einführen, WhiskerKitBackend als dokumentierten Fallback erhalten.
 **Depends on**: Phase 6
 **Requirements**: RECORD-04, RECORD-05
 **Success Criteria** (what must be TRUE):
@@ -128,8 +128,15 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Modell-Download beim Erststart mit Fortschrittsanzeige (oder Fake-Progress als Fallback)
   3. Warmup-Inferenz nach Model-Load beendet Metal-Shader-Kompilierung vor erster Diktat-Sitzung
   4. `TranscriptionBackend`-Protokoll isoliert Backend-Wechsel von AppDelegate und AppState
-  5. WhisperKitBackend bleibt als Fallback erhalten (auskommentiert oder feature-geflaggt)
-**Plans**: TBD
+  5. WhiskerKitBackend bleibt als Fallback erhalten (auskommentiert oder feature-geflaggt)
+**Plans**: 7 plans
+- [ ] 07-01-PLAN.md — Test-Updates (RecordingStateTests 8 Cases, TranscriptionServiceTests MockBackend, AppStateTests isModelError) (Wave 0, Build-Gate)
+- [ ] 07-02-PLAN.md — TranscriptionBackend Protokoll + AppState 3 neue RecordingState Cases + isModelError + StatusBarIconView Previews (Wave 1, parallel)
+- [ ] 07-03-PLAN.md — SPM: WhisperKit entfernen (5 pbxproj-Stellen) + FluidAudio 0.12.4 via Xcode hinzufügen (Wave 1, Checkpoint)
+- [ ] 07-04-PLAN.md — ParakeetBackend actor (FluidAudio, Warmup, MinSample-Guard) + WhiskerKitBackend.swift auskommentiert (Wave 2)
+- [ ] 07-05-PLAN.md — TranscriptionService Facade-Umbau: WhiskerKit-Import entfernen, Backend-Delegation, resampleTo16kHz verbatim erhalten (Wave 3)
+- [ ] 07-06-PLAN.md — AppDelegate.setupTranscription() Update: Cache-Check D-07, neue States, isModelError-Pfad D-08/D-09 (Wave 4)
+- [ ] 07-07-PLAN.md — Manuelle Human-Verify-Checkpoints: Tests grün, Download-UX, Live-Transkription Parakeet (Wave 5)
 
 ### Phase 8: Settings
 **Goal**: Konsolidiertes Settings-Fenster mit allen Konfigurationsoptionen — Hotkey-Konfiguration, Mikrofon-Auswahl, Ausgabemodus, Groq API-Key, Profil-Verwaltung, Launch at Login, Modell-Status und Retry.
@@ -166,6 +173,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 4. Text Output | 4/4 | Complete | 2026-04-19 |
 | 5. LLM + Prompt Profiles | 7/7 | Complete | 2026-04-19 |
 | 6. History | 5/5 | Complete | 2026-04-21 |
-| 7. Parakeet Backend | TBD | Not started | — |
+| 7. Parakeet Backend | 0/7 | Not started | — |
 | 8. Settings | TBD | Not started | — |
 | 9. Integration & Validierung | TBD | Not started | — |
