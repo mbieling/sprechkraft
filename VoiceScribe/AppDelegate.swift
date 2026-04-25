@@ -31,6 +31,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// AudioController — initialisiert nach AppState-Injection via setupAudioController().
     private var audioController: AudioController?
 
+    /// GroqService — injiziert von VoiceScribeApp für bessere Testbarkeit.
+    var groqService: GroqServiceProtocol!
+
     /// TranscriptionService — Download und Transkription. Actor-isoliert.
     private let transcriptionService = TranscriptionService()
 
@@ -131,12 +134,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
                             if let key = apiKey, !key.isEmpty {
                                 do {
-                                    outputText = try await GroqService.shared.process(
+                                    outputText = try await self.groqService.process(
                                         transcript: text,
                                         profile: activeProfile,
                                         apiKey: key
                                     )
                                 } catch {
+                                    // Improved Error Feedback (UX-02): Zeige Fehler-Icon für 2 Sekunden
+                                    await MainActor.run {
+                                        self.appState?.recordingState = .error
+                                        self.updateIcon()
+                                    }
+                                    // Kurze Pause, damit der User den Fehlerzustand wahrnimmt
+                                    try? await Task.sleep(for: .seconds(2))
+                                    
                                     // D-10: Stille Fallback bei Groq-Fehler (Timeout, API-Fehler, etc.)
                                     outputText = text
                                 }
@@ -327,6 +338,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(.separator())
 
+        // UX-03: Hilfe-Menü mit Dokumentation und Support
+        let helpItem = NSMenuItem(title: "Hilfe", action: nil, keyEquivalent: "")
+        let helpSubmenu = NSMenu()
+        
+        let docItem = NSMenuItem(title: "Dokumentation", action: #selector(openDocumentation), keyEquivalent: "")
+        docItem.target = self
+        helpSubmenu.addItem(docItem)
+        
+        let supportItem = NSMenuItem(title: "Support & Feedback", action: #selector(openSupport), keyEquivalent: "")
+        supportItem.target = self
+        helpSubmenu.addItem(supportItem)
+        
+        helpItem.submenu = helpSubmenu
+        menu.addItem(helpItem)
+
+        menu.addItem(.separator())
+
         // Beenden
         menu.addItem(NSMenuItem(
             title: "Beenden",
@@ -372,6 +400,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appState?.activeProfileID = profileID
     }
 
+    @objc private func openDocumentation() {
+        if let url = URL(string: "https://github.com/mbieling/VoiceScribe") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    @objc private func openSupport() {
+        if let url = URL(string: "https://github.com/mbieling/VoiceScribe/issues") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
     // MARK: - Icon-Update
 
     /// Aktualisiert das NSHostingView im StatusItem-Button mit dem aktuellen AppState.
@@ -396,20 +436,55 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Transcription Setup (RECORD-05)
 
-    /// Startet Modell-Download beim App-Start (D-09).
-    /// Fortschritt via NSStatusItem-Title "↓ XX%" (D-10).
-    /// isModelReady wird nach Abschluss auf true gesetzt (D-11).
+    /// Startet Modell-Download beim App-Start.
+    /// D-07: Cache-Prüfung — wenn Modell bereits vorhanden, kein Spinner anzeigen.
+    /// D-06: Kein Fortschrittsbalken — Spinner (.modelLoading) + Titel-Text als UX.
+    /// isModelReady wird nach Abschluss gesetzt; isModelError bei Fehler (D-08).
     private func setupTranscription() {
+        // D-07: Cache-Pfad prüfen bevor Lade-UI angezeigt wird.
+        // FluidAudio cached intern in ~/Library/Application Support/FluidAudio/Models.
+        // Wenn Modell-Datei existiert: kein Spinner — downloadAndLoad returned schnell.
+        let cacheURL = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/Application Support/FluidAudio/Models")
+        let modelCached = FileManager.default.fileExists(atPath: cacheURL.path)
+
+        if !modelCached {
+            // D-06: Spinner-State + Titel-Text — kein Fortschrittsbalken
+            appState?.recordingState = .modelLoading
+            updateIcon()  // Observation-B: sofort nach State-Mutation
+        }
+
         Task {
+            // D-03: .warmingUp setzen bevor downloadAndLoad — Warmup läuft im Backend-Call
+            // (progressHandler mit fraction=0.0 → 1.0 signalisiert den vollen Lifecycle)
             await transcriptionService.downloadAndLoad { [weak self] fraction in
-                // @MainActor (Closure deklariert in downloadAndLoad als @MainActor)
-                let pct = Int(fraction * 100)
-                self?.statusItem.button?.title = pct < 100 ? "↓ \(pct)%" : ""
+                // @MainActor Closure — safe für UI-Updates
+                // fraction: 0.0 = Beginn (kein echter Progress von FluidAudio — Pitfall 3)
+                //           1.0 = fertig (nach loadModels + Warmup-Inferenz)
+                if fraction < 1.0 {
+                    // D-06: Größen-Hinweis im Titel während Download läuft
+                    self?.statusItem.button?.title = "Parakeet-Modell wird geladen (~1.2 GB)…"
+                    self?.appState?.recordingState = .warmingUp  // D-03: Backend führt Warmup durch
+                    self?.updateIcon()
+                } else {
+                    self?.statusItem.button?.title = ""
+                }
             }
-            // Download abgeschlossen (oder fehlgeschlagen — isModelReady bleibt dann false, D-13)
+
+            // Download abgeschlossen (oder fehlgeschlagen — isModelReady bleibt dann false)
             statusItem.button?.title = ""
-            appState?.isModelReady = await transcriptionService.isModelReady
-            updateIcon()
+            let ready = await transcriptionService.isModelReady
+            appState?.isModelReady = ready
+
+            if ready {
+                appState?.recordingState = .idle
+            } else {
+                // D-08: isModelError setzen — Phase 8 zeigt Retry-Button
+                appState?.isModelError = true
+                // D-09: .modelError-State für Icon-Feedback
+                appState?.recordingState = .modelError
+            }
+            updateIcon()  // Observation-B: finaler Icon-Update nach State-Settle
         }
     }
 
