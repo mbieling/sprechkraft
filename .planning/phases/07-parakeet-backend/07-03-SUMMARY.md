@@ -2,7 +2,7 @@
 phase: 07-parakeet-backend
 plan: "03"
 subsystem: build-config
-status: partial-checkpoint
+status: complete
 tags: [spm, whisperkit, fluidaudio, pbxproj]
 dependency_graph:
   requires: ["07-01"]
