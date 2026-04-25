@@ -38,6 +38,7 @@
 		AA000020 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = AA000021 /* KeyboardShortcuts */; };
 		AA000022 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = AA000023 /* LaunchAtLogin */; };
 		AA000024 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = AA000025 /* Defaults */; };
+		FA070700 /* FluidAudio in Frameworks */ = {isa = PBXBuildFile; productRef = FA070701 /* FluidAudio */; };
 		BB040201 /* TextOutputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB040200 /* TextOutputService.swift */; };
 /* End PBXBuildFile section */
 
@@ -85,6 +86,7 @@
 				AA000020 /* KeyboardShortcuts in Frameworks */,
 				AA000022 /* LaunchAtLogin in Frameworks */,
 				AA000024 /* Defaults in Frameworks */,
+				FA070700 /* FluidAudio in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,6 +249,7 @@
 				AA000025 /* Defaults */,
 				KC050501 /* KeychainAccess */,
 				GR060601 /* GRDB */,
+				FA070701 /* FluidAudio */,
 			);
 			productName = VoiceScribe;
 			productReference = AA000005 /* VoiceScribe.app */;
@@ -304,6 +307,7 @@
 				AA000102 /* XCRemoteSwiftPackageReference "Defaults" */,
 				KC050500 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				GR060600 /* XCRemoteSwiftPackageReference "GRDB.swift" */,
+				FA070702 /* XCRemoteSwiftPackageReference "FluidAudio" */,
 			);
 			productRefGroup = AA000042 /* Products */;
 			projectDirPath = "";
@@ -650,6 +654,14 @@
 				minimumVersion = 7.5.0;
 			};
 		};
+		FA070702 /* XCRemoteSwiftPackageReference "FluidAudio" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/FluidInference/FluidAudio";
+			requirement = {
+				kind = exactVersion;
+				version = 0.12.4;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -677,6 +689,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = GR060600 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
 			productName = GRDB;
+		};
+		FA070701 /* FluidAudio */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FA070702 /* XCRemoteSwiftPackageReference "FluidAudio" */;
+			productName = FluidAudio;
 		};
 /* End XCSwiftPackageProductDependency section */
 
