@@ -5,7 +5,7 @@
 // Pitfall I8: Warmup-Inferenz nach loadModels ist Pflicht (Metal Shader JIT, 5-15s ohne Warmup).
 // Pitfall C4: downloadAndLoad NIEMALS auf @MainActor aufrufen — actor-Methoden sind automatisch off-thread.
 
-import FluidAudio   // @preconcurrency import FluidAudio  — falls Swift-6-Sendable-Warnung erscheint (D-12)
+@preconcurrency import FluidAudio
 
 actor ParakeetBackend: TranscriptionBackend {
 
