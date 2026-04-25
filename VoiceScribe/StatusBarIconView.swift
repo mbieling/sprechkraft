@@ -112,3 +112,15 @@ struct WaveformView: View {
 #Preview("LLM") {
     StatusBarIconView(state: .llmProcessing, audioLevel: 0.0).padding()
 }
+
+#Preview("Model Loading") {
+    StatusBarIconView(state: .modelLoading, audioLevel: 0.0).padding()
+}
+
+#Preview("Warming Up") {
+    StatusBarIconView(state: .warmingUp, audioLevel: 0.0).padding()
+}
+
+#Preview("Model Error") {
+    StatusBarIconView(state: .modelError, audioLevel: 0.0).padding()
+}
