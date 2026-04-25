@@ -4,10 +4,11 @@ import SwiftUI
 
 @Suite("RecordingState (FEED-01)")
 struct RecordingStateTests {
-    @Test("hat genau 4 Fälle")
+    @Test("hat genau 8 Fälle")
     func caseCount() {
-        let all: [RecordingState] = [.idle, .recording, .transcribing, .llmProcessing]
-        #expect(all.count == 4)
+        let all: [RecordingState] = [.idle, .recording, .transcribing, .llmProcessing,
+                                      .error, .modelLoading, .warmingUp, .modelError]
+        #expect(all.count == 8)
     }
 
     @Test(".idle.color entspricht grau #8E8E93")
@@ -47,8 +48,34 @@ struct RecordingStateTests {
 
     @Test("accessibilityLabel nicht leer für alle Zustände")
     func accessibilityLabels() {
-        for state: RecordingState in [.idle, .recording, .transcribing, .llmProcessing] {
+        for state: RecordingState in [.idle, .recording, .transcribing, .llmProcessing,
+                                       .error, .modelLoading, .warmingUp, .modelError] {
             #expect(!state.accessibilityLabel.isEmpty)
         }
+    }
+
+    @Test(".modelLoading und .warmingUp haben systemOrange Farbe (D-06)")
+    func modelLoadingColor() {
+        #expect(RecordingState.modelLoading.color == Color(.systemOrange))
+        #expect(RecordingState.warmingUp.color == Color(.systemOrange))
+    }
+
+    @Test(".modelError hat systemRed Farbe (D-09)")
+    func modelErrorColor() {
+        #expect(RecordingState.modelError.color == Color(.systemRed))
+    }
+
+    @Test(".modelLoading.isPulsing == true (Spinner-Animation, D-06)")
+    func modelLoadingIsPulsing() {
+        #expect(RecordingState.modelLoading.isPulsing == true)
+        #expect(RecordingState.warmingUp.isPulsing == false)
+        #expect(RecordingState.modelError.isPulsing == false)
+    }
+
+    @Test("systemImage der neuen States korrekt (D-05)")
+    func newStateSystemImages() {
+        #expect(RecordingState.modelLoading.systemImage == "arrow.down.circle")
+        #expect(RecordingState.warmingUp.systemImage == "hourglass")
+        #expect(RecordingState.modelError.systemImage == "exclamationmark.triangle.fill")
     }
 }
