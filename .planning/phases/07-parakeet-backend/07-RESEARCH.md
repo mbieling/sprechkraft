@@ -488,22 +488,22 @@ let models = try await AsrModels.load(from: repoDirectory, version: .v3)
 
 **Zu A1 kritische Anmerkung:** Falls Metal-Warmup länger als die `.warmingUp`-State-Anzeige dauert, ist das kein Fehler — `isModelReady=true` wird erst nach abgeschlossener `downloadAndLoad` (inklusive Warmup) gesetzt. Der Guard in `startRecordingWithCue` verhindert Aufnahme-Start. [ASSUMED]
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Progress-Handler: Zwischenwerte während CoreML-Compilation**
    - What we know: `downloadAndLoad` hat keinen nativen Progress-Parameter.
    - What's unclear: Ob CoreML-Compilation (nach Download) mehrere Sekunden dauert und ebenfalls gezeigt werden sollte.
-   - Recommendation: Beim ersten Build messen. Wenn > 5s: separaten "Modell wird kompiliert…" Titel-Text zeigen (zweite Phase in progressHandler mit `0.5`-Wert für UI-Feedback).
+   - **RESOLVED:** Deferred to first-build validation per CONTEXT.md Claude's Discretion area. Spinner + Größen-Hinweis (D-06) ist ausreichend für Phase 7; Zwischenwert-Feedback kann in Phase 9 nachgerüstet werden wenn Compilation > 5s dauert.
 
 2. **`source: .microphone` vs `source: .file` für Qualität**
    - What we know: `AudioSource` hat `.microphone`, `.file`, `.system`. API-Docs zeigen beide in Beispielen.
    - What's unclear: Ob `source` die Inferenz-Parameter beeinflusst (z.B. stärkere Noise-Reduction für Mikrofon).
-   - Recommendation: `.microphone` verwenden da wir Mikrofon-Input haben; beim ersten Build mit kurzem Diktat verifizieren.
+   - **RESOLVED:** Deferred to first-build validation per CONTEXT.md Claude's Discretion area. Plan 07-04 verwendet `.microphone` als Default; Qualitätsvergleich in Phase 9 (Integrations-Validierung).
 
 3. **RecordingStateTests.caseCount() und andere bestehende Tests**
    - What we know: Test erwartet `count == 4`; nach Phase 7 gibt es 7 Cases.
    - What's unclear: Ob weitere Tests hard-coded Assumptions über RecordingState-Cases haben.
-   - Recommendation: `RecordingStateTests.swift` vollständig aktualisieren als Wave-0-Aufgabe.
+   - **RESOLVED:** Wave 0 (Plan 07-01) aktualisiert `RecordingStateTests.caseCount()` auf 8 und fügt alle neuen Cases zu allen switch-Statements hinzu. Vollständig geplant.
 
 ## Environment Availability
 
