@@ -38,7 +38,6 @@
 		AA000020 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = AA000021 /* KeyboardShortcuts */; };
 		AA000022 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = AA000023 /* LaunchAtLogin */; };
 		AA000024 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = AA000025 /* Defaults */; };
-		CAFE0028 /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = BEEF0028 /* WhisperKit */; };
 		BB040201 /* TextOutputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB040200 /* TextOutputService.swift */; };
 /* End PBXBuildFile section */
 
@@ -86,7 +85,6 @@
 				AA000020 /* KeyboardShortcuts in Frameworks */,
 				AA000022 /* LaunchAtLogin in Frameworks */,
 				AA000024 /* Defaults in Frameworks */,
-				CAFE0028 /* WhisperKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,7 +245,6 @@
 				AA000021 /* KeyboardShortcuts */,
 				AA000023 /* LaunchAtLogin */,
 				AA000025 /* Defaults */,
-				BEEF0028 /* WhisperKit */,
 				KC050501 /* KeychainAccess */,
 				GR060601 /* GRDB */,
 			);
@@ -305,7 +302,6 @@
 				AA000100 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				AA000101 /* XCRemoteSwiftPackageReference "LaunchAtLogin-modern" */,
 				AA000102 /* XCRemoteSwiftPackageReference "Defaults" */,
-				DEAD0103 /* XCRemoteSwiftPackageReference "argmax-oss-swift" */,
 				KC050500 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				GR060600 /* XCRemoteSwiftPackageReference "GRDB.swift" */,
 			);
@@ -638,14 +634,6 @@
 				minimumVersion = 8.0.0;
 			};
 		};
-		DEAD0103 /* XCRemoteSwiftPackageReference "argmax-oss-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/argmaxinc/argmax-oss-swift";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.18.0;
-			};
-		};
 		KC050500 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
@@ -679,11 +667,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AA000102 /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
-		};
-		BEEF0028 /* WhisperKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DEAD0103 /* XCRemoteSwiftPackageReference "argmax-oss-swift" */;
-			productName = WhisperKit;
 		};
 		KC050501 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
