@@ -16,6 +16,9 @@
 		AA000216 /* AudioController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000217 /* AudioController.swift */; };
 		AA000218 /* AudioDeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000219 /* AudioDeviceManager.swift */; };
 		DEAD0220 /* TranscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEAD0221 /* TranscriptionService.swift */; };
+		TB070801 /* TranscriptionBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = TB070800 /* TranscriptionBackend.swift */; };
+		PB070803 /* ParakeetBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = PB070802 /* ParakeetBackend.swift */; };
+		WK070805 /* WhisperKitBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK070804 /* WhisperKitBackend.swift */; };
 		AA000016 /* AudioControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000017 /* AudioControllerTests.swift */; };
 		AA000018 /* DefaultsKeysTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000019 /* DefaultsKeysTests.swift */; };
 		AA000026 /* WaveformViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000027 /* WaveformViewTests.swift */; };
@@ -52,6 +55,9 @@
 		AA000217 /* AudioController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioController.swift; sourceTree = "<group>"; };
 		AA000219 /* AudioDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDeviceManager.swift; sourceTree = "<group>"; };
 		DEAD0221 /* TranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionService.swift; sourceTree = "<group>"; };
+		TB070800 /* TranscriptionBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionBackend.swift; sourceTree = "<group>"; };
+		PB070802 /* ParakeetBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParakeetBackend.swift; sourceTree = "<group>"; };
+		WK070804 /* WhisperKitBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperKitBackend.swift; sourceTree = "<group>"; };
 		BB040200 /* TextOutputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOutputService.swift; sourceTree = "<group>"; };
 		AA000017 /* AudioControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioControllerTests.swift; sourceTree = "<group>"; };
 		AA000019 /* DefaultsKeysTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultsKeysTests.swift; sourceTree = "<group>"; };
@@ -126,7 +132,10 @@
 		DEAD0222 /* Transcription */ = {
 			isa = PBXGroup;
 			children = (
+				TB070800 /* TranscriptionBackend.swift */,
 				DEAD0221 /* TranscriptionService.swift */,
+				PB070802 /* ParakeetBackend.swift */,
+				WK070804 /* WhisperKitBackend.swift */,
 			);
 			path = Transcription;
 			sourceTree = "<group>";
@@ -343,6 +352,9 @@
 				AA000216 /* AudioController.swift in Sources */,
 				AA000218 /* AudioDeviceManager.swift in Sources */,
 				DEAD0220 /* TranscriptionService.swift in Sources */,
+				TB070801 /* TranscriptionBackend.swift in Sources */,
+				PB070803 /* ParakeetBackend.swift in Sources */,
+				WK070805 /* WhisperKitBackend.swift in Sources */,
 				BB040201 /* TextOutputService.swift in Sources */,
 				PP050300 /* PromptProfile.swift in Sources */,
 				HT060603 /* HistoryStore.swift in Sources */,
