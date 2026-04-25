@@ -58,4 +58,11 @@ struct AppStateTests {
         #expect(state.audioLevel == 0.0)
         #expect(state.micPermissionDenied == false)
     }
+
+    @Test("isModelError startet mit false (D-08)")
+    func initialModelErrorFalse() {
+        let state = AppState()
+        #expect(state.isModelError == false,
+                "isModelError muss false sein nach Initialisierung — wird nur bei Download-Fehler true")
+    }
 }
