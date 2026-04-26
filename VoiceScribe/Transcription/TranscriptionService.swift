@@ -53,7 +53,10 @@ actor TranscriptionService {
     ///   - sampleRate: Hardware-Samplerate aus AVAudioEngine (z.B. 44100, 48000)
     func transcribeWithResampling(_ samples: [Float], sampleRate: Double) async -> String? {
         let samples16k = resampleTo16kHz(samples, fromSampleRate: sampleRate)
-        return await backend.transcribeWithResampling(samples16k, sampleRate: 16000.0)
+        // Sanitize: AVAudioEngine render-cycle drops can leave NaN/Inf in the buffer.
+        // FluidAudio throws invalidAudioData on non-finite values — replace with silence.
+        let sanitized = samples16k.map { $0.isFinite ? $0 : 0.0 }
+        return await backend.transcribeWithResampling(sanitized, sampleRate: 16000.0)
     }
 
     // MARK: - Resampling (RECORD-04, D-13)
