@@ -142,20 +142,24 @@ final class AudioController: @unchecked Sendable {
     /// Stoppt die Mikrofon-Aufnahme und setzt den Tap zurueck.
     /// removeTap wird IMMER als erstes aufgerufen (Pitfall 5).
     func stopRecording() {
-        // Phase 3: Sample-Array extrahieren und Callback ausloesen (D-05)
-        // recordedSamples zuerst leeren (vor Task-Dispatch) um Memory-Spike zu vermeiden (RESEARCH.md Pitfall 5)
-        let capturedSamples = recordedSamples
+        // removeTap VOR recordedSamples-Zugriff — stoppt Render-Thread-Callbacks und schliesst
+        // den Data Race: Render-Thread und Main-Thread koennen sonst gleichzeitig auf recordedSamples
+        // zugreifen, was den internen Array-Buffer doppelt freigibt (malloc: pointer not allocated).
+        engine.inputNode.removeTap(onBus: 0)
+
+        // sampleRate vor stop() abfragen — Format ist nach engine.stop() ggf. nicht mehr verfuegbar
         let capturedSampleRate = engine.inputNode.outputFormat(forBus: 0).sampleRate
+        engine.stop()
+
+        // Ab hier: kein Render-Thread mehr aktiv — recordedSamples-Zugriff ist sicher
+        let capturedSamples = recordedSamples
         recordedSamples = []
         Task { @MainActor [weak self] in
             self?.onRecordingComplete?(capturedSamples, capturedSampleRate)
         }
 
-        // Pitfall 5: removeTap zuerst, dann stop — verhindert doppelte Callbacks
-        engine.inputNode.removeTap(onBus: 0)
-        engine.stop()
         silenceAccumulator = 0
-        lastDispatchedLevel = -1  // WR-02: Reset fuer naechste Aufnahme-Session
+        lastDispatchedLevel = -1
     }
 
     /// Fordert Mikrofon-Berechtigung an, falls noch nicht erteilt.
