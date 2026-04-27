@@ -144,7 +144,7 @@ AppDelegate.onRecordingComplete handler:
 ### Recommended Project Structure
 
 ```
-VoiceScribe/
+SPRECHKRAFT/
 ├── Models/
 │   └── PromptProfile.swift          # Codable & Defaults.Serializable & Identifiable
 ├── Services/
@@ -316,7 +316,7 @@ actor GroqService {
 import KeychainAccess
 
 // Initialisierung mit Bundle Identifier als Service-Name
-private let keychain = Keychain(service: Bundle.main.bundleIdentifier ?? "com.voicescribe")
+private let keychain = Keychain(service: Bundle.main.bundleIdentifier ?? "com.sprechkraft")
 
 // Lesen (nil wenn nicht gesetzt)
 let apiKey: String? = keychain["groqApiKey"]
@@ -583,7 +583,7 @@ Task {
 | Statische KeyboardShortcuts.Name Extensions | Dynamische Laufzeit-Instanziierung via String | KeyboardShortcuts v2+ | Ermöglicht benutzer-definierte Profile ohne Compile-Zeit-Wissen |
 
 **Deprecated/outdated:**
-- `/no_think` Prefix: Funktioniert, aber instabil bei Multi-Turn (laut HuggingFace Qwen3-32B discussion #16). Für VoiceScribe (Single-Turn) wäre es technisch OK, aber `reasoning_effort: "none"` ist die von Groq dokumentierte First-Class-Lösung.
+- `/no_think` Prefix: Funktioniert, aber instabil bei Multi-Turn (laut HuggingFace Qwen3-32B discussion #16). Für SPRECHKRAFT (Single-Turn) wäre es technisch OK, aber `reasoning_effort: "none"` ist die von Groq dokumentierte First-Class-Lösung.
 
 ---
 
@@ -635,9 +635,9 @@ Task {
 | Property | Value |
 |----------|-------|
 | Framework | Swift Testing (bereits in Phases 1-4 verwendet) |
-| Config file | Xcode Test Target `VoiceScribeTests` |
-| Quick run command | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS' -only-testing:VoiceScribeTests/PromptProfileTests` |
-| Full suite command | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS'` |
+| Config file | Xcode Test Target `SPRECHKRAFTTests` |
+| Quick run command | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS' -only-testing:SPRECHKRAFTTests/PromptProfileTests` |
+| Full suite command | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS'` |
 
 ### Phase Requirements → Test Map
 
@@ -657,14 +657,14 @@ Task {
 - Echter Groq API-Call mit echtem Key — Netzwerk
 
 ### Sampling Rate
-- **Per task commit:** `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS' -only-testing:VoiceScribeTests/PromptProfileTests -only-testing:VoiceScribeTests/GroqServiceTests`
+- **Per task commit:** `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS' -only-testing:SPRECHKRAFTTests/PromptProfileTests -only-testing:SPRECHKRAFTTests/GroqServiceTests`
 - **Per wave merge:** Full suite
 - **Phase gate:** Full suite green vor `/gsd-verify-work`
 
 ### Wave 0 Gaps
 
-- [ ] `VoiceScribeTests/PromptProfileTests.swift` — PROF-01, PROF-03, PROF-04, Defaults round-trip
-- [ ] `VoiceScribeTests/GroqServiceTests.swift` — PROF-05, SET-01, Mock URLSession für Groq-Response
+- [ ] `SPRECHKRAFTTests/PromptProfileTests.swift` — PROF-01, PROF-03, PROF-04, Defaults round-trip
+- [ ] `SPRECHKRAFTTests/GroqServiceTests.swift` — PROF-05, SET-01, Mock URLSession für Groq-Response
 
 ---
 
@@ -701,7 +701,7 @@ Task {
 - `console.groq.com/docs/model/qwen/qwen3-32b` (WebFetch + WebSearch 2026-04-19) — `reasoning_effort: "none"` für non-thinking mode; Temperatur-Empfehlungen
 - `/sindresorhus/defaults` (Context7) — `Codable & Defaults.Serializable`-Pattern; `[User]` Array-Key-Beispiel
 - `github.com/kishikawakatsumi/KeychainAccess` (WebFetch 2026-04-19) — Subscript-API, Service-Initialisierung
-- Projekt-Codebase (VoiceScribe) — AppState.swift, Defaults+Keys.swift, KeyboardShortcuts+Names.swift, AppDelegate.swift, SettingsView.swift
+- Projekt-Codebase (SPRECHKRAFT) — AppState.swift, Defaults+Keys.swift, KeyboardShortcuts+Names.swift, AppDelegate.swift, SettingsView.swift
 
 ### Secondary (MEDIUM confidence)
 

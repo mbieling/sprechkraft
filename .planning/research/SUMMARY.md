@@ -1,13 +1,13 @@
 # Project Research Summary
 
-**Project:** VoiceScribe — macOS Menu Bar Dictation App
+**Project:** SPRECHKRAFT — macOS Menu Bar Dictation App
 **Domain:** Native macOS, lokale ASR, globaler Hotkey, LLM-Nachbearbeitung
 **Researched:** 2026-04-21 (Milestone v0.19.0: Parakeet + Settings)
 **Confidence:** HIGH
 
 ## Executive Summary
 
-VoiceScribe ist eine native macOS Menu-Bar-Diktat-App der Kategorie "systemweite Push-to-Talk-Sprachsteuerung". Die Kernanforderungen — globale Hotkeys, Text-Injektion in beliebige Fremdfenster, vollständig lokale Inferenz — schließen App-Sandbox und Mac-App-Store-Distribution aus. Der richtige Stack ist: Swift 6 + AppKit (NSStatusItem), AVFoundation für Audio-Capture, und ein austauschbares Transkriptions-Backend hinter einem `TranscriptionBackend`-Protokoll.
+SPRECHKRAFT ist eine native macOS Menu-Bar-Diktat-App der Kategorie "systemweite Push-to-Talk-Sprachsteuerung". Die Kernanforderungen — globale Hotkeys, Text-Injektion in beliebige Fremdfenster, vollständig lokale Inferenz — schließen App-Sandbox und Mac-App-Store-Distribution aus. Der richtige Stack ist: Swift 6 + AppKit (NSStatusItem), AVFoundation für Audio-Capture, und ein austauschbares Transkriptions-Backend hinter einem `TranscriptionBackend`-Protokoll.
 
 Die wichtigste architektonische Entdeckung dieser Recherche: **FluidAudio (FluidInference/FluidAudio v0.12.4)** macht die Python-Subprocess-Brücke unnötig. FluidAudio ist ein natives Swift-SPM-Paket, das Parakeet TDT v3 via CoreML/Neural Engine bereitstellt — 66 MB RAM statt ~2 GB MLX, ~110x Realtime-Factor auf M4 Pro, und direkte Swift-API ohne venv-Bundling, SIP-Kompatibilitätsprobleme oder codesign-Aufwand für hunderte `.so`-Dateien. Die Python-Subprocess-Variante bleibt als dokumentierter Fallback bestehen, ist aber nicht mehr der empfohlene Weg.
 

@@ -24,7 +24,7 @@ status: all_fixed
 
 ### CR-01: `try!` in HistoryStore singleton crashes on DB init failure
 
-**Files modified:** `VoiceScribe/History/HistoryStore.swift`
+**Files modified:** `SPRECHKRAFT/History/HistoryStore.swift`
 **Commit:** 6d97339
 **Applied fix:** `try!` durch ein `do/catch`-Konstrukt in der lazy-Closure ersetzt. Bei Fehler wird ein In-Memory-`HistoryStore` als Fallback erstellt und der Fehler via `print` in Console.app geloggt. Falls auch In-Memory fehlschlägt, ist das ein Programmierfehler und ein Crash korrekt.
 
@@ -32,7 +32,7 @@ status: all_fixed
 
 ### WR-01: Synchronous DatabaseQueue calls block the main thread
 
-**Files modified:** `VoiceScribe/History/HistoryStore.swift`, `VoiceScribe/AppDelegate.swift`, `VoiceScribe/History/HistoryView.swift`, `VoiceScribeTests/HistoryStoreTests.swift`
+**Files modified:** `SPRECHKRAFT/History/HistoryStore.swift`, `SPRECHKRAFT/AppDelegate.swift`, `SPRECHKRAFT/History/HistoryView.swift`, `SPRECHKRAFTTests/HistoryStoreTests.swift`
 **Commit:** e9532a3
 **Applied fix:** `insert`, `delete`, `deleteAll` und `search` auf `async throws` umgestellt; alle verwenden jetzt `try await dbQueue.write`/`read`. Call-Sites in AppDelegate und HistoryView angepasst (Kontextmenü- und Alert-Buttons erhalten `Task { try? await ... }`-Wrapper, Debounce-Task verwendet `try? await`). Alle Testmethoden auf `async throws` umgestellt.
 
@@ -42,7 +42,7 @@ Hinweis: Der LLM-Pfad in AppDelegate wurde refaktoriert — `historyEntry` wird 
 
 ### WR-02: Silent swallowing of DB insert errors with no diagnostics
 
-**Files modified:** `VoiceScribe/AppDelegate.swift`
+**Files modified:** `SPRECHKRAFT/AppDelegate.swift`
 **Commit:** e9532a3 (gemeinsam mit WR-01 gefixt)
 **Applied fix:** Beide Insert-Stellen (LLM-Pfad und Direkt-Pfad) verwenden jetzt `do/catch` mit `print("[HistoryStore] Insert failed: \(error)")`. Die Fire-and-Forget-Semantik bleibt erhalten — Fehler blockieren die Transkriptionsausgabe nicht, sind aber in Console.app sichtbar.
 
@@ -50,7 +50,7 @@ Hinweis: Der LLM-Pfad in AppDelegate wurde refaktoriert — `historyEntry` wird 
 
 ### WR-03: Strong `self` capture in inner fire-and-forget Task (LLM path)
 
-**Files modified:** `VoiceScribe/AppDelegate.swift`
+**Files modified:** `SPRECHKRAFT/AppDelegate.swift`
 **Commit:** 1cf9028
 **Applied fix:** Innerer LLM-Task auf `Task { [weak self] in guard let self else { return }` umgestellt. Konsistent mit dem äußeren `onRecordingComplete`-Callback der bereits `[weak self]` verwendet.
 
@@ -58,7 +58,7 @@ Hinweis: Der LLM-Pfad in AppDelegate wurde refaktoriert — `historyEntry` wird 
 
 ### WR-04: `DateFormatter` allocated on every SwiftUI render pass
 
-**Files modified:** `VoiceScribe/History/HistoryView.swift`
+**Files modified:** `SPRECHKRAFT/History/HistoryView.swift`
 **Commit:** 65c6cea
 **Applied fix:** Zwei `private let`-Formatter auf Datei-Scope hinzugefügt: `historyDateFormatter` (dd.MM.yyyy) und `historyTimeFormatter` (HH:mm). Alle drei Allokierungsstellen ersetzt: `groupedEntries`-Closure, `accessibilityLabel(for:)` und `HistoryRowView.timeString`.
 
@@ -66,7 +66,7 @@ Hinweis: Der LLM-Pfad in AppDelegate wurde refaktoriert — `historyEntry` wird 
 
 ### WR-05: Missing test coverage for `delete()` and `deleteAll()`
 
-**Files modified:** `VoiceScribeTests/HistoryStoreTests.swift`
+**Files modified:** `SPRECHKRAFTTests/HistoryStoreTests.swift`
 **Commit:** dabe6ef
 **Applied fix:** Zwei neue `async throws`-Tests hinzugefügt: `testDeleteRemovesEntry()` prüft Einzel-Löschen und verifiziert explizit den FTS5-Index (sucht nach dem gelöschten Term — erwartet leere Ergebnisse); `testDeleteAllClearsStore()` prüft Gesamt-Löschen mit 5 Einträgen.
 

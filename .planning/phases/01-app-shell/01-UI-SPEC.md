@@ -121,7 +121,7 @@ Quelle: CONTEXT.md D-05, D-06 (gesperrt).
 
 ```
 ┌─────────────────────────────┐
-│  VoiceScribe                │  ← Disabled (App-Name, Semibold 13pt)
+│  SPRECHKRAFT                │  ← Disabled (App-Name, Semibold 13pt)
 ├─────────────────────────────┤  ← NSMenuItem.separator()
 │  Einstellungen…             │  ← Öffnet Settings-Fenster (D-07)
 │  ☑ Beim Login starten       │  ← LaunchAtLogin Toggle (NSMenuItem mit State)
@@ -136,7 +136,7 @@ Quelle: CONTEXT.md D-05, D-06 (gesperrt).
 |--------|-----------|
 | Linksklick auf Icon | Aufnahme starten/stoppen (direkte Aktion, kein Menü) |
 | Rechtsklick auf Icon | Menü öffnen |
-| Klick auf „Einstellungen…" | Öffnet SwiftUI-Fenster „VoiceScribe — Einstellungen" |
+| Klick auf „Einstellungen…" | Öffnet SwiftUI-Fenster „SPRECHKRAFT — Einstellungen" |
 | Klick auf „Beim Login starten" | Toggle-State wechseln via `LaunchAtLogin-modern` |
 | Klick auf „Beenden" | `NSApp.terminate(nil)` |
 
@@ -150,7 +150,7 @@ Quelle: CONTEXT.md D-07 (gesperrt).
 
 | Eigenschaft | Wert |
 |-------------|------|
-| Fenster-Titel | „VoiceScribe — Einstellungen" |
+| Fenster-Titel | „SPRECHKRAFT — Einstellungen" |
 | Inhalt Phase 1 | Leer (Placeholder-Text: „Einstellungen folgen in weiteren Phasen") |
 | Mindestgröße | 400×300 pt |
 | Schließen | Standard macOS Fenster-Schließen-Button |
@@ -162,12 +162,12 @@ Quelle: CONTEXT.md D-07 (gesperrt).
 
 | Element | Copy |
 |---------|------|
-| App-Name im Menü | „VoiceScribe" |
+| App-Name im Menü | „SPRECHKRAFT" |
 | Einstellungen-Menüpunkt | „Einstellungen…" (mit Auslassungszeichen — macOS-Konvention für Menüpunkte die ein Fenster öffnen) |
 | Login-Toggle-Label | „Beim Login starten" |
 | Beenden-Menüpunkt | „Beenden" |
 | Einstellungsfenster-Placeholder | „Einstellungen folgen in weiteren Phasen." |
-| Fenster-Titel | „VoiceScribe — Einstellungen" (Em-Dash, macOS-Konvention) |
+| Fenster-Titel | „SPRECHKRAFT — Einstellungen" (Em-Dash, macOS-Konvention) |
 | Fehlerzustand (kein) | Phase 1 hat keine Fehlerzustände im UI |
 | Empty State | Nicht anwendbar (kein Datenzustand in Phase 1) |
 
@@ -196,7 +196,7 @@ In Phase 1 wird der State durch Hotkey-Druck zyklisch durchgetastet (Demo-Modus)
 
 | Element | Anforderung |
 |---------|-------------|
-| Menu-Bar-Icon | `accessibilityLabel`: aktueller Zustand als String (z.B. „VoiceScribe — Bereit", „VoiceScribe — Aufnahme läuft") |
+| Menu-Bar-Icon | `accessibilityLabel`: aktueller Zustand als String (z.B. „SPRECHKRAFT — Bereit", „SPRECHKRAFT — Aufnahme läuft") |
 | Toggle „Beim Login starten" | `accessibilityValue`: „Ein" / „Aus" |
 | Alle Menüpunkte | Standard `NSMenuItem` Accessibility — keine Zusatzarbeit nötig |
 

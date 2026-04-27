@@ -31,8 +31,8 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - VoiceScribe/AppDelegate.swift
-    - VoiceScribe/SettingsView.swift
+    - SPRECHKRAFT/AppDelegate.swift
+    - SPRECHKRAFT/SettingsView.swift
 
 key-decisions:
   - "AXIsProcessTrusted() in setupAudioController() aufgerufen statt applicationDidFinishLaunching — appState ist in setupAudioController() garantiert nicht nil (guard let appState else { return })"
@@ -76,12 +76,12 @@ completed: "2026-04-19"
 
 ## Files Created/Modified
 
-- `VoiceScribe/AppDelegate.swift` — TextOutputService-Wiring, AX-Check, setupOutputModeHotkey(), Menü-Häkchen + @objc-Actions
-- `VoiceScribe/SettingsView.swift` — Textausgabe-Section, AX-Permission-Banner, OutputMode-Picker, KeyboardShortcuts.Recorder, Preview
+- `SPRECHKRAFT/AppDelegate.swift` — TextOutputService-Wiring, AX-Check, setupOutputModeHotkey(), Menü-Häkchen + @objc-Actions
+- `SPRECHKRAFT/SettingsView.swift` — Textausgabe-Section, AX-Permission-Banner, OutputMode-Picker, KeyboardShortcuts.Recorder, Preview
 
 ## Decisions Made
 
-- AXIsProcessTrusted() in setupAudioController() platziert statt applicationDidFinishLaunching: Plan 03 sah beide Orte vor; setupAudioController() ist sicherer, da appState dort via guard let gebunden ist. In applicationDidFinishLaunching wird appState erst durch VoiceScribeApp.onAppear injiziert.
+- AXIsProcessTrusted() in setupAudioController() platziert statt applicationDidFinishLaunching: Plan 03 sah beide Orte vor; setupAudioController() ist sicherer, da appState dort via guard let gebunden ist. In applicationDidFinishLaunching wird appState erst durch SPRECHKRAFTApp.onAppear injiziert.
 - setupOutputModeHotkey() in applicationDidFinishLaunching: Hotkey soll systemweit verfügbar sein ab App-Start — kein appState-Zugriff nötig.
 
 ## Deviations from Plan

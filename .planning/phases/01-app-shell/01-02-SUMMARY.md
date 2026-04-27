@@ -27,12 +27,12 @@ tech_stack:
     - "enum als Namespace für Design-Tokens (kein struct, keine Instanziierung möglich)"
 key_files:
   created:
-    - VoiceScribe/AppState.swift
-    - VoiceScribe/StatusBarIconView.swift
-    - VoiceScribe/Constants/DesignTokens.swift
-    - VoiceScribe/Extensions/KeyboardShortcuts+Names.swift
+    - SPRECHKRAFT/AppState.swift
+    - SPRECHKRAFT/StatusBarIconView.swift
+    - SPRECHKRAFT/Constants/DesignTokens.swift
+    - SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift
   modified:
-    - VoiceScribe.xcodeproj/project.pbxproj (4 neue Dateien + 2 neue Gruppen registriert)
+    - SPRECHKRAFT.xcodeproj/project.pbxproj (4 neue Dateien + 2 neue Gruppen registriert)
 decisions:
   - "SwiftUI .renderingMode(.original) statt .alwaysOriginal — Image.TemplateRenderingMode kennt kein .alwaysOriginal (NSImage/UIImage-API); Verhalten ist äquivalent"
   - "KeyboardShortcuts+Names.swift aus Plan 03 vorgezogen — HotkeyTests.swift blockierte Test-Target-Build ohne toggleRecording-Name-Extension"
@@ -56,9 +56,9 @@ RecordingState-Enum mit 4 Zuständen (idle/recording/transcribing/llmProcessing)
 
 | Task | Name | Commit | Files |
 |------|------|--------|-------|
-| 1 | RecordingState-Enum und AppState implementieren | 24de095 | VoiceScribe/AppState.swift, project.pbxproj |
-| 2 | StatusBarIconView mit Pulse-Animation | e5d542b | VoiceScribe/StatusBarIconView.swift, VoiceScribe/Extensions/KeyboardShortcuts+Names.swift |
-| 3 | DesignTokens-Enum für Spacing-Konstanten | 574db4d | VoiceScribe/Constants/DesignTokens.swift |
+| 1 | RecordingState-Enum und AppState implementieren | 24de095 | SPRECHKRAFT/AppState.swift, project.pbxproj |
+| 2 | StatusBarIconView mit Pulse-Animation | e5d542b | SPRECHKRAFT/StatusBarIconView.swift, SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift |
+| 3 | DesignTokens-Enum für Spacing-Konstanten | 574db4d | SPRECHKRAFT/Constants/DesignTokens.swift |
 
 ## Test Status
 
@@ -85,7 +85,7 @@ enum RecordingState: Equatable {
     var color: Color
     var isPulsing: Bool       // true für .recording und .llmProcessing
     var pulseSpeed: Double    // 0.8 für .recording, 1.2 für .llmProcessing
-    var accessibilityLabel: String  // Deutsch: "VoiceScribe — Bereit" etc.
+    var accessibilityLabel: String  // Deutsch: "SPRECHKRAFT — Bereit" etc.
 }
 ```
 
@@ -145,7 +145,7 @@ extension KeyboardShortcuts.Name {
 - **Gefunden während:** Task 2 (Build-Fehler)
 - **Problem:** Der Plan-Code nutzt `.renderingMode(.alwaysOriginal)`. In SwiftUI ist `Image.TemplateRenderingMode` ein eigenständiger Typ ohne `.alwaysOriginal` — das ist die `NSImage`/`UIImage`-API. SwiftUI kennt nur `.original` und `.template`.
 - **Fix:** `.renderingMode(.original)` — gleiches Verhalten (keine Template-Umfärbung), korrekte SwiftUI-API.
-- **Dateien:** VoiceScribe/StatusBarIconView.swift
+- **Dateien:** SPRECHKRAFT/StatusBarIconView.swift
 - **Commit:** e5d542b
 
 **2. [Rule 3 - Blockierendes Problem] HotkeyTests.swift blockierte Test-Target-Build**
@@ -153,14 +153,14 @@ extension KeyboardShortcuts.Name {
 - **Problem:** `HotkeyTests.swift` referenziert `KeyboardShortcuts.Name.toggleRecording`, das laut ursprünglichem Plan erst in Plan 03 definiert wird. Das Test-Target ließ sich nicht kompilieren — weder `-only-testing` noch `-skip-testing` helfen vor dem Build.
 - **Fix:** `KeyboardShortcuts+Names.swift` aus Plan 03 vorgezogen. Die Extension ist trivial (1 statische Konstante), hat keine Abhängigkeiten und schadet Plan 03 nicht — Plan 03 muss die Datei nur noch in AppDelegate.setupHotkey() verwenden.
 - **Bonus:** HotkeyTests (2 Tests) laufen jetzt ebenfalls grün — Plan 03 muss sie nicht mehr GREEN machen.
-- **Dateien:** VoiceScribe/Extensions/KeyboardShortcuts+Names.swift, project.pbxproj
+- **Dateien:** SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift, project.pbxproj
 - **Commit:** e5d542b
 
 **3. [Rule 2 - Fehlende Funktionalität] onAppear fehlte im Pattern-Code**
 - **Gefunden während:** Task 2 Implementierung
 - **Problem:** Das PATTERNS.md-Pattern für StatusBarIconView nutzt nur `onChange(of:)`, nicht `onAppear`. Damit würde der initiale Zustand (z.B. `.recording` beim App-Start) keine Pulse-Animation starten.
 - **Fix:** `onAppear { applyAnimation(for: state) }` ergänzt, damit der Initialzustand korrekt animiert wird.
-- **Dateien:** VoiceScribe/StatusBarIconView.swift
+- **Dateien:** SPRECHKRAFT/StatusBarIconView.swift
 - **Commit:** e5d542b
 
 ## Threat Mitigations Applied
@@ -176,10 +176,10 @@ Keine — alle Werte sind konkret implementiert und durch Tests verifiziert.
 
 ## Self-Check: PASSED
 
-- [x] VoiceScribe/AppState.swift: FOUND
-- [x] VoiceScribe/StatusBarIconView.swift: FOUND
-- [x] VoiceScribe/Constants/DesignTokens.swift: FOUND
-- [x] VoiceScribe/Extensions/KeyboardShortcuts+Names.swift: FOUND
+- [x] SPRECHKRAFT/AppState.swift: FOUND
+- [x] SPRECHKRAFT/StatusBarIconView.swift: FOUND
+- [x] SPRECHKRAFT/Constants/DesignTokens.swift: FOUND
+- [x] SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift: FOUND
 - [x] Commit 24de095: FOUND (feat: RecordingState + AppState)
 - [x] Commit e5d542b: FOUND (feat: StatusBarIconView + KeyboardShortcuts+Names)
 - [x] Commit 574db4d: FOUND (feat: DesignTokens)

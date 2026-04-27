@@ -31,8 +31,8 @@ Keine.
 
 ## Key Files
 
-- VoiceScribe/Audio/AudioController.swift
-- VoiceScribe/Audio/AudioDeviceManager.swift
-- VoiceScribe/StatusBarIconView.swift
-- VoiceScribe/SettingsView.swift
-- VoiceScribe/AppDelegate.swift
+- SPRECHKRAFT/Audio/AudioController.swift
+- SPRECHKRAFT/Audio/AudioDeviceManager.swift
+- SPRECHKRAFT/StatusBarIconView.swift
+- SPRECHKRAFT/SettingsView.swift
+- SPRECHKRAFT/AppDelegate.swift

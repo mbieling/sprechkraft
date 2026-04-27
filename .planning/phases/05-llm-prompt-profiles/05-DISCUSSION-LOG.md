@@ -40,7 +40,7 @@
 | Option | Description | Selected |
 |--------|-------------|----------|
 | Defaults.Keys Codable Array | `[PromptProfile]` in UserDefaults via Defaults-Library | ✓ |
-| JSON-Datei AppSupport | JSON in ~/Library/Application Support/VoiceScribe/ | |
+| JSON-Datei AppSupport | JSON in ~/Library/Application Support/SPRECHKRAFT/ | |
 | GRDB jetzt einführen | SQLite schon in Phase 5, Phase 6 baut darauf | |
 
 **User's choice:** Defaults.Keys Codable Array

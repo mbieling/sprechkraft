@@ -32,7 +32,7 @@ completed: 2026-04-16
 ### Task 4: LaunchAtLogin-Toggle persistent (SET-05)
 - **Status:** approved
 - Menü-Haken ändert sich bei Klick
-- VoiceScribe erscheint in Systemeinstellungen → Anmeldeobjekte
+- SPRECHKRAFT erscheint in Systemeinstellungen → Anmeldeobjekte
 - Zustand überlebt App-Neustart (Persistenz bestätigt)
 
 ## Requirements-Abdeckung

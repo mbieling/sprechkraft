@@ -4,14 +4,14 @@ reviewed: 2026-04-19T00:00:00Z
 depth: standard
 files_reviewed: 8
 files_reviewed_list:
-  - VoiceScribe/Extensions/Defaults+Keys.swift
-  - VoiceScribe/Extensions/KeyboardShortcuts+Names.swift
-  - VoiceScribe/AppState.swift
-  - VoiceScribe/TextOutput/TextOutputService.swift
-  - VoiceScribeTests/TextOutputServiceTests.swift
-  - VoiceScribeTests/DefaultsKeysTests.swift
-  - VoiceScribe/AppDelegate.swift
-  - VoiceScribe/SettingsView.swift
+  - SPRECHKRAFT/Extensions/Defaults+Keys.swift
+  - SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift
+  - SPRECHKRAFT/AppState.swift
+  - SPRECHKRAFT/TextOutput/TextOutputService.swift
+  - SPRECHKRAFTTests/TextOutputServiceTests.swift
+  - SPRECHKRAFTTests/DefaultsKeysTests.swift
+  - SPRECHKRAFT/AppDelegate.swift
+  - SPRECHKRAFT/SettingsView.swift
 findings:
   critical: 1
   warning: 4
@@ -39,7 +39,7 @@ Ein kritisches Problem wurde identifiziert: Der `force_cast` auf `AXUIElement` (
 
 ### CR-01: force_cast auf AXUIElement kann bei Fremdtypen crashen
 
-**File:** `VoiceScribe/TextOutput/TextOutputService.swift:63`
+**File:** `SPRECHKRAFT/TextOutput/TextOutputService.swift:63`
 **Issue:** `focusedRef as! AXUIElement` ist ein unkonditionierter Force-Cast. Der vorausgehende `guard`-Block garantiert nur, dass `focusedRef` nicht `nil` ist — nicht, dass der Laufzeittyp tatsächlich `AXUIElement` ist. Liefert ein Accessibility-Provider aus einer Drittanbieter-App oder einem Browser-Plugin ein Objekt eines anderen CF-Typs zurück, crasht die App mit `EXC_BAD_ACCESS` oder einem Laufzeitfehler ohne Möglichkeit zur Fehlerbehandlung.
 
 Das gleiche Muster tritt bei Zeile 88 (`rv as! AXValue`) auf, ist dort jedoch erheblich weniger riskant: `AXValueGetValue` liefert selbst einen `Bool`-Return, sodass ein falsch getyptes Objekt maximal einen `false`-Return erzeugt.
@@ -71,7 +71,7 @@ guard CFGetTypeID(focusedRef) == AXUIElementGetTypeID(),
 
 ### WR-01: Cursor-Positionierung nach Einfügen verwendet falschen Ausgangspunkt
 
-**File:** `VoiceScribe/TextOutput/TextOutputService.swift:117`
+**File:** `SPRECHKRAFT/TextOutput/TextOutputService.swift:117`
 **Issue:** Die Cursor-Neuposition nach dem Schreiben berechnet sich aus `safeLoc`, das bereits durch `min(cursorRange.location, existing.unicodeScalars.count)` gebildet wurde. Gleichzeitig wird `cursorRange.location` (der ursprüngliche Cursor) ohne dieselbe Clampung für `safeLoc` wiederholt — aber das ist noch korrekt. Das eigentliche Problem: `safeLoc` wird aus `cursorRange.location` im Verhältnis zu `existing` berechnet, aber `insertText()` in Schritt 4 hat `loc` ebenfalls intern geclamppt. Wenn `cursorRange.location > existing.unicodeScalars.count` (z.B. bei einem Race-Condition zwischen Lesen und Schreiben des AX-Werts durch eine andere App), ist `safeLoc` korrekt. Der `insertScalarCount`-Ausdruck in Zeile 116 verwendet jedoch `text.unicodeScalars.count` (der neue Text) — das ist korrekt. Der Bug liegt woanders:
 
 `safeLoc` in Zeile 117 entspricht `min(cursorRange.location, existing.unicodeScalars.count)`. Bei einer nicht-leeren Selektion (`cursorRange.length > 0`) zeigt die neue Cursor-Position auf `safeLoc + insertScalarCount`, d.h. auf das Ende des eingefügten Textes, **aber der ersetzte Bereich (`cursorRange.length` Skalare) wurde nicht vom Offset abgezogen**. Das `insertText()`-Ergebnis hat an Position `safeLoc` bereits `cursorRange.length` Skalare gelöscht und `insertScalarCount` eingefügt. Die korrekte neue Cursor-Endposition ist `safeLoc + insertScalarCount` — das ist richtig für den Fall dass `length == 0`. Bei `length > 0` bleibt der Cursor ebenfalls auf `safeLoc + insertScalarCount`, was korrekt ist (Ende der Ersetzung). **Tatsächlicher Bug**: Der `safeLoc` in Zeile 117 wird aus `cursorRange.location` und `existing.unicodeScalars.count` gebildet, aber `cursorRange.location` ist der Beginn der Selektion — was richtig ist. Der wirkliche Fehler: Zeile 117 re-berechnet `safeLoc` unabhängig von dem `safeLoc` in `insertText()`, was zu einem inkonsistenten Cursor führt wenn `cursorRange.location > existing.unicodeScalars.count`. `insertText()` clamppt `loc` auf `scalars.count` intern, die externe `safeLoc`-Berechnung (Zeile 117) clamppt auf `existing.unicodeScalars.count` — beide sollten identisch sein. Das ist sauber. **Der echte Bug**: `cursorRange.length` wird beim Aufbau von `newCursorRange` nirgends berücksichtigt — bei Ersetzungen (`length > 0`) ist das akzeptabel (Cursor ans Ende der Einfügung), aber `safeLoc` hätte `min(cursorRange.location, composedScalarCount - insertScalarCount)` sein sollen, um im resultierenden String gültig zu sein, nicht im Quell-String `existing`.
@@ -90,7 +90,7 @@ var newCursorRange = CFRange(location: newCursorLocation, length: 0)
 
 ### WR-02: setupOutputModeHotkey verwendet guard self != nil statt guard let self
 
-**File:** `VoiceScribe/AppDelegate.swift:300`
+**File:** `SPRECHKRAFT/AppDelegate.swift:300`
 **Issue:** Der Hotkey-Callback prüft `guard self != nil else { return }` — das ist ineffektiv. `self` ist `[weak self]` im Closure-Kopf, d.h. es handelt sich um `Optional<AppDelegate>`. `guard self != nil` stellt nur sicher, dass `self` nicht dealloziert wurde, lädt `self` aber nicht in eine starke Referenz. Jeder nachfolgende Zugriff auf `self` (in diesem Fall `Defaults[.outputMode]`) ist zwar `@MainActor`-isoliert, aber da `Defaults` hier nicht über `self` aufgerufen wird, gibt es keinen direkten ABA-Fehler — der Toggle-Code greift nie auf `self` zu. Das eigentliche Problem: Das Pattern ist irreführend und im Gegensatz zu `setupHotkey()` (Zeile 282) inkonsistent. Sollte in Zukunft Code hinzugefügt werden, der `self` nach dem Guard nutzt, entsteht ein latenter ABA-Race.
 
 **Fix:**
@@ -117,7 +117,7 @@ Da `Defaults` thread-safe ist und hier kein `self`-Zugriff erfolgt, ist `[weak s
 
 ### WR-03: AX-Injektion fällt bei setAttributeValue-Fehler still zurück ohne Clipboard-Fallback
 
-**File:** `VoiceScribe/TextOutput/TextOutputService.swift:105-112`
+**File:** `SPRECHKRAFT/TextOutput/TextOutputService.swift:105-112`
 **Issue:** Wenn `AXUIElementSetAttributeValue` in Schritt 6 fehlschlägt (z.B. weil ein Element `kAXValueAttribute` zwar lesbar, aber nicht schreibbar hat — ein häufiger Fall bei read-only Feldern), gibt `injectViaAX` still zurück (`return`). Der Text wird weder injiziert noch in den Clipboard geschrieben. Der Nutzer verliert seinen diktierten Text ohne jede Rückmeldung. Das ist ein stiller Datenverlust.
 
 **Fix:**
@@ -141,7 +141,7 @@ Alternativ kann das bewusste Nicht-Schreiben als Design-Entscheidung beibehalten
 
 ### WR-04: NSPasteboard-Zugriff in Tests ist nicht isoliert — Tests können sich gegenseitig beeinflussen
 
-**File:** `VoiceScribeTests/TextOutputServiceTests.swift:48, 57, 171, 178`
+**File:** `SPRECHKRAFTTests/TextOutputServiceTests.swift:48, 57, 171, 178`
 **Issue:** Mehrere Test-Suites schreiben direkt auf `NSPasteboard.general` und lesen unmittelbar danach zurück, ohne den Pasteboard-Inhalt vor dem Test zurückzusetzen. Da Swift Testing keine garantierte Ausführungsreihenfolge erzwingt (insbesondere bei paralleler Ausführung via `swift test --parallel`), können Tests aus verschiedenen Suites denselben Pasteboard-Zustand sehen. Z.B. könnte `writeToClipboard()` in `TextOutputServiceClipboardTests` den Zustand von `TextOutputServiceModusTests.noPermissionUsesClipboard` überschreiben, wenn beide Suites parallel laufen. Dies kann zu Flaky-Tests führen.
 
 **Fix:**
@@ -165,7 +165,7 @@ struct TextOutputServiceClipboardTests {
 
 ### IN-01: writeToClipboard ist internal (kein private) — unbeabsichtigt öffentliche API
 
-**File:** `VoiceScribe/TextOutput/TextOutputService.swift:131`
+**File:** `SPRECHKRAFT/TextOutput/TextOutputService.swift:131`
 **Issue:** `writeToClipboard(_ text: String)` hat keine explizite Zugriffsmodifikator-Annotation. Da es sich innerhalb eines `final class` befindet, ist die Standardsichtbarkeit `internal`. Der Testcode greift direkt darauf zu (`TextOutputService.shared.writeToClipboard(insert)` in Zeile 138 der Testdatei). Das erzeugt eine unbeabsichtigte öffentliche API — jeder Code im gleichen Modul kann Clipboard-Schreibvorgänge direkt auslösen, ohne den normalen `output()`-Pfad zu durchlaufen. Die Methode sollte `private` sein; der Test sollte stattdessen `output("insert", mode: .clipboard, axPermitted: false)` aufrufen.
 
 **Fix:**
@@ -183,7 +183,7 @@ Der Test `longTextExceedsGuard()` muss dann umgeschrieben werden — die Guard-L
 
 ### IN-02: SettingsView.appState ist Optional — defensive Prüfung über die gesamte View verteilt
 
-**File:** `VoiceScribe/SettingsView.swift:17`
+**File:** `SPRECHKRAFT/SettingsView.swift:17`
 **Issue:** `var appState: AppState?` ist optional, und alle Zugriffe nutzen `appState?.micPermissionDenied == true` / `appState?.axPermissionDenied == true`. Das ist defensiv, aber es führt dazu, dass fehlende Injection (kein `appState`) still ignoriert wird — die Permission-Banner werden nicht angezeigt, obwohl der Zustand möglicherweise korrekt sein sollte. Das Muster entspricht nicht dem Swift-Idiom für required dependencies (non-optional `let`). Wenn `appState` garantiert injiziert wird (was im AppDelegate-Aufruf der Fall ist), sollte es non-optional sein.
 
 **Fix:**
@@ -199,12 +199,12 @@ let appState: AppState
 
 ### IN-03: Kommentar-Jahreszahl in RESEARCH.md-Referenz ist unplausibel
 
-**File:** `VoiceScribe/TextOutput/TextOutputService.swift:4`
+**File:** `SPRECHKRAFT/TextOutput/TextOutputService.swift:4`
 **Issue:** `// Apple Developer Forums thread 658733 (2040-Limit)` — dieser Kommentar ist korrekt in der Sache. Kein Befund für die Kommentarqualität.
 
 Stattdessen: `SettingsView.swift:58` — `.cornerRadius(8)` ist deprecated in macOS 14+ zugunsten von `.clipShape(.rect(cornerRadius: 8))`. Der Compiler erzeugt möglicherweise eine Deprecation-Warnung in zukünftigen Xcode-Versionen.
 
-**File:** `VoiceScribe/SettingsView.swift:58, 144`
+**File:** `SPRECHKRAFT/SettingsView.swift:58, 144`
 **Issue:** `.cornerRadius(8)` ist seit macOS 14 / iOS 17 deprecated. Es funktioniert noch, erzeugt aber ab Xcode 16 eine Compiler-Warnung.
 
 **Fix:**

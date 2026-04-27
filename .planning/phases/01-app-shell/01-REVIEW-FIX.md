@@ -24,7 +24,7 @@ status: all_fixed
 
 ### WR-01 + WR-03: `statusItem` als `lazy var`, `guard statusItem != nil` entfernt
 
-**Files modified:** `VoiceScribe/AppDelegate.swift`
+**Files modified:** `SPRECHKRAFT/AppDelegate.swift`
 **Commit:** 4b322ab
 **Applied fix:** `private var statusItem: NSStatusItem!` wurde zu `private lazy var statusItem: NSStatusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)` umgestellt. Die explizite Zuweisung in `applicationDidFinishLaunching` und der `guard statusItem != nil`-Check in `updateIcon()` wurden entfernt, da `lazy var` die Initialisierung beim ersten Zugriff garantiert.
 
@@ -32,7 +32,7 @@ status: all_fixed
 
 ### WR-02: Fenstersuche auf stabilen `window.identifier` umgestellt
 
-**Files modified:** `VoiceScribe/VoiceScribeApp.swift`
+**Files modified:** `SPRECHKRAFT/SPRECHKRAFTApp.swift`
 **Commit:** 7d0d372
 **Applied fix:** `$0.title.contains("Einstellungen")` wurde durch `$0.identifier?.rawValue == "settings"` ersetzt. Damit ist die Fenstersuche unabhaengig von lokalisierten Fenstertiteln und richtet sich nach der stabilen SwiftUI-Window-ID.
 
@@ -40,7 +40,7 @@ status: all_fixed
 
 ### WR-04: 300ms-Sleep mit TODO-Kommentar dokumentiert
 
-**Files modified:** `VoiceScribe/VoiceScribeApp.swift`
+**Files modified:** `SPRECHKRAFT/SPRECHKRAFTApp.swift`
 **Commit:** b8ee385
 **Applied fix:** Ueber `Task.sleep(for: .milliseconds(300))` wurde ein TODO-Kommentar eingefuegt, der den pragmatischen Workaround erklaert und auf den empfohlenen Ersatz via `NSWindow.didBecomeKeyNotification`-One-Shot-Observer vor Produktion hinweist.
 
@@ -48,7 +48,7 @@ status: all_fixed
 
 ### WR-05: `pulseSpeed` gibt `Double?` zurueck, nil fuer nicht-pulsierende Zustaende
 
-**Files modified:** `VoiceScribe/AppState.swift`, `VoiceScribe/StatusBarIconView.swift`
+**Files modified:** `SPRECHKRAFT/AppState.swift`, `SPRECHKRAFT/StatusBarIconView.swift`
 **Commit:** 3c0c886
 **Applied fix:** `pulseSpeed` in `RecordingState` wurde von `Double` auf `Double?` umgestellt. `.recording` gibt `0.8`, `.llmProcessing` gibt `1.2`, alle anderen Zustaende geben `nil` zurueck. In `StatusBarIconView.applyAnimation(for:)` wurde `if state.isPulsing { ... state.pulseSpeed ... }` durch `if let speed = state.pulseSpeed { ... speed ... }` ersetzt, sodass die Animation nur startet, wenn `pulseSpeed` einen Wert liefert.
 

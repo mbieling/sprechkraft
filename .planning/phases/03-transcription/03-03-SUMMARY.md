@@ -13,7 +13,7 @@ dependency_graph:
     - resampleTo16kHz(_:fromSampleRate:) -> [Float]
     - transcribeWithResampling(_:sampleRate:) async -> String?
   affects:
-    - VoiceScribe/Transcription/TranscriptionService.swift
+    - SPRECHKRAFT/Transcription/TranscriptionService.swift
 tech_stack:
   patterns:
     - Swift actor fuer Concurrency-Safety (WhisperKit-Zugriff serialisiert)
@@ -57,6 +57,6 @@ Alle 5 RED-Tests aus Plan 03-01 laufen grün. Build: SUCCEEDED.
 
 | Datei | Beschreibung |
 |-------|-------------|
-| `VoiceScribe/Transcription/TranscriptionService.swift` | actor TranscriptionService — 156 Zeilen |
+| `SPRECHKRAFT/Transcription/TranscriptionService.swift` | actor TranscriptionService — 156 Zeilen |
 
 ## Self-Check: PASSED

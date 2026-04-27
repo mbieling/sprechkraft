@@ -1,4 +1,4 @@
-# VoiceScribe: Lokale Diktat-App für macOS
+# SPRECHKRAFT: Lokale Diktat-App für macOS
 
 ## Current Milestone: v0.19.0 Parakeet + Settings
 

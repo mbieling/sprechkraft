@@ -1,7 +1,7 @@
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
 
-**VoiceScribe: Lokale Diktat-App für macOS**
+**SPRECHKRAFT: Lokale Diktat-App für macOS**
 
 Eine native macOS Menu-Bar-App für systemweites Diktat. Der Nutzer hält einen globalen Hotkey gedrückt, spricht, lässt los — und der Text erscheint entweder direkt im aktiven Textfeld oder im Clipboard. Transkription läuft vollständig lokal via Parakeet v3 (gebundelt in der App). Optional durchläuft das Transkript eines von mehreren KI-Prompt-Profilen via Groq API (qwen/qwen3-32b), bevor der Text ausgegeben wird.
 

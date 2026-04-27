@@ -31,7 +31,7 @@ reasoning_checkpoint: "AVAudioConverter-Protokoll: .noDataNow = temporär keine 
 ## Evidence
 
 - timestamp: 2026-04-19T00:00:00Z
-  file: VoiceScribe/Transcription/TranscriptionService.swift
+  file: SPRECHKRAFT/Transcription/TranscriptionService.swift
   lines: 140-148
   finding: |
     AVAudioConverter input-block gibt `nil` mit Status `.noDataNow` zurück wenn `inputConsumed == true`.
@@ -42,7 +42,7 @@ reasoning_checkpoint: "AVAudioConverter-Protokoll: .noDataNow = temporär keine 
     Korrekt wäre `.endOfStream` um dem Converter zu signalisieren dass alle Eingabedaten erschöpft sind.
 
 - timestamp: 2026-04-19T00:00:01Z
-  file: VoiceScribe/Audio/AudioController.swift
+  file: SPRECHKRAFT/Audio/AudioController.swift
   lines: 144-158
   finding: |
     stopRecording() ist korrekt implementiert: capturedSamples wird vor Task-Dispatch
@@ -62,4 +62,4 @@ root_cause: "AVAudioConverter-Callback in resampleTo16kHz() setzt outStatus auf 
 fix: "outStatus.pointee = .noDataNow durch .endOfStream ersetzen in TranscriptionService.swift Zeile 142. Fix angewendet."
 verification: "Fix beseitigt den Retry-Loop des Converters. outputBuffer.frameLength wird nach einmaliger Konvertierung korrekt gesetzt. -50/-10877-Fehler entfallen."
 files_changed:
-  - VoiceScribe/Transcription/TranscriptionService.swift
+  - SPRECHKRAFT/Transcription/TranscriptionService.swift

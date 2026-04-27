@@ -18,9 +18,9 @@ created: 2026-04-19
 | Property | Value |
 |----------|-------|
 | **Framework** | Swift Testing (bereits in Phases 1-4 verwendet) |
-| **Config file** | Xcode Test Target `VoiceScribeTests` |
-| **Quick run command** | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS' -only-testing:VoiceScribeTests/PromptProfileTests -only-testing:VoiceScribeTests/GroqServiceTests` |
-| **Full suite command** | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS'` |
+| **Config file** | Xcode Test Target `SPRECHKRAFTTests` |
+| **Quick run command** | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS' -only-testing:SPRECHKRAFTTests/PromptProfileTests -only-testing:SPRECHKRAFTTests/GroqServiceTests` |
+| **Full suite command** | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS'` |
 | **Estimated runtime** | ~30 seconds |
 
 ---
@@ -51,10 +51,10 @@ created: 2026-04-19
 
 ## Wave 0 Requirements
 
-- [ ] `VoiceScribeTests/PromptProfileTests.swift` — PROF-01 (CRUD), PROF-03 (LLM-Toggle-Routing), PROF-04 (isDefault-Invariante, genau 1 Default), Defaults-Codable-Round-Trip
-- [ ] `VoiceScribeTests/GroqServiceTests.swift` — PROF-05 (Mock URLSession für Groq-Response), SET-01 (Keychain store/retrieve), D-10 (stille Fallback bei Fehler)
+- [ ] `SPRECHKRAFTTests/PromptProfileTests.swift` — PROF-01 (CRUD), PROF-03 (LLM-Toggle-Routing), PROF-04 (isDefault-Invariante, genau 1 Default), Defaults-Codable-Round-Trip
+- [ ] `SPRECHKRAFTTests/GroqServiceTests.swift` — PROF-05 (Mock URLSession für Groq-Response), SET-01 (Keychain store/retrieve), D-10 (stille Fallback bei Fehler)
 
-*Hinweis: `VoiceScribeTests/HotkeyTests.swift` existiert bereits (Phase 1) — nur erweitern um dynamische UUID-basierte Namen.*
+*Hinweis: `SPRECHKRAFTTests/HotkeyTests.swift` existiert bereits (Phase 1) — nur erweitern um dynamische UUID-basierte Namen.*
 
 ---
 

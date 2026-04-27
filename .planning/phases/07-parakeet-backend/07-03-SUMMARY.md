@@ -7,13 +7,13 @@ tags: [spm, whisperkit, fluidaudio, pbxproj]
 dependency_graph:
   requires: ["07-01"]
   provides: ["07-04", "07-05"]
-  affects: ["VoiceScribe.xcodeproj/project.pbxproj"]
+  affects: ["SPRECHKRAFT.xcodeproj/project.pbxproj"]
 tech_stack:
   added: []
   patterns: ["SPM dependency management via pbxproj direct edit"]
 key_files:
   modified:
-    - VoiceScribe.xcodeproj/project.pbxproj
+    - SPRECHKRAFT.xcodeproj/project.pbxproj
 decisions:
   - "WhisperKit removed via direct pbxproj edit (5 locations); FluidAudio addition requires Xcode UI due to UUID generation complexity"
 metrics:
@@ -35,7 +35,7 @@ Task 1 is complete and committed. Task 2 requires human Xcode UI interaction and
 
 | Task | Name | Commit | Files |
 |------|------|--------|-------|
-| 1 | Remove WhisperKit from project.pbxproj | bb46951 | VoiceScribe.xcodeproj/project.pbxproj |
+| 1 | Remove WhisperKit from project.pbxproj | bb46951 | SPRECHKRAFT.xcodeproj/project.pbxproj |
 
 ## Pending Tasks
 
@@ -45,7 +45,7 @@ Task 1 is complete and committed. Task 2 requires human Xcode UI interaction and
 
 ## What Was Done
 
-Task 1 removed WhisperKit from `VoiceScribe.xcodeproj/project.pbxproj` at exactly 5 locations:
+Task 1 removed WhisperKit from `SPRECHKRAFT.xcodeproj/project.pbxproj` at exactly 5 locations:
 
 1. **PBXBuildFile entry** (line 41): `CAFE0028 /* WhisperKit in Frameworks */` — single-line entry removed
 2. **PBXFrameworksBuildPhase reference** (line 89): `CAFE0028 /* WhisperKit in Frameworks */,` — removed
@@ -63,22 +63,22 @@ Other SPM dependencies (GRDB, KeyboardShortcuts, KeychainAccess, LaunchAtLogin, 
 **Why manual:** Adding an SPM package via Xcode automatically generates correct UUIDs for all required pbxproj sections (PBXBuildFile, PBXFrameworksBuildPhase, XCRemoteSwiftPackageReference, XCSwiftPackageProductDependency) and updates `Package.resolved` with the checksum. Manual pbxproj editing for SPM addition is error-prone and fragile.
 
 **Steps for user:**
-1. Open Xcode: `open /Users/mbieling/claude/voice/VoiceScribe.xcodeproj`
+1. Open Xcode: `open /Users/mbieling/claude/voice/SPRECHKRAFT.xcodeproj`
 2. Wait for Xcode to finish loading (it may show a warning about missing WhisperKit — expected)
 3. Go to: File > Add Package Dependencies...
 4. Paste URL: `https://github.com/FluidInference/FluidAudio.git`
 5. Press Enter, wait for metadata fetch
 6. Select version: "Exact Version" = `0.12.4` (or "Up to Next Minor Version" from `0.12.4`)
 7. Click "Add Package"
-8. In the "Add to Target" dialog: check `VoiceScribe` (not VoiceScribeTests)
+8. In the "Add to Target" dialog: check `SPRECHKRAFT` (not SPRECHKRAFTTests)
 9. Click "Add Package" to confirm
 
 **Verify success:**
 ```bash
-grep "FluidAudio\|FluidInference" VoiceScribe.xcodeproj/project.pbxproj | head -5
+grep "FluidAudio\|FluidInference" SPRECHKRAFT.xcodeproj/project.pbxproj | head -5
 # Expected: at least 4 lines
 
-grep "FluidInference" VoiceScribe.xcodeproj/Package.resolved
+grep "FluidInference" SPRECHKRAFT.xcodeproj/Package.resolved
 # Expected: entry with "FluidInference/FluidAudio" and version 0.12.4
 ```
 
@@ -90,7 +90,7 @@ None — plan executed exactly as written. Task 1 was auto-type and completed. T
 
 ## Self-Check: PASSED
 
-- [x] `VoiceScribe.xcodeproj/project.pbxproj` modified (17 lines deleted)
+- [x] `SPRECHKRAFT.xcodeproj/project.pbxproj` modified (17 lines deleted)
 - [x] Commit `bb46951` exists: `chore(07-03): remove WhisperKit SPM dependency from project.pbxproj`
 - [x] No unexpected file deletions
 - [x] Other SPM dependencies untouched

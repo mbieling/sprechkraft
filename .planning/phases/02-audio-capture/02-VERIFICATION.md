@@ -52,17 +52,17 @@ human_verification:
 
 | Artefakt | Erwartet | Status | Details |
 |----------|----------|--------|---------|
-| `VoiceScribe/Audio/AudioController.swift` | AVAudioEngine-Wrapper mit installTap, RMS, Silence-Detection | VERIFIED | `final class AudioController: @unchecked Sendable`; `startRecording() throws`; `stopRecording()`; `calculateRMS(buffer:)`; `updateSilenceDetection(rms:bufferDuration:)`; Permission-Check via `AVAudioApplication.shared.recordPermission` |
-| `VoiceScribe/Audio/AudioDeviceManager.swift` | Geraete-Enumeration + Core-Audio-Bridge | VERIFIED | `enum AudioDeviceManager`; `availableMicrophones() -> [AVCaptureDevice]`; `uniqueIDToAudioObjectID(_:)`; `setInputDevice(uid:engine:)` mit `kAudioHardwarePropertyTranslateUIDToDevice` |
-| `VoiceScribe/Extensions/Defaults+Keys.swift` | Type-safe Defaults-Keys fuer Phase 2 | VERIFIED | `silenceDuration = Key<Double>("silenceDuration", default: 1.5)`; `selectedMicUID = Key<String?>("selectedMicUID", default: nil)` |
-| `VoiceScribe/AppState.swift` | `audioLevel` + `micPermissionDenied` Properties | VERIFIED | `var audioLevel: CGFloat = 0.0`; `var micPermissionDenied: Bool = false`; `toggleRecording()` (echter Cycle, kein Demo-Cycle); `resetToIdle()` |
-| `VoiceScribe/StatusBarIconView.swift` | WaveformView + audioLevel-Parameter | VERIFIED | `struct WaveformView: View` mit Canvas-Rendering; `let audioLevel: CGFloat`; `VStack(spacing: 0)`; `if state == .recording { WaveformView(level: audioLevel) }`; `.frame(width: 18, height: 4)`; `.accessibilityHidden(true)` |
-| `VoiceScribe/SettingsView.swift` | Mikrofon-Picker, Stille-Slider, Permission-Banner | VERIFIED | `Section("Mikrofon")` + `Section("Stille-Erkennung")`; `Picker("Eingabegeraet")`; `Slider(in: 0.5...5.0)`; Permission-Banner mit `Color(.systemRed)`; `AudioDeviceManager.availableMicrophones()` in `onAppear` |
-| `VoiceScribe/AppDelegate.swift` | AudioController-Initialisierung, echtes Toggle, Audio-Cues | VERIFIED | `private var audioController: AudioController?`; `setupAudioController()`; `startRecordingWithCue()` + `stopRecordingWithCue()`; `NSSound("Tink")`/`NSSound("Pop")`; `StatusBarIconView(state: state, audioLevel: level)` |
-| `VoiceScribeTests/AudioControllerTests.swift` | Unit-Tests fuer RMS + Silence-Logic | VERIFIED | `@Suite("AudioController (RECORD-01, RECORD-02)")`; Tests fuer stille/laute Buffer, Silence-Trigger, Silence-Reset |
-| `VoiceScribeTests/DefaultsKeysTests.swift` | Unit-Tests fuer Defaults-Keys | VERIFIED | `@Suite("Defaults Keys (SET-03, SET-04)")`; Tests fuer silenceDuration (1.5) und selectedMicUID (nil) |
-| `VoiceScribeTests/WaveformViewTests.swift` | Unit-Tests fuer WaveformView-Sichtbarkeit | VERIFIED | `@Suite("WaveformView (FEED-03)")`; 6 Tests fuer Level-Varianten und alle RecordingState-Werte |
-| `VoiceScribe/Info.plist` | NSMicrophoneUsageDescription | VERIFIED | Zeile 25: `<key>NSMicrophoneUsageDescription</key>` vorhanden |
+| `SPRECHKRAFT/Audio/AudioController.swift` | AVAudioEngine-Wrapper mit installTap, RMS, Silence-Detection | VERIFIED | `final class AudioController: @unchecked Sendable`; `startRecording() throws`; `stopRecording()`; `calculateRMS(buffer:)`; `updateSilenceDetection(rms:bufferDuration:)`; Permission-Check via `AVAudioApplication.shared.recordPermission` |
+| `SPRECHKRAFT/Audio/AudioDeviceManager.swift` | Geraete-Enumeration + Core-Audio-Bridge | VERIFIED | `enum AudioDeviceManager`; `availableMicrophones() -> [AVCaptureDevice]`; `uniqueIDToAudioObjectID(_:)`; `setInputDevice(uid:engine:)` mit `kAudioHardwarePropertyTranslateUIDToDevice` |
+| `SPRECHKRAFT/Extensions/Defaults+Keys.swift` | Type-safe Defaults-Keys fuer Phase 2 | VERIFIED | `silenceDuration = Key<Double>("silenceDuration", default: 1.5)`; `selectedMicUID = Key<String?>("selectedMicUID", default: nil)` |
+| `SPRECHKRAFT/AppState.swift` | `audioLevel` + `micPermissionDenied` Properties | VERIFIED | `var audioLevel: CGFloat = 0.0`; `var micPermissionDenied: Bool = false`; `toggleRecording()` (echter Cycle, kein Demo-Cycle); `resetToIdle()` |
+| `SPRECHKRAFT/StatusBarIconView.swift` | WaveformView + audioLevel-Parameter | VERIFIED | `struct WaveformView: View` mit Canvas-Rendering; `let audioLevel: CGFloat`; `VStack(spacing: 0)`; `if state == .recording { WaveformView(level: audioLevel) }`; `.frame(width: 18, height: 4)`; `.accessibilityHidden(true)` |
+| `SPRECHKRAFT/SettingsView.swift` | Mikrofon-Picker, Stille-Slider, Permission-Banner | VERIFIED | `Section("Mikrofon")` + `Section("Stille-Erkennung")`; `Picker("Eingabegeraet")`; `Slider(in: 0.5...5.0)`; Permission-Banner mit `Color(.systemRed)`; `AudioDeviceManager.availableMicrophones()` in `onAppear` |
+| `SPRECHKRAFT/AppDelegate.swift` | AudioController-Initialisierung, echtes Toggle, Audio-Cues | VERIFIED | `private var audioController: AudioController?`; `setupAudioController()`; `startRecordingWithCue()` + `stopRecordingWithCue()`; `NSSound("Tink")`/`NSSound("Pop")`; `StatusBarIconView(state: state, audioLevel: level)` |
+| `SPRECHKRAFTTests/AudioControllerTests.swift` | Unit-Tests fuer RMS + Silence-Logic | VERIFIED | `@Suite("AudioController (RECORD-01, RECORD-02)")`; Tests fuer stille/laute Buffer, Silence-Trigger, Silence-Reset |
+| `SPRECHKRAFTTests/DefaultsKeysTests.swift` | Unit-Tests fuer Defaults-Keys | VERIFIED | `@Suite("Defaults Keys (SET-03, SET-04)")`; Tests fuer silenceDuration (1.5) und selectedMicUID (nil) |
+| `SPRECHKRAFTTests/WaveformViewTests.swift` | Unit-Tests fuer WaveformView-Sichtbarkeit | VERIFIED | `@Suite("WaveformView (FEED-03)")`; 6 Tests fuer Level-Varianten und alle RecordingState-Werte |
+| `SPRECHKRAFT/Info.plist` | NSMicrophoneUsageDescription | VERIFIED | Zeile 25: `<key>NSMicrophoneUsageDescription</key>` vorhanden |
 
 ### Key-Link-Verifikation
 
@@ -75,7 +75,7 @@ human_verification:
 | `AppDelegate.swift` | `StatusBarIconView.swift` | `updateIcon()` mit audioLevel-Parameter | VERIFIED | Zeile 182: `NSHostingView(rootView: StatusBarIconView(state: state, audioLevel: level))` |
 | `SettingsView.swift` | `Defaults+Keys.swift` | `@Default(.silenceDuration)` und `@Default(.selectedMicUID)` | VERIFIED | Zeilen 17-18: `@Default(.silenceDuration) private var silenceDuration`; `@Default(.selectedMicUID) private var selectedMicUID` |
 | `SettingsView.swift` | `AudioDeviceManager.swift` | `AudioDeviceManager.availableMicrophones()` fuer Picker-Daten | VERIFIED | Zeile 118: `availableMics = AudioDeviceManager.availableMicrophones()` |
-| `VoiceScribeApp.swift` | `AppDelegate.swift` | `appDelegate.setupAudioController()` nach AppState-Injection | VERIFIED | Zeile 49: `appDelegate.setupAudioController()` in `HiddenActivationView.onAppear` |
+| `SPRECHKRAFTApp.swift` | `AppDelegate.swift` | `appDelegate.setupAudioController()` nach AppState-Injection | VERIFIED | Zeile 49: `appDelegate.setupAudioController()` in `HiddenActivationView.onAppear` |
 
 ### Datenfluss-Trace (Level 4)
 
@@ -108,7 +108,7 @@ Alle 7 Requirements vollstaendig abgedeckt. Keine verwaisten Requirements gefund
 
 | Datei | Zeile | Pattern | Schwere | Auswirkung |
 |-------|-------|---------|---------|------------|
-| `VoiceScribeApp.swift` | 70 | `TODO: Vor Produktion durch NSWindow.didBecomeKeyNotification ersetzen` — Sleep-Workaround fuer Settings-Fenster-Activation | Info | Betrifft nur das Oeffnen des Settings-Fensters, nicht Phase-2-Kernfunktionalitaet; kein Audio-Blocker |
+| `SPRECHKRAFTApp.swift` | 70 | `TODO: Vor Produktion durch NSWindow.didBecomeKeyNotification ersetzen` — Sleep-Workaround fuer Settings-Fenster-Activation | Info | Betrifft nur das Oeffnen des Settings-Fensters, nicht Phase-2-Kernfunktionalitaet; kein Audio-Blocker |
 
 Keine Blocker oder Warnung-Stufe Anti-Patterns in Phase-2-Kernfunktionen gefunden. Der TODO ist aus Phase 1 vorgeerbt und explizit als kuenftiger Verbesserungskandidat markiert.
 
@@ -135,7 +135,7 @@ Phase 2 erreicht ihr Ziel vollstaendig. Alle 5 Roadmap Success Criteria sind ver
 - Alle hardware-abhaengigen Verhaltensweisen wurden manuell bestaetigt.
 - 25/25 Unit-Tests laufen gemaess SUMMARY gruen (RMS, Silence-Detection, Defaults-Keys, WaveformView, AppState).
 
-Einziger nicht-blockierender Befund: TODO in VoiceScribeApp.swift (Sleep-Workaround fuer Settings-Fenster) — betrifft Phase 1, nicht Phase 2.
+Einziger nicht-blockierender Befund: TODO in SPRECHKRAFTApp.swift (Sleep-Workaround fuer Settings-Fenster) — betrifft Phase 1, nicht Phase 2.
 
 ---
 

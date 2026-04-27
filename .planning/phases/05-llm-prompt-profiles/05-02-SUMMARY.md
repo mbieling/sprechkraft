@@ -6,13 +6,13 @@ tags: [tdd, groq, red-phase, wave-0]
 dependency_graph:
   requires: []
   provides: [GroqServiceTests-RED]
-  affects: [VoiceScribeTests/GroqServiceTests.swift]
+  affects: [SPRECHKRAFTTests/GroqServiceTests.swift]
 tech_stack:
   added: []
   patterns: [Swift Testing @Suite/@Test, @testable import, JSONEncoder/Decoder Unit-Tests]
 key_files:
   created:
-    - VoiceScribeTests/GroqServiceTests.swift
+    - SPRECHKRAFTTests/GroqServiceTests.swift
   modified: []
 decisions:
   - "Wave-0 RED-Stubs: kein echter API-Key im Test-Code (T-5-01 eingehalten, groqApiKey/Keychain 0 Treffer)"
@@ -32,7 +32,7 @@ metrics:
 
 ## What Was Built
 
-`VoiceScribeTests/GroqServiceTests.swift` mit 4 Test-Stubs im RED-Zustand (Wave 0):
+`SPRECHKRAFTTests/GroqServiceTests.swift` mit 4 Test-Stubs im RED-Zustand (Wave 0):
 
 | Test | Requirement | Beschreibung |
 |------|-------------|--------------|
@@ -63,5 +63,5 @@ Die gesamte Datei ist intentionell ein RED-Stub. Die Tests schlagen fehl, bis Wa
 
 ## Self-Check: PASSED
 
-- FOUND: VoiceScribeTests/GroqServiceTests.swift
+- FOUND: SPRECHKRAFTTests/GroqServiceTests.swift
 - FOUND: commit ecdec62 (test(05-02): add failing RED stubs for GroqService)

@@ -6,21 +6,21 @@ tags: [avfoundation, core-audio, swift6-concurrency, silence-detection, unit-tes
 dependency_graph:
   requires: [01-app-shell]
   provides: [AudioController, AudioDeviceManager, Defaults+Keys-Phase2, AppState-audioLevel]
-  affects: [AppState.swift, VoiceScribe.xcodeproj/project.pbxproj]
+  affects: [AppState.swift, SPRECHKRAFT.xcodeproj/project.pbxproj]
 tech_stack:
   added: [AVFoundation, CoreAudio]
   patterns: [nonisolated-@unchecked-Sendable, Task-@MainActor-Bridge, Observation-B, Lazy-Device-Switch]
 key_files:
   created:
-    - VoiceScribe/Audio/AudioController.swift
-    - VoiceScribe/Audio/AudioDeviceManager.swift
-    - VoiceScribe/Extensions/Defaults+Keys.swift
-    - VoiceScribeTests/AudioControllerTests.swift
-    - VoiceScribeTests/DefaultsKeysTests.swift
+    - SPRECHKRAFT/Audio/AudioController.swift
+    - SPRECHKRAFT/Audio/AudioDeviceManager.swift
+    - SPRECHKRAFT/Extensions/Defaults+Keys.swift
+    - SPRECHKRAFTTests/AudioControllerTests.swift
+    - SPRECHKRAFTTests/DefaultsKeysTests.swift
   modified:
-    - VoiceScribe/AppState.swift
-    - VoiceScribe/Info.plist
-    - VoiceScribe.xcodeproj/project.pbxproj
+    - SPRECHKRAFT/AppState.swift
+    - SPRECHKRAFT/Info.plist
+    - SPRECHKRAFT.xcodeproj/project.pbxproj
 decisions:
   - "AudioController als nonisolated @unchecked Sendable — installTap-Callbacks laufen auf Audio-Render-Thread, kein @MainActor moeglich"
   - "startRecording() ist synchron throws (nicht async) — Permission-Request bei .undetermined wird via Task{} dispatched, naechster Aufruf erhaelt .granted"
@@ -48,7 +48,7 @@ metrics:
 
 ## What Was Built
 
-### AudioController (`VoiceScribe/Audio/AudioController.swift`)
+### AudioController (`SPRECHKRAFT/Audio/AudioController.swift`)
 - `final class AudioController: @unchecked Sendable` — bewusst NICHT @MainActor
 - `startRecording() throws`: Permission-Check (D-14, T-02-01) → Geraet setzen (lazy) → removeTap (Pitfall 5) → Format abfragen → installTap → engine.start()
 - `stopRecording()`: removeTap ZUERST (Pitfall 5) → engine.stop() → Akkumulator-Reset
@@ -57,13 +57,13 @@ metrics:
 - `onAutoStop: (() -> Void)?`: Callback fuer AppDelegate (wird in Plan 02 verdrahtet)
 - RMS clampen auf 0.0-1.0 via `min(1.0, rms * 4.0)` (T-02-03)
 
-### AudioDeviceManager (`VoiceScribe/Audio/AudioDeviceManager.swift`)
+### AudioDeviceManager (`SPRECHKRAFT/Audio/AudioDeviceManager.swift`)
 - `enum AudioDeviceManager` (stateless Namespace, kein Lifecycle)
 - `availableMicrophones() -> [AVCaptureDevice]`: AVCaptureDevice.DiscoverySession (RECORD-03)
 - `uniqueIDToAudioObjectID(_ uid:) -> AudioObjectID?`: Core-Audio-Bridge via kAudioHardwarePropertyTranslateUIDToDevice
 - `setInputDevice(uid:engine:) throws`: Graceful return bei unbekannter UID (T-02-02)
 
-### Defaults+Keys (`VoiceScribe/Extensions/Defaults+Keys.swift`)
+### Defaults+Keys (`SPRECHKRAFT/Extensions/Defaults+Keys.swift`)
 - `silenceDuration: Key<Double>` — Default 1.5s (D-09, SET-03)
 - `selectedMicUID: Key<String?>` — Default nil = System-Standard (SET-04)
 
@@ -86,21 +86,21 @@ metrics:
 - **Found during:** Task 2 Test-Ausfuehrung
 - **Issue:** `testRMSCalculation_silentBuffer()` und `testRMSCalculation_loudBuffer()` riefen `await MainActor.run` auf, waren aber als `throws` (nicht `async throws`) deklariert — Swift-6-Compile-Fehler
 - **Fix:** Beide Testfunktionen als `async throws` deklariert
-- **Files modified:** VoiceScribeTests/AudioControllerTests.swift
+- **Files modified:** SPRECHKRAFTTests/AudioControllerTests.swift
 - **Commit:** f8fffc0
 
 **2. [Rule 2 - Missing Critical] CFString-Pointer-Warning in AudioDeviceManager behoben**
 - **Found during:** Task 2 Build
 - **Issue:** `&cfUID` als `UnsafeRawPointer` erzeugte Swift-Warning "forming UnsafeRawPointer to CFString may contain object reference"
 - **Fix:** `withUnsafePointer(to: cfUID)` statt `&cfUID` — idiomatischer Swift fuer Core-Audio-Bridge
-- **Files modified:** VoiceScribe/Audio/AudioDeviceManager.swift
+- **Files modified:** SPRECHKRAFT/Audio/AudioDeviceManager.swift
 - **Commit:** f8fffc0
 
 **3. [Rule 2 - Missing Critical] startRecording() async-Handling fuer .undetermined**
 - **Found during:** Task 2 Implementierung
 - **Issue:** Plan spezifizierte `func startRecording() throws` (synchron), aber `AVAudioApplication.requestRecordPermission()` ist async — kein direktes `await` moeglich in throws-Kontext
 - **Fix:** Bei `.undetermined`: `Task { _ = await AVAudioApplication.requestRecordPermission() }` dispatch; Caller ruft `requestPermissionIfNeeded()` separat auf bevor startRecording. Verhalten: erster Aufruf fordert Permission an und returned; zweiter Aufruf (nach Dialog) startet Aufnahme.
-- **Files modified:** VoiceScribe/Audio/AudioController.swift
+- **Files modified:** SPRECHKRAFT/Audio/AudioController.swift
 - **Commit:** f8fffc0
 
 ## Threat Surface Scan
@@ -114,17 +114,17 @@ Keine neuen Threat-Surfaces ausserhalb des Plans `<threat_model>`. Alle 5 STRIDE
 
 ## Known Stubs
 
-- `onAutoStop` Callback in AudioController ist deklariert aber noch nicht verdrahtet — wird in Plan 02 (UI + Wiring) in AppDelegate/VoiceScribeApp gesetzt.
+- `onAutoStop` Callback in AudioController ist deklariert aber noch nicht verdrahtet — wird in Plan 02 (UI + Wiring) in AppDelegate/SPRECHKRAFTApp gesetzt.
 - `AudioController` wird noch nicht in der App instantiiert — Plan 02 wired AppDelegate.
 
 ## Self-Check: PASSED
 
 ### Created Files Exist
-- FOUND: VoiceScribe/Audio/AudioController.swift
-- FOUND: VoiceScribe/Audio/AudioDeviceManager.swift
-- FOUND: VoiceScribe/Extensions/Defaults+Keys.swift
-- FOUND: VoiceScribeTests/AudioControllerTests.swift
-- FOUND: VoiceScribeTests/DefaultsKeysTests.swift
+- FOUND: SPRECHKRAFT/Audio/AudioController.swift
+- FOUND: SPRECHKRAFT/Audio/AudioDeviceManager.swift
+- FOUND: SPRECHKRAFT/Extensions/Defaults+Keys.swift
+- FOUND: SPRECHKRAFTTests/AudioControllerTests.swift
+- FOUND: SPRECHKRAFTTests/DefaultsKeysTests.swift
 
 ### Commits Exist
 - FOUND: 4eb8537 — Task 1 (Defaults+Keys, Info.plist, AppState)

@@ -24,13 +24,13 @@ status: partial
 
 ### WR-01: Silence auto-stop fires on every silent buffer after threshold is crossed
 
-**Files modified:** `VoiceScribe/Audio/AudioController.swift`
+**Files modified:** `SPRECHKRAFT/Audio/AudioController.swift`
 **Commit:** 4a52487
 **Applied fix:** `silenceAccumulator = 0` direkt vor dem `Task { @MainActor }` Dispatch in `updateSilenceDetection()` eingefügt. Verhindert, dass nach Überschreitung des Schwellwerts jeder weitere stille Buffer einen neuen Auto-Stopp-Task auslöst.
 
 ### WR-02: `updateIcon()` creates and discards `NSHostingView` at audio-buffer rate (~86 Hz)
 
-**Files modified:** `VoiceScribe/Audio/AudioController.swift`
+**Files modified:** `SPRECHKRAFT/Audio/AudioController.swift`
 **Commit:** ea0a32a
 **Applied fix:** Option A (Throttle im Tap) umgesetzt. Neue Property `lastDispatchedLevel: CGFloat = -1` hinzugefügt. Im Tap-Block wird ein `guard abs(clampedLevel - self.lastDispatchedLevel) > 0.05` eingefügt — Level-Updates werden nur noch dispatcht wenn sich der Pegel um mehr als 5% geändert hat. `lastDispatchedLevel` wird in `startRecording()` und `stopRecording()` auf `-1` zurückgesetzt, damit der erste Dispatch der neuen Session sicher feuert.
 
@@ -38,7 +38,7 @@ status: partial
 
 ### WR-03: Missing `updateIcon()` call in `startRecordingWithCue()` error path
 
-**File:** `VoiceScribe/AppDelegate.swift:66-78`
+**File:** `SPRECHKRAFT/AppDelegate.swift:66-78`
 **Reason:** Fix bereits implizit vorhanden — kein Handlungsbedarf. Der aktuelle Code hat `updateIcon()` auf Zeile 77 **ausserhalb** des do/catch-Blocks. Damit wird `updateIcon()` in beiden Pfaden ausgeführt: sowohl bei erfolgreichem Start als auch nach einem Fehler (catch-Pfad mit `appState?.resetToIdle()`). Der Reviewer hat den Code möglicherweise mit einer früheren Version analysiert, in der `updateIcon()` noch innerhalb des do-Blocks (nur bei Erfolg) stand. Das Verhalten ist aktuell korrekt.
 **Original issue:** Icon bleibt nach fehlgeschlagenem `startRecording()` visuell im `.recording`-Zustand, weil `updateIcon()` im catch-Block fehlte.
 

@@ -30,14 +30,14 @@ tech-stack:
 
 key-files:
   created:
-    - VoiceScribe/ProfileEditorSheet.swift
+    - SPRECHKRAFT/ProfileEditorSheet.swift
   modified:
-    - VoiceScribe/SettingsView.swift
-    - VoiceScribe/AppDelegate.swift
-    - VoiceScribe.xcodeproj/project.pbxproj
+    - SPRECHKRAFT/SettingsView.swift
+    - SPRECHKRAFT/AppDelegate.swift
+    - SPRECHKRAFT.xcodeproj/project.pbxproj
 
 key-decisions:
-  - "ProfileEditorSheet liegt direkt in VoiceScribe/ (nicht VoiceScribe/Views/) — Projekt hat keine Views/-Unterstruktur, alle View-Dateien direkt im Hauptverzeichnis"
+  - "ProfileEditorSheet liegt direkt in SPRECHKRAFT/ (nicht SPRECHKRAFT/Views/) — Projekt hat keine Views/-Unterstruktur, alle View-Dateien direkt im Hauptverzeichnis"
   - ".frame(width:minHeight:) ist kein gueltiger SwiftUI-Modifier — stattdessen .frame(width:height:) auf NavigationStack"
   - "Notification.Name.refreshProfileHotkeys als Bridge statt direktem AppDelegate-Aufruf — SettingsView hat keinen Referenz auf AppDelegate"
 
@@ -82,14 +82,14 @@ completed: 2026-04-20
 
 ## Files Created/Modified
 
-- `/Users/mbieling/claude/voice/VoiceScribe/ProfileEditorSheet.swift` — neu, 112 Zeilen, alle 5 Sektionen
-- `/Users/mbieling/claude/voice/VoiceScribe/SettingsView.swift` — Section("Prompt-Profile") + Groq-Banner + Sheet
-- `/Users/mbieling/claude/voice/VoiceScribe/AppDelegate.swift` — refreshProfileHotkeys Notification + Observer
-- `/Users/mbieling/claude/voice/VoiceScribe.xcodeproj/project.pbxproj` — PE050600/PE050601 registriert
+- `/Users/mbieling/claude/voice/SPRECHKRAFT/ProfileEditorSheet.swift` — neu, 112 Zeilen, alle 5 Sektionen
+- `/Users/mbieling/claude/voice/SPRECHKRAFT/SettingsView.swift` — Section("Prompt-Profile") + Groq-Banner + Sheet
+- `/Users/mbieling/claude/voice/SPRECHKRAFT/AppDelegate.swift` — refreshProfileHotkeys Notification + Observer
+- `/Users/mbieling/claude/voice/SPRECHKRAFT.xcodeproj/project.pbxproj` — PE050600/PE050601 registriert
 
 ## Decisions Made
 
-- ProfileEditorSheet in `VoiceScribe/` direkt (nicht `VoiceScribe/Views/`) — Projekt hat keine Views-Unterstruktur
+- ProfileEditorSheet in `SPRECHKRAFT/` direkt (nicht `SPRECHKRAFT/Views/`) — Projekt hat keine Views-Unterstruktur
 - `.frame(width: 420, height: 460)` auf `NavigationStack` statt `.frame(width:minHeight:)` auf `Form` — `minHeight` als Named Parameter in `frame()` existiert nicht in dieser Kombination
 - Notification-Bridge für Hotkey-Refresh: SettingsView hat keine Referenz auf AppDelegate → `NotificationCenter.default.post(name: .refreshProfileHotkeys)` als saubere Entkopplung
 
@@ -101,7 +101,7 @@ completed: 2026-04-20
 - **Found during:** Task 1 (Build-Verifikation)
 - **Issue:** `frame(width:minHeight:)` ist kein gültiger SwiftUI `View`-Modifier — `minHeight` als benannter Parameter existiert nicht in dieser Overload
 - **Fix:** `.frame(width: 420, height: 460)` auf den äußeren `NavigationStack` (nach Toolbar-Modifier) verschoben
-- **Files modified:** VoiceScribe/ProfileEditorSheet.swift
+- **Files modified:** SPRECHKRAFT/ProfileEditorSheet.swift
 - **Committed in:** c9ae049 (Task 1 commit)
 
 ---
@@ -121,7 +121,7 @@ Keine neuen Trust Boundaries eingeführt. Alle im Plan dokumentierten Mitigation
 
 ## Self-Check: PASSED
 
-- `VoiceScribe/ProfileEditorSheet.swift` existiert: FOUND
+- `SPRECHKRAFT/ProfileEditorSheet.swift` existiert: FOUND
 - `struct ProfileEditorSheet: View` (1 Treffer): FOUND
 - `Section("Prompt-Profile")` in SettingsView (1 Treffer): FOUND
 - `groqKeyMissing` in SettingsView (2 Treffer): FOUND

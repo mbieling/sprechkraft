@@ -7,8 +7,8 @@ dependency_graph:
   requires: ["06-02 (HistoryEntry + HistoryStore GRDB-Datenbankschicht)"]
   provides: ["HistoryView SwiftUI-View", "HistoryRowView", "Copy-Flash D-10", "T6-DELETE Confirm-Alert"]
   affects:
-    - "VoiceScribe/History/HistoryView.swift"
-    - "VoiceScribe.xcodeproj/project.pbxproj"
+    - "SPRECHKRAFT/History/HistoryView.swift"
+    - "SPRECHKRAFT.xcodeproj/project.pbxproj"
 tech_stack:
   added: []
   patterns:
@@ -19,9 +19,9 @@ tech_stack:
     - "Unicode-Escape-Sequenzen für typografische Anführungszeichen in Swift-String-Literals"
 key_files:
   created:
-    - "VoiceScribe/History/HistoryView.swift"
+    - "SPRECHKRAFT/History/HistoryView.swift"
   modified:
-    - "VoiceScribe.xcodeproj/project.pbxproj"
+    - "SPRECHKRAFT.xcodeproj/project.pbxproj"
 decisions:
   - "Unicode-Escape statt direkter U+201C/U+201E Zeichen in Swift-String-Literal — Swift-Compiler interpretiert U+201C als String-Delimiter (Rule 1 Bug-Fix)"
 metrics:
@@ -39,11 +39,11 @@ metrics:
 
 | Task | Name | Commit | Files |
 |------|------|--------|-------|
-| 1 | HistoryView.swift — vollständige SwiftUI-View | 143b8d9 | VoiceScribe/History/HistoryView.swift, VoiceScribe.xcodeproj/project.pbxproj |
+| 1 | HistoryView.swift — vollständige SwiftUI-View | 143b8d9 | SPRECHKRAFT/History/HistoryView.swift, SPRECHKRAFT.xcodeproj/project.pbxproj |
 
 ## Erstellte Dateien
 
-### VoiceScribe/History/HistoryView.swift (251 Zeilen)
+### SPRECHKRAFT/History/HistoryView.swift (251 Zeilen)
 
 **HistoryView (Haupt-View):**
 - `@State searchText`, `entries`, `flashingEntryID`, `showClearConfirm`, `debounceTask`
@@ -127,7 +127,7 @@ HistoryView.swift in HT060620-Gruppe (History/) und AA000070 (Sources-Phase) ein
 - **Found during:** Task 1 (erster Build — BUILD FAILED)
 - **Issue:** `Text("Keine Einträge für „\(searchText)" gefunden.")` — Swift-Compiler (6.x) interpretiert U+201C (`"` — LINKES DOPPELTES ANFÜHRUNGSZEICHEN) als String-Delimiter; erzeugt 3 Compiler-Fehler: "expected ',' separator", "unterminated string literal", "expected member name following '.'"
 - **Fix:** Unicode-Escape-Sequenzen: `\u{201E}` (öffnendes „) und `\u{201C}` (schließendes ") statt direkter Unicode-Zeichen im String-Literal. Außerdem `\u{00E4}` (ä) und `\u{00FC}` (ü) für maximale Robustheit.
-- **Files modified:** VoiceScribe/History/HistoryView.swift
+- **Files modified:** SPRECHKRAFT/History/HistoryView.swift
 - **Commit:** 143b8d9
 
 ## Known Stubs
@@ -140,10 +140,10 @@ Keine neuen Threat-Surfaces — alle Boundaries (T6-FTS5, T6-DELETE) waren im Pl
 
 ## Self-Check: PASSED
 
-- FOUND: VoiceScribe/History/HistoryView.swift (251 Zeilen)
-- FOUND: HT060612 + HT060613 in VoiceScribe.xcodeproj/project.pbxproj
+- FOUND: SPRECHKRAFT/History/HistoryView.swift (251 Zeilen)
+- FOUND: HT060612 + HT060613 in SPRECHKRAFT.xcodeproj/project.pbxproj
 - FOUND: commit 143b8d9 (feat(06-03): HistoryView.swift)
-- VERIFIED: BUILD SUCCEEDED (xcodebuild build -scheme VoiceScribe)
+- VERIFIED: BUILD SUCCEEDED (xcodebuild build -scheme SPRECHKRAFT)
 - VERIFIED: showClearConfirm vorhanden (T6-DELETE)
 - VERIFIED: Task.sleep(for: .milliseconds(200)) vorhanden (D-06)
 - VERIFIED: observeAll() + task(id:) vorhanden (Pitfall 7)

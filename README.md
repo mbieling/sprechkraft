@@ -1,4 +1,4 @@
-# VoiceScribe: Lokale Diktat-App für macOS
+# SPRECHKRAFT: Lokale Diktat-App für macOS
 
 ## What This Is
 

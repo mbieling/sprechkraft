@@ -18,9 +18,9 @@ created: 2026-04-17
 | Property | Value |
 |----------|-------|
 | **Framework** | Swift Testing (import Testing) |
-| **Config file** | VoiceScribeTests/ (Wave 0 legt Struktur an) |
-| **Quick run command** | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS' -testPlan AudioCaptureQuick 2>&1 \| grep -E "PASS\|FAIL\|error:"` |
-| **Full suite command** | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS' 2>&1 \| grep -E "PASS\|FAIL\|error:"` |
+| **Config file** | SPRECHKRAFTTests/ (Wave 0 legt Struktur an) |
+| **Quick run command** | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS' -testPlan AudioCaptureQuick 2>&1 \| grep -E "PASS\|FAIL\|error:"` |
+| **Full suite command** | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS' 2>&1 \| grep -E "PASS\|FAIL\|error:"` |
 | **Estimated runtime** | ~8 seconds (unit tests only; AVAudioEngine-Integration manuell) |
 
 ---
@@ -38,14 +38,14 @@ created: 2026-04-17
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 02-01-01 | 01 | 0 | — | — | Info.plist enthaelt NSMicrophoneUsageDescription | manual | `grep -r "NSMicrophoneUsageDescription" VoiceScribe/Info.plist` | W0 | pending |
-| 02-01-02 | 01 | 1 | RECORD-01 | T-02-01 | AudioController startet/stoppt AVAudioEngine | unit | `xcodebuild test -scheme VoiceScribe -only-testing:VoiceScribeTests/AudioControllerTests/testStartStop` | W0 | pending |
-| 02-02-01 | 01 | 1 | RECORD-02 | — | RMS-Berechnung: stille Buffer -> ~0.0, lauter Buffer -> > 0.1 | unit | `xcodebuild test -scheme VoiceScribe -only-testing:VoiceScribeTests/AudioControllerTests/testRMSCalculation` | W0 | pending |
-| 02-02-02 | 01 | 1 | RECORD-02 | — | Silence-Timer loest Auto-Stopp nach konfigurierter Dauer aus | unit | `xcodebuild test -scheme VoiceScribe -only-testing:VoiceScribeTests/AudioControllerTests/testSilenceDetection` | W0 | pending |
+| 02-01-01 | 01 | 0 | — | — | Info.plist enthaelt NSMicrophoneUsageDescription | manual | `grep -r "NSMicrophoneUsageDescription" SPRECHKRAFT/Info.plist` | W0 | pending |
+| 02-01-02 | 01 | 1 | RECORD-01 | T-02-01 | AudioController startet/stoppt AVAudioEngine | unit | `xcodebuild test -scheme SPRECHKRAFT -only-testing:SPRECHKRAFTTests/AudioControllerTests/testStartStop` | W0 | pending |
+| 02-02-01 | 01 | 1 | RECORD-02 | — | RMS-Berechnung: stille Buffer -> ~0.0, lauter Buffer -> > 0.1 | unit | `xcodebuild test -scheme SPRECHKRAFT -only-testing:SPRECHKRAFTTests/AudioControllerTests/testRMSCalculation` | W0 | pending |
+| 02-02-02 | 01 | 1 | RECORD-02 | — | Silence-Timer loest Auto-Stopp nach konfigurierter Dauer aus | unit | `xcodebuild test -scheme SPRECHKRAFT -only-testing:SPRECHKRAFTTests/AudioControllerTests/testSilenceDetection` | W0 | pending |
 | 02-03-01 | 02 | 1 | FEED-02 | — | NSSound-Cue wird bei Start und Stopp abgespielt | manual | Manuell verifizieren: Ton bei Hotkey-Start/Stopp hoerbar | — | pending |
-| 02-04-01 | 02 | 1 | FEED-03 | — | Waveform-View existiert und rendert bei audioLevel > 0 | unit | `xcodebuild test -scheme VoiceScribe -only-testing:VoiceScribeTests/WaveformViewTests/testRendersWhenActive` | W0 | pending |
-| 02-05-01 | 01 | 1 | SET-03 | — | silenceDuration-Defaults-Key hat Standardwert 1.5 | unit | `xcodebuild test -scheme VoiceScribe -only-testing:VoiceScribeTests/DefaultsKeysTests/testSilenceDurationDefault` | W0 | pending |
-| 02-05-02 | 01 | 1 | SET-04 | — | selectedMicUID-Defaults-Key hat Standardwert nil | unit | `xcodebuild test -scheme VoiceScribe -only-testing:VoiceScribeTests/DefaultsKeysTests/testSelectedMicUIDDefault` | W0 | pending |
+| 02-04-01 | 02 | 1 | FEED-03 | — | Waveform-View existiert und rendert bei audioLevel > 0 | unit | `xcodebuild test -scheme SPRECHKRAFT -only-testing:SPRECHKRAFTTests/WaveformViewTests/testRendersWhenActive` | W0 | pending |
+| 02-05-01 | 01 | 1 | SET-03 | — | silenceDuration-Defaults-Key hat Standardwert 1.5 | unit | `xcodebuild test -scheme SPRECHKRAFT -only-testing:SPRECHKRAFTTests/DefaultsKeysTests/testSilenceDurationDefault` | W0 | pending |
+| 02-05-02 | 01 | 1 | SET-04 | — | selectedMicUID-Defaults-Key hat Standardwert nil | unit | `xcodebuild test -scheme SPRECHKRAFT -only-testing:SPRECHKRAFTTests/DefaultsKeysTests/testSelectedMicUIDDefault` | W0 | pending |
 | 02-06-01 | 03 | 1 | RECORD-03 | — | Geraetesliste enthaelt mindestens Built-in-Mikrofon | manual | Manuell: Mikrofon-Dropdown in Settings zeigt Geraete | — | pending |
 | 02-07-01 | 03 | 1 | — | T-02-02 | Mikrofon-Permission-Banner erscheint in Settings wenn denied | manual | Berechtigung in macOS entziehen, App starten, Settings oeffnen | — | pending |
 
@@ -55,9 +55,9 @@ created: 2026-04-17
 
 ## Wave 0 Requirements
 
-- [ ] `VoiceScribeTests/AudioControllerTests.swift` — Stubs fuer RECORD-01, RECORD-02 (testStartStop, testRMSCalculation, testSilenceDetection)
-- [ ] `VoiceScribeTests/WaveformViewTests.swift` — Stub fuer FEED-03 (testRendersWhenActive)
-- [ ] `VoiceScribeTests/DefaultsKeysTests.swift` — Tests fuer SET-03, SET-04 (testSilenceDurationDefault, testSelectedMicUIDDefault)
+- [ ] `SPRECHKRAFTTests/AudioControllerTests.swift` — Stubs fuer RECORD-01, RECORD-02 (testStartStop, testRMSCalculation, testSilenceDetection)
+- [ ] `SPRECHKRAFTTests/WaveformViewTests.swift` — Stub fuer FEED-03 (testRendersWhenActive)
+- [ ] `SPRECHKRAFTTests/DefaultsKeysTests.swift` — Tests fuer SET-03, SET-04 (testSilenceDurationDefault, testSelectedMicUIDDefault)
 - [ ] Swift Testing Target in Xcode-Projekt eingerichtet (falls nicht bereits aus Phase 1 vorhanden)
 
 ---

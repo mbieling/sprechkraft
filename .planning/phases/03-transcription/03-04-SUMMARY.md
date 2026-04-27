@@ -13,9 +13,9 @@ dependency_graph:
     - isModelReady-Guard in startRecordingWithCue()
     - onRecordingComplete-Callback in setupAudioController() verdrahtet
   affects:
-    - VoiceScribe/AppDelegate.swift
-    - VoiceScribe/AppState.swift
-    - VoiceScribe/Audio/AudioController.swift
+    - SPRECHKRAFT/AppDelegate.swift
+    - SPRECHKRAFT/AppState.swift
+    - SPRECHKRAFT/Audio/AudioController.swift
 tech_stack:
   added: []
   patterns:
@@ -24,9 +24,9 @@ tech_stack:
     - await MainActor.run {} fuer UI-Updates nach async actor-Aufruf
 key_files:
   modified:
-    - VoiceScribe/AppDelegate.swift
-    - VoiceScribe/AppState.swift
-    - VoiceScribe/Audio/AudioController.swift
+    - SPRECHKRAFT/AppDelegate.swift
+    - SPRECHKRAFT/AppState.swift
+    - SPRECHKRAFT/Audio/AudioController.swift
 decisions:
   - "appState?.isModelReady direkt setzen (nicht await transcriptionService.isModelReady) — PATTERNS.md empfiehlt direktes Setzen; await-Variante funktioniert aber ebenfalls (beide korrekt in Swift 6)"
   - "AudioController.onRecordingComplete + recordedSamples in diesem Plan implementiert (Rule 3): Wave-1-Agent (03-02) hat anderen Worktree — Basis-Commit enthielt diese Aenderungen nicht"
@@ -76,14 +76,14 @@ Phase-3-Pipeline vollstaendig verdrahtet: App-Start loest WhisperKit-Modell-Down
 - **Gefunden bei:** Task 1, Build-Fehler Zeile 74+215
 - **Problem:** `AppState` hatte keine `isModelReady`-Property, obwohl sie in Plan 03-02 vorgesehen war
 - **Fix:** Property `var isModelReady: Bool = false` in AppState.swift hinzugefuegt
-- **Dateien:** `VoiceScribe/AppState.swift`
+- **Dateien:** `SPRECHKRAFT/AppState.swift`
 - **Commit:** b80ff52
 
 **2. [Rule 3 - Blocking Issue] AudioController.onRecordingComplete fehlte**
 - **Gefunden bei:** Task 2, Build-Fehler Zeile 68
 - **Problem:** `AudioController` hatte weder `onRecordingComplete`-Callback noch `recordedSamples`-Akkumulation. Plan 03-02 (Wave 1, anderer Worktree) hatte diese Aenderungen nicht in den Basis-Commit eingebracht.
 - **Fix:** Vollstaendige 03-02-Erweiterung in AudioController.swift implementiert (Properties, installTap-Akkumulation, stopRecording-Erweiterung)
-- **Dateien:** `VoiceScribe/Audio/AudioController.swift`
+- **Dateien:** `SPRECHKRAFT/Audio/AudioController.swift`
 - **Commit:** 93a5c79
 
 ## Verifikation

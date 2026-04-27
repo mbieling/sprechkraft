@@ -18,7 +18,7 @@ created: 2026-04-16
 | Property | Value |
 |----------|-------|
 | **Framework** | Swift Testing (Xcode built-in) |
-| **Config file** | VoiceScribeTests/ — Wave 0 erstellt |
+| **Config file** | SPRECHKRAFTTests/ — Wave 0 erstellt |
 | **Quick run command** | `swift test` |
 | **Full suite command** | `swift test --parallel` |
 | **Estimated runtime** | ~10 seconds |
@@ -49,8 +49,8 @@ created: 2026-04-16
 
 ## Wave 0 Requirements
 
-- [ ] `VoiceScribeTests/HotkeyTests.swift` — stubs für SET-02 (KeyboardShortcuts Integration)
-- [ ] `VoiceScribeTests/AppStateTests.swift` — stubs für FEED-01 (Icon-Zustände)
+- [ ] `SPRECHKRAFTTests/HotkeyTests.swift` — stubs für SET-02 (KeyboardShortcuts Integration)
+- [ ] `SPRECHKRAFTTests/AppStateTests.swift` — stubs für FEED-01 (Icon-Zustände)
 - [ ] Xcode-Projekt mit Test-Target konfigurieren
 
 *Visuelle UI-Verhalten (Icon-Animation, Menu, Login-Toggle) erfordern manuelle Verifikation.*

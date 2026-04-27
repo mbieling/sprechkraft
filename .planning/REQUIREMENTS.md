@@ -1,4 +1,4 @@
-# Requirements — VoiceScribe
+# Requirements — SPRECHKRAFT
 
 ## v1 Requirements
 

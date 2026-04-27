@@ -28,7 +28,7 @@ tech-stack:
 
 key-files:
   modified:
-    - path: "VoiceScribe/AppDelegate.swift"
+    - path: "SPRECHKRAFT/AppDelegate.swift"
       change: "setupTranscription() ersetzt — Cache-Check, neue States, Error-Path"
 
 decisions:
@@ -89,6 +89,6 @@ Keine neuen Security-relevanten Surfaces. `FileManager.fileExists` auf lokalem P
 
 ## Self-Check: PASSED
 
-- [x] `VoiceScribe/AppDelegate.swift` existiert und enthält alle neuen Patterns
+- [x] `SPRECHKRAFT/AppDelegate.swift` existiert und enthält alle neuen Patterns
 - [x] Commit `1dc1ccf` existiert in git log
 - [x] Keine unerwarteten Datei-Löschungen im Commit

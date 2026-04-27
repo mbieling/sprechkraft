@@ -29,7 +29,7 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - "VoiceScribe/Transcription/TranscriptionService.swift"
+    - "SPRECHKRAFT/Transcription/TranscriptionService.swift"
 
 key-decisions:
   - "resampleTo16kHz bleibt in TranscriptionService (D-13): Backend-unabhängig, 16kHz-Samples gehen ans Backend"
@@ -69,7 +69,7 @@ completed: "2026-04-25"
 
 ## Files Created/Modified
 
-- `VoiceScribe/Transcription/TranscriptionService.swift` — WhisperKit-Code entfernt, Facade-Pattern implementiert, resampleTo16kHz verbatim bewahrt
+- `SPRECHKRAFT/Transcription/TranscriptionService.swift` — WhisperKit-Code entfernt, Facade-Pattern implementiert, resampleTo16kHz verbatim bewahrt
 
 ## Decisions Made
 

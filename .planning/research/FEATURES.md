@@ -235,7 +235,7 @@ Settings-Fenster
    Progress-Hook für die gesamte Downloadgröße in allen Versionen. Muss mit `tqdm`-Integration
    oder manuellem Polling gelöst werden. Verifikation nötig.
 
-3. **Modell-Cache-Verzeichnis:** Soll das Modell in `~/Library/Application Support/VoiceScribe/`
+3. **Modell-Cache-Verzeichnis:** Soll das Modell in `~/Library/Application Support/SPRECHKRAFT/`
    liegen (App-kontrolliert) oder in `~/.cache/huggingface/hub/` (HF-Standard)?
    App-Support-Verzeichnis ist besser für "Modell neu herunterladen"-Feature und Deinstallation.
 

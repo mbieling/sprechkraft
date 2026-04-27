@@ -83,10 +83,10 @@ Kein LLM in dieser Phase. Kein App-spezifischer Fallback-Mechanismus (v2). Keine
 - `.planning/phases/03-transcription/03-CONTEXT.md` D-07/D-08/D-12 — Pipeline-Stub der ersetzt wird, resetToIdle-Pattern, Fehlerbehandlung
 
 ### Bestehendes Code
-- `VoiceScribe/AppDelegate.swift:72-78` — onRecordingComplete-Callback (Integrationspunkt: print() wird durch TextOutputService ersetzt)
-- `VoiceScribe/Extensions/Defaults+Keys.swift` — Vorlage für neuen OutputMode-Key
-- `VoiceScribe/Extensions/KeyboardShortcuts+Names.swift` — Vorlage für toggleOutputMode-Name
-- `VoiceScribe/Views/SettingsView.swift` — micPermissionDenied-Banner als Pattern für axPermissionDenied-Banner
+- `SPRECHKRAFT/AppDelegate.swift:72-78` — onRecordingComplete-Callback (Integrationspunkt: print() wird durch TextOutputService ersetzt)
+- `SPRECHKRAFT/Extensions/Defaults+Keys.swift` — Vorlage für neuen OutputMode-Key
+- `SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift` — Vorlage für toggleOutputMode-Name
+- `SPRECHKRAFT/Views/SettingsView.swift` — micPermissionDenied-Banner als Pattern für axPermissionDenied-Banner
 
 </canonical_refs>
 

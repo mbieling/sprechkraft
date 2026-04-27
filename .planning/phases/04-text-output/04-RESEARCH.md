@@ -95,7 +95,7 @@ Entitlements: Kein spezielles Entitlement für AX API nötig. `NSAccessibilityUs
 | Statt | Könnte man nutzen | Abwägung |
 |-------|-------------------|----------|
 | `kAXValueAttribute` write | Clipboard + CGEvent Cmd+V (VoiceInk-Ansatz) | VoiceInk wählt CGEvent weil es mit allen Apps funktioniert inkl. Electron; D-01 ist aber locked — kAXValueAttribute bleibt Primärmethode |
-| `AXIsProcessTrusted()` | `AXIsProcessTrustedWithOptions()` | `WithOptions` zeigt OS-Dialog; für VoiceScribe unerwünscht (D-11 sagt: Banner in SettingsView statt Dialog). Einfaches `AXIsProcessTrusted()` ohne Optionen ist korrekt. |
+| `AXIsProcessTrusted()` | `AXIsProcessTrustedWithOptions()` | `WithOptions` zeigt OS-Dialog; für SPRECHKRAFT unerwünscht (D-11 sagt: Banner in SettingsView statt Dialog). Einfaches `AXIsProcessTrusted()` ohne Optionen ist korrekt. |
 
 ---
 
@@ -148,7 +148,7 @@ TranscriptionService.transcribeWithResampling()
 ### Empfohlene Dateistruktur
 
 ```
-VoiceScribe/
+SPRECHKRAFT/
 ├── TextOutput/
 │   └── TextOutputService.swift      # @MainActor-Klasse mit AX + Clipboard-Logik
 ├── Extensions/
@@ -276,7 +276,7 @@ final class TextOutputService {
 ### Pattern 2: OutputMode Enum + Defaults Key
 
 ```swift
-// VoiceScribe/Extensions/Defaults+Keys.swift (Erweiterung)
+// SPRECHKRAFT/Extensions/Defaults+Keys.swift (Erweiterung)
 // Source: Bestehendes Pattern aus silenceDuration/selectedMicUID
 
 enum OutputMode: String, Defaults.Serializable {
@@ -316,7 +316,7 @@ if let url = URL(string:
 ### Pattern 5: Hotkey toggleOutputMode
 
 ```swift
-// VoiceScribe/Extensions/KeyboardShortcuts+Names.swift (Ergänzung)
+// SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift (Ergänzung)
 // Source: Bestehendes toggleRecording-Pattern [VERIFIED: Codebase]
 
 extension KeyboardShortcuts.Name {
@@ -563,36 +563,36 @@ Step 2.6: SKIPPED (Phase 4 ist rein code-/config-seitig; keine externen Tool-Dep
 |----------|-------|
 | Framework | Swift Testing (import Testing) |
 | Config file | Xcode-Projekt (kein separates pytest.ini/jest.config) |
-| Quick run command | `xcodebuild test -scheme VoiceScribe -only-testing VoiceScribeTests/TextOutputServiceTests` |
-| Full suite command | `xcodebuild test -scheme VoiceScribe` |
+| Quick run command | `xcodebuild test -scheme SPRECHKRAFT -only-testing SPRECHKRAFTTests/TextOutputServiceTests` |
+| Full suite command | `xcodebuild test -scheme SPRECHKRAFT` |
 
 ### Phase Requirements → Test Map
 
 | Req ID | Verhalten | Test-Typ | Automatisierter Befehl | Datei vorhanden? |
 |--------|-----------|----------|----------------------|-----------------|
 | OUT-01 | AX-Injektion schreibt Text in Textfeld | manual | — (AX benötigt echte App, nicht CI) | ❌ Wave 0 |
-| OUT-01 | TextOutputService.output() ruft AX-Pfad bei permission=true, mode=.field auf | unit (mock) | `xcodebuild test -only-testing VoiceScribeTests/TextOutputServiceTests` | ❌ Wave 0 |
+| OUT-01 | TextOutputService.output() ruft AX-Pfad bei permission=true, mode=.field auf | unit (mock) | `xcodebuild test -only-testing SPRECHKRAFTTests/TextOutputServiceTests` | ❌ Wave 0 |
 | OUT-01 | Cursor-Berechnung (String-Insert an Range-Position) | unit (pure logic) | s.o. | ❌ Wave 0 |
 | OUT-01 | 2040-Zeichen-Limit: Fallback auf Clipboard wenn composed.count > 2000 | unit (mock) | s.o. | ❌ Wave 0 |
 | OUT-02 | Clipboard-Schreiben setzt clearContents() dann setString() | unit (NSPasteboard.general testbar) | s.o. | ❌ Wave 0 |
 | OUT-02 | Clipboard-Modus bei axPermitted=false | unit (mock) | s.o. | ❌ Wave 0 |
-| OUT-03 | Defaults.Keys.outputMode hat Standardwert .field | unit | `xcodebuild test -only-testing VoiceScribeTests/DefaultsKeysTests` | ❌ Wave 0 (Erweiterung) |
-| OUT-03 | toggleOutputMode wechselt field↔clipboard | unit | `xcodebuild test -only-testing VoiceScribeTests/TextOutputServiceTests` | ❌ Wave 0 |
+| OUT-03 | Defaults.Keys.outputMode hat Standardwert .field | unit | `xcodebuild test -only-testing SPRECHKRAFTTests/DefaultsKeysTests` | ❌ Wave 0 (Erweiterung) |
+| OUT-03 | toggleOutputMode wechselt field↔clipboard | unit | `xcodebuild test -only-testing SPRECHKRAFTTests/TextOutputServiceTests` | ❌ Wave 0 |
 | OUT-03 | Modus persistiert nach App-Neustart | manual | — | Human-Verify |
-| AX-Permission | axPermissionDenied in AppState startet false | unit | `xcodebuild test -only-testing VoiceScribeTests/AppStateTests` | ❌ Wave 0 (Erweiterung) |
+| AX-Permission | axPermissionDenied in AppState startet false | unit | `xcodebuild test -only-testing SPRECHKRAFTTests/AppStateTests` | ❌ Wave 0 (Erweiterung) |
 
 **Testbarkeits-Hinweis für AX-Injektion:** Echter AX-Aufruf erfordert laufende App mit AX-Permission — nicht in CI testbar. Lösung: `TextOutputServiceProtocol` für Injektion definieren; Unit-Tests verwenden einen `MockTextOutputService`. Der `TextOutputService` selbst ist ein Wave-2-manueller Human-Verify-Test.
 
 ### Sampling Rate
 
-- **Pro Task-Commit:** `xcodebuild test -only-testing VoiceScribeTests/TextOutputServiceTests -only-testing VoiceScribeTests/DefaultsKeysTests -only-testing VoiceScribeTests/AppStateTests`
-- **Pro Wave-Merge:** `xcodebuild test -scheme VoiceScribe` (Full Suite)
+- **Pro Task-Commit:** `xcodebuild test -only-testing SPRECHKRAFTTests/TextOutputServiceTests -only-testing SPRECHKRAFTTests/DefaultsKeysTests -only-testing SPRECHKRAFTTests/AppStateTests`
+- **Pro Wave-Merge:** `xcodebuild test -scheme SPRECHKRAFT` (Full Suite)
 - **Phase Gate:** Full Suite grün vor `/gsd-verify-work`
 
 ### Wave 0 Gaps
 
-- [ ] `VoiceScribeTests/TextOutputServiceTests.swift` — Covers OUT-01 (unit/mock), OUT-02, OUT-03
-- [ ] `VoiceScribe/TextOutput/TextOutputService.swift` — Core-Implementierung
+- [ ] `SPRECHKRAFTTests/TextOutputServiceTests.swift` — Covers OUT-01 (unit/mock), OUT-02, OUT-03
+- [ ] `SPRECHKRAFT/TextOutput/TextOutputService.swift` — Core-Implementierung
 - [ ] `OutputMode`-Enum in Defaults+Keys.swift — Prerequisite für Tests
 
 ---
@@ -614,7 +614,7 @@ Step 2.6: SKIPPED (Phase 4 ist rein code-/config-seitig; keine externen Tool-Dep
 | Pattern | STRIDE | Mitigation |
 |---------|--------|-----------|
 | Clipboard-Sniffing durch andere Apps | Information Disclosure | Unvermeidbar auf macOS (Pasteboard ist shared); akzeptiertes Risiko für lokale Diktat-App |
-| AX-Permission Missbrauch (andere App liest Text via AX) | Information Disclosure | OS-Kontrolle; VoiceScribe ist Sender, nicht Receiver |
+| AX-Permission Missbrauch (andere App liest Text via AX) | Information Disclosure | OS-Kontrolle; SPRECHKRAFT ist Sender, nicht Receiver |
 | Buffer-Overflow via langen Text (2040-Limit) | Denial of Service | Expliziter Guard `newText.count > 2000` mit Clipboard-Fallback |
 
 ---
@@ -628,7 +628,7 @@ Step 2.6: SKIPPED (Phase 4 ist rein code-/config-seitig; keine externen Tool-Dep
 - AXSwift UIElement.swift — CFRange-Packing-Pattern — https://github.com/tmandry/AXSwift/blob/main/Sources/UIElement.swift
 - Apple Developer Forums — 2040-Zeichen-Crash — https://developer.apple.com/forums/thread/658733
 - Jano.dev (Jan 2025) — AXIsProcessTrusted() Verwendung + URL-Scheme — https://jano.dev/apple/macos/swift/2025/01/08/Accessibility-Permission.html
-- Codebase VoiceScribe — Bestehendes Pattern für Defaults, KeyboardShortcuts, AppState — lokale Analyse
+- Codebase SPRECHKRAFT — Bestehendes Pattern für Defaults, KeyboardShortcuts, AppState — lokale Analyse
 
 ### Secondary (MEDIUM confidence)
 - VoiceInk CursorPaster.swift (GitHub Beingpax/VoiceInk) — Clipboard+CGEvent-Ansatz als Gegenbeispiel zu D-01

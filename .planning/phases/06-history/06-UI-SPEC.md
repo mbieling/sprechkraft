@@ -31,7 +31,7 @@ ausschließlich der bestehenden Skala:
 
 Kein neuer Spacing-Token wird eingeführt.
 
-Quelle: `VoiceScribe/Constants/DesignTokens.swift` (codebase, bestehend).
+Quelle: `SPRECHKRAFT/Constants/DesignTokens.swift` (codebase, bestehend).
 
 ---
 
@@ -94,7 +94,7 @@ Quelle: CONTEXT.md D-10 (grüner Flash), Specifics (systemPurple-Badge); AppStat
 | Resizeable | ja | `.windowResizability(.contentSize)` mit Min-Constraint |
 
 ### Fenstertitel
-`"VoiceScribe — Verlauf"` — konsistentes Muster zu `"VoiceScribe — Einstellungen"`.
+`"SPRECHKRAFT — Verlauf"` — konsistentes Muster zu `"SPRECHKRAFT — Einstellungen"`.
 
 ### Menüpunkt
 Text: `"Verlauf…"` (Ellipsis-Zeichen U+2026, nicht drei Punkte) — einheitlich mit
@@ -102,7 +102,7 @@ Text: `"Verlauf…"` (Ellipsis-Zeichen U+2026, nicht drei Punkte) — einheitlic
 
 Position im Kontextmenü: vor „Einstellungen…", nach App-spezifischen Aktionseinträgen.
 
-Quelle: CONTEXT.md D-01, D-02; VoiceScribeApp.swift/AppDelegate.swift Muster (codebase).
+Quelle: CONTEXT.md D-01, D-02; SPRECHKRAFTApp.swift/AppDelegate.swift Muster (codebase).
 
 ---
 
@@ -278,7 +278,7 @@ Quelle: CONTEXT.md D-12; RESEARCH.md Pattern „Confirm-Dialog beim Leeren".
 | Element | Text (DE) | Kontext |
 |---------|-----------|---------|
 | Menüpunkt | `"Verlauf…"` | NSMenuItem in AppDelegate-Kontextmenü |
-| Fenstertitel | `"VoiceScribe — Verlauf"` | Window-Titelbar |
+| Fenstertitel | `"SPRECHKRAFT — Verlauf"` | Window-Titelbar |
 | Suchfeld-Placeholder | `"Verlauf durchsuchen…"` | TextField Placeholder |
 | KI-Badge | `"KI"` | Badge-Label wenn is_llm_processed == true |
 | Empty State A Titel | `"Noch keine Einträge"` | Kein Eintrag in DB |
@@ -371,7 +371,7 @@ Quelle: CONTEXT.md `<deferred>`.
 | DesignTokens.Spacing (xs/sm/md/lg/xl) | `DesignTokens.swift` (codebase) |
 | Schriftgrößen 13/11/10 pt | `SettingsView.swift` (codebase) |
 | systemPurple für KI-Badge | CONTEXT.md Specifics; AppState.swift `llmProcessing.color` |
-| Fenster-Muster (NotificationCenter-Brücke, .accessory-Workaround) | `VoiceScribeApp.swift` (codebase) |
+| Fenster-Muster (NotificationCenter-Brücke, .accessory-Workaround) | `SPRECHKRAFTApp.swift` (codebase) |
 
 ---
 

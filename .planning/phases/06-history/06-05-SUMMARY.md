@@ -6,7 +6,7 @@ tags: [history, smoke-test, human-verify]
 
 requires:
   - phase: 06-history plan 04
-    provides: AppDelegate + VoiceScribeApp Wiring (Menüpunkt, Window-Scene, DB-Insert)
+    provides: AppDelegate + SPRECHKRAFTApp Wiring (Menüpunkt, Window-Scene, DB-Insert)
 
 provides:
   - Manuell bestätigte End-to-End-Funktion des History-Features

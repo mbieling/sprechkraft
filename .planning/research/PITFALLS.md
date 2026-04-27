@@ -1,6 +1,6 @@
 # Pitfalls Research
 
-**Project:** VoiceScribe — macOS Menu Bar Dictation App
+**Project:** SPRECHKRAFT — macOS Menu Bar Dictation App
 **Domain:** Native macOS, local ASR, Accessibility text injection, global hotkey
 **Researched:** 2026-04-15 (initial); 2026-04-21 (v0.19.0 supplement: Python/MLX subprocess + Settings UI)
 **Overall confidence:** HIGH for macOS/Swift/CoreML specifics; MEDIUM for Parakeet-specific behavior (limited public docs)
@@ -233,7 +233,7 @@ Apple's hardened runtime requirement mandates that every executable Mach-O in th
 - Signing each binary manually after adding new Python packages is tedious and easy to forget
 
 **Warning signs:**
-- `codesign --verify --deep --strict VoiceScribe.app` reports unsigned binaries
+- `codesign --verify --deep --strict SPRECHKRAFT.app` reports unsigned binaries
 - App opens on developer machine (where Gatekeeper may be relaxed) but not on other machines
 - System log contains `AMFI: ... not valid`
 
@@ -241,15 +241,15 @@ Apple's hardened runtime requirement mandates that every executable Mach-O in th
 - Write a build script that signs every file matching `**/*.so` and `**/*.dylib` inside the bundle before the final app signing step.
 - Sign leaf binaries first (innermost), then the outer `.app` wrapper last.
 - Use `--timestamp` and `-o runtime` flags on every `codesign` invocation.
-- For local-only distribution (no notarization), `xattr -r -d com.apple.quarantine VoiceScribe.app` removes the quarantine flag that triggers Gatekeeper for the developer's own use.
+- For local-only distribution (no notarization), `xattr -r -d com.apple.quarantine SPRECHKRAFT.app` removes the quarantine flag that triggers Gatekeeper for the developer's own use.
 
 ```bash
 # Sign all Python extension modules and dylibs
-find VoiceScribe.app -name "*.so" -o -name "*.dylib" | while read f; do
+find SPRECHKRAFT.app -name "*.so" -o -name "*.dylib" | while read f; do
   codesign --force --timestamp -o runtime --sign "Developer ID Application: ..." "$f"
 done
 # Sign the app bundle last
-codesign --force --deep --timestamp -o runtime --sign "Developer ID Application: ..." VoiceScribe.app
+codesign --force --deep --timestamp -o runtime --sign "Developer ID Application: ..." SPRECHKRAFT.app
 ```
 
 **Phase:** v0.19.0 (Parakeet bundling). Must be automated in the build process, not a manual step.
@@ -366,7 +366,7 @@ For a menu bar app that runs continuously in the background, `kSecAttrAccessible
 // Correct accessibility for a background menu bar app:
 let query: [String: Any] = [
     kSecClass as String: kSecClassGenericPassword,
-    kSecAttrService as String: "VoiceScribe",
+    kSecAttrService as String: "SPRECHKRAFT",
     kSecAttrAccount as String: "groq-api-key",
     kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
     kSecValueData as String: keyData

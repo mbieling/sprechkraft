@@ -6,11 +6,11 @@ tags: [xcode, spm, swift6, menu-bar, tdd-red]
 dependency_graph:
   requires: []
   provides:
-    - VoiceScribe.xcodeproj (App + Test Target)
-    - VoiceScribe/Info.plist (LSUIElement=YES)
-    - VoiceScribe/VoiceScribe.entitlements (no sandbox)
+    - SPRECHKRAFT.xcodeproj (App + Test Target)
+    - SPRECHKRAFT/Info.plist (LSUIElement=YES)
+    - SPRECHKRAFT/SPRECHKRAFT.entitlements (no sandbox)
     - Package.swift (SPM CLI compatibility)
-    - VoiceScribeTests/*.swift (RED phase scaffolds)
+    - SPRECHKRAFTTests/*.swift (RED phase scaffolds)
     - .gitignore
   affects: []
 tech_stack:
@@ -26,20 +26,20 @@ tech_stack:
     - Swift Testing (@Test, @Suite) for unit tests
 key_files:
   created:
-    - VoiceScribe.xcodeproj/project.pbxproj
-    - VoiceScribe/Info.plist
-    - VoiceScribe/VoiceScribe.entitlements
-    - VoiceScribe/VoiceScribeApp.swift
-    - VoiceScribeTests/RecordingStateTests.swift
-    - VoiceScribeTests/AppStateTests.swift
-    - VoiceScribeTests/HotkeyTests.swift
+    - SPRECHKRAFT.xcodeproj/project.pbxproj
+    - SPRECHKRAFT/Info.plist
+    - SPRECHKRAFT/SPRECHKRAFT.entitlements
+    - SPRECHKRAFT/SPRECHKRAFTApp.swift
+    - SPRECHKRAFTTests/RecordingStateTests.swift
+    - SPRECHKRAFTTests/AppStateTests.swift
+    - SPRECHKRAFTTests/HotkeyTests.swift
     - Package.swift
     - .gitignore
     - .planning/phases/01-app-shell/01-VALIDATION.md (updated)
   modified: []
 decisions:
   - "xcodegen nicht installiert — pbxproj manuell erstellt (vollständig valide Struktur)"
-  - "Bundle Identifier: com.voicescribe.app (lokal, kein Developer Team)"
+  - "Bundle Identifier: com.sprechkraft.app (lokal, kein Developer Team)"
   - "Ad-hoc signing (CODE_SIGN_IDENTITY = -) für Phase 1 ohne Distribution"
   - "SWIFT_STRICT_CONCURRENCY = complete aktiviert für Swift 6 correctness"
 metrics:
@@ -62,7 +62,7 @@ Xcode-Projektgerüst mit manuell erstellter project.pbxproj, LSUIElement=YES in 
 | Task | Name | Commit | Files |
 |------|------|--------|-------|
 | 1 | Xcode-Verfügbarkeit prüfen | (checkpoint — vorab vom Orchestrator gelöst) | — |
-| 2 | Xcode-Projekt anlegen | d88a86c | project.pbxproj, Info.plist, VoiceScribe.entitlements, VoiceScribeApp.swift, .gitignore |
+| 2 | Xcode-Projekt anlegen | d88a86c | project.pbxproj, Info.plist, SPRECHKRAFT.entitlements, SPRECHKRAFTApp.swift, .gitignore |
 | 3 | SPM-Dependencies anbinden | 6f4acb3 | Package.swift |
 | 4 | Test-Scaffolds anlegen (RED) | df6baf8 | RecordingStateTests.swift, AppStateTests.swift, HotkeyTests.swift |
 | 5 | Build verifizieren + Nyquist-Sign-Off | e0ec071 | 01-VALIDATION.md |
@@ -78,11 +78,11 @@ Xcode-Projektgerüst mit manuell erstellter project.pbxproj, LSUIElement=YES in 
 
 Fehlermeldungen (Plan 02/03 machen sie grün):
 ```
-VoiceScribeTests/HotkeyTests.swift:9:43: error: type 'KeyboardShortcuts.Name' has no member 'toggleRecording'
-VoiceScribeTests/HotkeyTests.swift:15:43: error: type 'KeyboardShortcuts.Name' has no member 'toggleRecording'
-VoiceScribeTests/AppStateTests.swift:9:21: error: cannot find 'AppState' in scope
-VoiceScribeTests/AppStateTests.swift:10:42: error: cannot infer contextual base in reference to member 'idle'
-VoiceScribeTests/AppStateTests.swift:15:21: error: cannot find 'AppState' in scope
+SPRECHKRAFTTests/HotkeyTests.swift:9:43: error: type 'KeyboardShortcuts.Name' has no member 'toggleRecording'
+SPRECHKRAFTTests/HotkeyTests.swift:15:43: error: type 'KeyboardShortcuts.Name' has no member 'toggleRecording'
+SPRECHKRAFTTests/AppStateTests.swift:9:21: error: cannot find 'AppState' in scope
+SPRECHKRAFTTests/AppStateTests.swift:10:42: error: cannot infer contextual base in reference to member 'idle'
+SPRECHKRAFTTests/AppStateTests.swift:15:21: error: cannot find 'AppState' in scope
 (+ weitere fehlende RecordingState-Member)
 ** TEST BUILD FAILED **
 ```
@@ -102,7 +102,7 @@ Diese Fehler sind die dokumentierte RED-Phase der TDD-Schleife. Plan 02 implemen
 | pbxproj manuell erstellt | xcodegen nicht installiert; direktes Schreiben des pbxproj ist vollständig valide |
 | ad-hoc signing | Kein Apple Developer Team für Phase 1; "Sign to Run Locally" reicht für lokale Entwicklung |
 | SWIFT_STRICT_CONCURRENCY = complete | Swift 6 strict mode aktiviert; erzwingt korrekte Concurrency-Annotationen ab jetzt |
-| Bundle ID com.voicescribe.app | Lokal, nicht registriert; akzeptiertes Risiko für Phase 1 (T-01-05) |
+| Bundle ID com.sprechkraft.app | Lokal, nicht registriert; akzeptiertes Risiko für Phase 1 (T-01-05) |
 | Kein App Sandbox | Globale Hotkeys + AX-Text-Injektion inkompatibel mit Sandbox; bewusste Entscheidung aus STATE.md |
 
 ## SPM-Dependency-Versionen
@@ -121,7 +121,7 @@ Diese Fehler sind die dokumentierte RED-Phase der TDD-Schleife. Plan 02 implemen
 - **Gefunden während:** Task 2
 - **Problem:** Der Plan erwähnt xcodegen als Option (B); Tool ist nicht auf dem System installiert.
 - **Fix:** project.pbxproj vollständig manuell erstellt. Ergebnis identisch — `xcodebuild -list` erkennt beide Targets korrekt.
-- **Dateien:** VoiceScribe.xcodeproj/project.pbxproj
+- **Dateien:** SPRECHKRAFT.xcodeproj/project.pbxproj
 - **Commit:** d88a86c
 
 ## Threat Mitigations Applied
@@ -139,12 +139,12 @@ Plan 02 (RecordingState + AppState): Implementiert RecordingState-Enum mit Farbe
 
 ## Self-Check: PASSED
 
-- [x] VoiceScribe.xcodeproj/project.pbxproj: FOUND
-- [x] VoiceScribe/Info.plist: FOUND
-- [x] VoiceScribe/VoiceScribe.entitlements: FOUND
-- [x] VoiceScribeTests/RecordingStateTests.swift: FOUND
-- [x] VoiceScribeTests/AppStateTests.swift: FOUND
-- [x] VoiceScribeTests/HotkeyTests.swift: FOUND
+- [x] SPRECHKRAFT.xcodeproj/project.pbxproj: FOUND
+- [x] SPRECHKRAFT/Info.plist: FOUND
+- [x] SPRECHKRAFT/SPRECHKRAFT.entitlements: FOUND
+- [x] SPRECHKRAFTTests/RecordingStateTests.swift: FOUND
+- [x] SPRECHKRAFTTests/AppStateTests.swift: FOUND
+- [x] SPRECHKRAFTTests/HotkeyTests.swift: FOUND
 - [x] Package.swift: FOUND
 - [x] .gitignore: FOUND
 - [x] Commit d88a86c: FOUND (feat: create Xcode project)

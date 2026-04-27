@@ -9,7 +9,7 @@ created: 2026-04-19
 
 # Phase 5 — UI Design Contract: LLM + Prompt Profiles
 
-> Visual and interaction contract für die native macOS SwiftUI-App VoiceScribe.
+> Visual and interaction contract für die native macOS SwiftUI-App SPRECHKRAFT.
 > Generiert von gsd-ui-researcher. Verifiziert von gsd-ui-checker.
 >
 > Dieses Dokument ist SwiftUI-spezifisch: alle Maßangaben in Punkten (pt),
@@ -48,7 +48,7 @@ Ausnahmen:
 - Prompt-Texteditor Mindesthöhe: 80 pt — mehrzeilige Eingabe braucht feste Mindesthöhe
 - Touch-Target Mindestgröße: 44 pt × 44 pt — SF-Symbol-Buttons im Sheet (macOS HIG)
 
-**Quelle:** `VoiceScribe/Constants/DesignTokens.swift` — bestehende Skala, direkt übernommen.
+**Quelle:** `SPRECHKRAFT/Constants/DesignTokens.swift` — bestehende Skala, direkt übernommen.
 
 ---
 
@@ -70,7 +70,7 @@ Anmerkungen:
 - Sheet-Navigationstitel verwendet `.navigationTitle()` — Größe liegt bei macOS-Systemdefault (~15 pt semibold).
 - Zwei Weights: `regular (400)` für Body und Caption; `semibold (600)` für Label und Heading.
 
-**Quelle:** `VoiceScribe/SettingsView.swift` Zeilen 38–43 (Banner-Label 13pt, Caption 11pt) — identisches Muster. Weight `medium (500)` wird nicht verwendet.
+**Quelle:** `SPRECHKRAFT/SettingsView.swift` Zeilen 38–43 (Banner-Label 13pt, Caption 11pt) — identisches Muster. Weight `medium (500)` wird nicht verwendet.
 
 ---
 
@@ -99,7 +99,7 @@ Destructive reserviert für:
 **Icon-Zustands-Farben** (bereits in `RecordingState.color` definiert, unveränderter Kontrakt):
 - `.llmProcessing` → `Color(.systemPurple)`, pulsierend 1.2s — wird in Phase 5 während Groq-Aufruf gesetzt.
 
-**Quelle:** `VoiceScribe/AppState.swift` RecordingState.color; `VoiceScribe/SettingsView.swift` Banner-Pattern.
+**Quelle:** `SPRECHKRAFT/AppState.swift` RecordingState.color; `SPRECHKRAFT/SettingsView.swift` Banner-Pattern.
 
 ---
 
@@ -371,7 +371,7 @@ AppDelegate setzt `appState.recordingState = .llmProcessing` beim Start des Groq
 | „Als Standard"-Button (disabled) | `.accessibilityHint("Dieses Profil ist bereits als Standard markiert.")` | D-13 |
 | KeyboardShortcuts.Recorder | automatisch via Library | Label "Profil-Hotkey" |
 | Prompt-TextEditor | `.accessibilityLabel("Prompt-Text")` | TextEditor hat kein eingebautes Label |
-| Icon-Zustand llmProcessing | `"VoiceScribe — KI verarbeitet"` | bereits in `RecordingState.accessibilityLabel` |
+| Icon-Zustand llmProcessing | `"SPRECHKRAFT — KI verarbeitet"` | bereits in `RecordingState.accessibilityLabel` |
 
 ---
 

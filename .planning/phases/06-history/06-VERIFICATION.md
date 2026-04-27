@@ -6,7 +6,7 @@ score: 11/11 must-haves verified
 overrides_applied: 0
 human_verification:
   - test: "Menüpunkt 'Verlauf…' im Rechtsklick-Menü sichtbar und vor 'Einstellungen…' positioniert"
-    expected: "Menüpunkt erscheint an korrekter Position, Klick öffnet Fenster 'VoiceScribe — Verlauf'"
+    expected: "Menüpunkt erscheint an korrekter Position, Klick öffnet Fenster 'SPRECHKRAFT — Verlauf'"
     why_human: "NSStatusItem-Menü kann nicht programmatisch ausgelöst und überprüft werden"
   - test: "Nach Diktat erscheint neuer Eintrag automatisch in HistoryView mit Zeitstempel und Datum-Sektion HEUTE"
     expected: "Eintrag erscheint ohne manuelles Aktualisieren, zeigt HH:MM-Zeit, korrekte Sektion"
@@ -38,7 +38,7 @@ human_verification:
 | SC-1 | Nach jedem Diktat erscheint neuer Eintrag mit Zeitstempel, Original- und LLM-Text (falls vorhanden) | ? HUMAN | AppDelegate.swift Zeilen 147-176: Insert in beiden Pfaden implementiert; HistoryView observeAll() verdrahtet — Laufzeitverhalten erfordert menschliche Prüfung |
 | SC-2 | Volltextsuche liefert Ergebnisse in unter 200ms bei 1000 Einträgen | ✓ VERIFIED | testSearchPerformance in HistoryStoreTests.swift bestätigt FTS5-Performance (Unit-Test grün laut 06-02-SUMMARY); FTS5Pattern-Binding vorhanden |
 | SC-3 | Klick auf Eintrag kopiert Text in Clipboard mit sichtbarer Bestätigung | ? HUMAN | NSPasteboard.setString(entry.copyText) + flashingEntryID-Animation in HistoryView.swift Zeilen 166-179 — visueller Flash nicht automatisierbar |
-| SC-4 | History bleibt über App-Neustarts erhalten, vollständig lokal gespeichert | ✓ VERIFIED | HistoryStore.init(productionDB:) schreibt in Application Support/VoiceScribe/history.sqlite; kein Cloud-Dependency im Code; kein TTL/Expiry-Mechanismus |
+| SC-4 | History bleibt über App-Neustarts erhalten, vollständig lokal gespeichert | ✓ VERIFIED | HistoryStore.init(productionDB:) schreibt in Application Support/SPRECHKRAFT/history.sqlite; kein Cloud-Dependency im Code; kein TTL/Expiry-Mechanismus |
 
 ### PLAN-spezifische Must-Haves
 
@@ -48,7 +48,7 @@ human_verification:
 |---|----------|--------|----------|
 | 1 | Projekt kompiliert fehlerfrei nach GRDB-SPM-Integration | ✓ VERIFIED | 7 Commits vorhanden (b5b7938..312eb3d); GR060600/GR060601 in pbxproj mit 5 Treffern |
 | 2 | GRDB ist in allen 3 Pflichtstellen eingetragen | ✓ VERIFIED | GR060600 in packageReferences + XCRemoteSwiftPackageReference-Section; GR060601 in packageProductDependencies + XCSwiftPackageProductDependency-Section; groue/GRDB.swift mit minimumVersion 7.5.0 |
-| 3 | HistoryStoreTests.swift mit 5 Tests angelegt | ✓ VERIFIED | VoiceScribeTests/HistoryStoreTests.swift: 106 Zeilen, 5 @Test-Funktionen vorhanden |
+| 3 | HistoryStoreTests.swift mit 5 Tests angelegt | ✓ VERIFIED | SPRECHKRAFTTests/HistoryStoreTests.swift: 106 Zeilen, 5 @Test-Funktionen vorhanden |
 
 #### Plan 06-02 (Wave 1 — Datenbankschicht)
 
@@ -71,7 +71,7 @@ human_verification:
 
 | # | Wahrheit | Status | Nachweis |
 |---|----------|--------|----------|
-| 11 | NotificationCenter-Pipeline und Window-Scene verdrahtet | ✓ VERIFIED | AppDelegate.swift: Notification.Name.openHistory (Zeile 23), NSMenuItem "Verlauf…" (Zeile 248), @objc openHistoryMenu (Zeile 343), 2× HistoryStore.shared.insert (Zeilen 159, 176); VoiceScribeApp.swift: Window(..., id: "history") (Zeile 33), onReceive(.openHistory) (Zeile 89) |
+| 11 | NotificationCenter-Pipeline und Window-Scene verdrahtet | ✓ VERIFIED | AppDelegate.swift: Notification.Name.openHistory (Zeile 23), NSMenuItem "Verlauf…" (Zeile 248), @objc openHistoryMenu (Zeile 343), 2× HistoryStore.shared.insert (Zeilen 159, 176); SPRECHKRAFTApp.swift: Window(..., id: "history") (Zeile 33), onReceive(.openHistory) (Zeile 89) |
 
 **Score:** 11/11 muss-Haves automatisch verifiziert
 
@@ -79,11 +79,11 @@ human_verification:
 
 | Artefakt | Erwartet | Status | Details |
 |----------|----------|--------|---------|
-| `VoiceScribe/History/HistoryEntry.swift` | GRDB Record-Typ, >=40 Zeilen | ✓ VERIFIED | 56 Zeilen, FetchableRecord+PersistableRecord, copyText, preview |
-| `VoiceScribe/History/HistoryStore.swift` | @MainActor DatabaseQueue, >=80 Zeilen | ✓ VERIFIED | 152 Zeilen, Migration v1, FTS5, CRUD, observeAll |
-| `VoiceScribe/History/HistoryView.swift` | SwiftUI View, >=150 Zeilen | ✓ VERIFIED | 251 Zeilen, alle UI-Anforderungen implementiert |
-| `VoiceScribeTests/HistoryStoreTests.swift` | 5 Tests mit TDD-Contract | ✓ VERIFIED | 106 Zeilen, 5 @Test-Funktionen |
-| `VoiceScribe.xcodeproj/project.pbxproj` | GRDB in 3 Pflichtstellen | ✓ VERIFIED | GR060600 (5×), GR060601 (2×), groue/GRDB.swift (1×) |
+| `SPRECHKRAFT/History/HistoryEntry.swift` | GRDB Record-Typ, >=40 Zeilen | ✓ VERIFIED | 56 Zeilen, FetchableRecord+PersistableRecord, copyText, preview |
+| `SPRECHKRAFT/History/HistoryStore.swift` | @MainActor DatabaseQueue, >=80 Zeilen | ✓ VERIFIED | 152 Zeilen, Migration v1, FTS5, CRUD, observeAll |
+| `SPRECHKRAFT/History/HistoryView.swift` | SwiftUI View, >=150 Zeilen | ✓ VERIFIED | 251 Zeilen, alle UI-Anforderungen implementiert |
+| `SPRECHKRAFTTests/HistoryStoreTests.swift` | 5 Tests mit TDD-Contract | ✓ VERIFIED | 106 Zeilen, 5 @Test-Funktionen |
+| `SPRECHKRAFT.xcodeproj/project.pbxproj` | GRDB in 3 Pflichtstellen | ✓ VERIFIED | GR060600 (5×), GR060601 (2×), groue/GRDB.swift (1×) |
 
 ## Key-Link-Verifikation
 
@@ -97,7 +97,7 @@ human_verification:
 | HistoryView | HistoryStore.observeAll() | .task(id: searchText.isEmpty) | ✓ WIRED | HistoryView.swift Zeile 84/87 |
 | copyEntry(_:) | NSPasteboard.general | setString(entry.copyText) | ✓ WIRED | HistoryView.swift Zeile 168 |
 | AppDelegate.openHistoryMenu() | NotificationCenter.openHistory | post(name: .openHistory) | ✓ WIRED | AppDelegate.swift Zeile 344 |
-| VoiceScribeApp.onReceive(.openHistory) | openWindow(id: "history") | HiddenActivationView | ✓ WIRED | VoiceScribeApp.swift Zeilen 89-96 |
+| SPRECHKRAFTApp.onReceive(.openHistory) | openWindow(id: "history") | HiddenActivationView | ✓ WIRED | SPRECHKRAFTApp.swift Zeilen 89-96 |
 | AppDelegate.onRecordingComplete (LLM-Pfad) | HistoryStore.shared.insert | nach TextOutputService.output() | ✓ WIRED | AppDelegate.swift Zeile 159 |
 | AppDelegate.onRecordingComplete (Direkt-Pfad) | HistoryStore.shared.insert | nach TextOutputService.output() | ✓ WIRED | AppDelegate.swift Zeile 176 |
 
@@ -107,7 +107,7 @@ human_verification:
 |----------|---------------|--------|-------------|--------|
 | HistoryView | entries: [HistoryEntry] | historyStore.observeAll() → ValueObservation → GRDB DatabaseQueue | DatabaseQueue liest transcription_entries | ✓ FLOWING |
 | HistoryView | entries (Suche) | historyStore.search(query:) → FTS5 SQL-Query | GRDB FTS5 MATCH-Query gegen transcription_entries_fts | ✓ FLOWING |
-| HistoryStore | Persistenz | HistoryStore.init(productionDB:) → Application Support/VoiceScribe/history.sqlite | Filesystem-Pfad, kein Hardcode | ✓ FLOWING |
+| HistoryStore | Persistenz | HistoryStore.init(productionDB:) → Application Support/SPRECHKRAFT/history.sqlite | Filesystem-Pfad, kein Hardcode | ✓ FLOWING |
 
 ## Verhaltens-Spot-Checks
 
@@ -116,7 +116,7 @@ human_verification:
 | FTS5Pattern-Binding vorhanden | `grep "FTS5Pattern" HistoryStore.swift` | Zeile 110 gefunden | ✓ PASS |
 | synchronize(withTable:) vorhanden | `grep "synchronize" HistoryStore.swift` | Zeile 65 gefunden | ✓ PASS |
 | 2× HistoryStore.insert in AppDelegate | `grep -c "HistoryStore.shared.insert" AppDelegate.swift` | 2 | ✓ PASS |
-| Window-Scene "history" | `grep '"VoiceScribe — Verlauf"' VoiceScribeApp.swift` | Zeile 33 gefunden | ✓ PASS |
+| Window-Scene "history" | `grep '"SPRECHKRAFT — Verlauf"' SPRECHKRAFTApp.swift` | Zeile 33 gefunden | ✓ PASS |
 | Unit-Tests compilieren | Commit-Log zeigt BUILD SUCCEEDED | 7 Commits verifiziert | ✓ PASS |
 | Task.sleep 200ms Debounce | `grep "milliseconds(200)" HistoryView.swift` | Zeile 101 gefunden | ✓ PASS |
 
@@ -144,7 +144,7 @@ Keine Blocker gefunden. Scan über alle 4 History-Dateien ergab keine TODOs, FIX
 ### 1. Menüpunkt und Fenster-Öffnung
 
 **Test:** Rechtsklick auf Menüleisten-Icon; prüfen ob "Verlauf…" vor "Einstellungen…" erscheint; Klick auf "Verlauf…"
-**Erwartet:** Fenster "VoiceScribe — Verlauf" öffnet sich, mind. 480×320pt, Suchfeld sichtbar, bei leerer DB "Noch keine Einträge"
+**Erwartet:** Fenster "SPRECHKRAFT — Verlauf" öffnet sich, mind. 480×320pt, Suchfeld sichtbar, bei leerer DB "Noch keine Einträge"
 **Warum menschlich:** NSStatusItem-Menü nicht programmatisch auslösbar; Activation-Policy-Workaround (300ms) visuell prüfpflichtig
 
 ### 2. Diktat → Eintrag erscheint automatisch
@@ -179,7 +179,7 @@ Keine Blocker gefunden. Scan über alle 4 History-Dateien ergab keine TODOs, FIX
 - GRDB v7.5.0 korrekt in Xcode-Projekt integriert (3 Pflichtstellen, alle verknüpft)
 - HistoryEntry und HistoryStore vollständig implementiert, FTS5 mit synchronize und FTS5Pattern-Binding (T6-FTS5 mitigiert)
 - HistoryView vollständig implementiert: Datum-Sektionen, 200ms-Debounce, Copy-Flash, T6-DELETE Confirm-Alert, ValueObservation via task(id:)
-- AppDelegate und VoiceScribeApp korrekt verdrahtet: beide Insert-Pfade aktiv, Window-Scene und NotificationCenter-Brücke funktional
+- AppDelegate und SPRECHKRAFTApp korrekt verdrahtet: beide Insert-Pfade aktiv, Window-Scene und NotificationCenter-Brücke funktional
 
 **Ausstehend (nur menschlich prüfbar):**
 - 5 Checkpoints aus Plan 06-05 erfordern die laufende App mit echtem Mikrofon-Input

@@ -79,10 +79,10 @@ kein LLM in dieser Phase. Phase 4 hängt Text-Output ein.
 ## Existing Code Insights
 
 ### Reusable Assets
-- `VoiceScribe/Audio/AudioController.swift` — `installTap` bereits vorhanden, akkumuliert aktuell nur RMS. Phase 3 ergänzt Float-Sample-Akkumulation in derselben Callback-Closure. `stopRecording()` gibt das akkumulierte Array zurück (oder via Callback an AppDelegate).
-- `VoiceScribe/AppState.swift` — `RecordingState.transcribing` existiert, `resetToIdle()` existiert. Phase 3 nutzt beide ohne Änderung. Neuer State für "Modell lädt" (z.B. `isModelLoading: Bool`) oder Download-Progress-Property nötig.
-- `VoiceScribe/AppDelegate.swift:82-93` — `stopRecordingWithCue()` ruft aktuell `appState?.resetToIdle()` als Platzhalter auf. Phase 3 ersetzt diesen Aufruf durch den Transcription-Service-Kickoff.
-- `VoiceScribe/AppDelegate.swift:175-191` — `updateIcon()` / `statusItem.button?.title` — Download-Fortschritt kann hier als `title` gesetzt werden (kein neues View-Layer nötig).
+- `SPRECHKRAFT/Audio/AudioController.swift` — `installTap` bereits vorhanden, akkumuliert aktuell nur RMS. Phase 3 ergänzt Float-Sample-Akkumulation in derselben Callback-Closure. `stopRecording()` gibt das akkumulierte Array zurück (oder via Callback an AppDelegate).
+- `SPRECHKRAFT/AppState.swift` — `RecordingState.transcribing` existiert, `resetToIdle()` existiert. Phase 3 nutzt beide ohne Änderung. Neuer State für "Modell lädt" (z.B. `isModelLoading: Bool`) oder Download-Progress-Property nötig.
+- `SPRECHKRAFT/AppDelegate.swift:82-93` — `stopRecordingWithCue()` ruft aktuell `appState?.resetToIdle()` als Platzhalter auf. Phase 3 ersetzt diesen Aufruf durch den Transcription-Service-Kickoff.
+- `SPRECHKRAFT/AppDelegate.swift:175-191` — `updateIcon()` / `statusItem.button?.title` — Download-Fortschritt kann hier als `title` gesetzt werden (kein neues View-Layer nötig).
 
 ### Established Patterns
 - **Swift 6 Strict Concurrency** (`SWIFT_STRICT_CONCURRENCY = complete`) — Transcription-Task muss async sein, Ergebnis via `Task { @MainActor in }` zurück auf Main Thread.

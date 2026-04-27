@@ -154,7 +154,7 @@ AppDelegate: updateIcon()
 ### Empfohlene Projektstruktur (Erweiterung)
 
 ```
-VoiceScribe/
+SPRECHKRAFT/
 ├── Audio/
 │   ├── AudioController.swift      # Phase 2 — Tap + RMS (ERWEITERUNG: Float-Akkumulation)
 │   └── AudioDeviceManager.swift   # Phase 2 — unverändert
@@ -556,31 +556,31 @@ updateIcon()
 
 | Property | Value |
 |----------|-------|
-| Framework | Swift Testing (import Testing) — bereits aktiv in VoiceScribeTests/ |
+| Framework | Swift Testing (import Testing) — bereits aktiv in SPRECHKRAFTTests/ |
 | Config file | Xcode Test Target (kein separates Config-File) |
-| Quick run command | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS' -only-testing:VoiceScribeTests/TranscriptionServiceTests 2>&1 \| tail -20` |
-| Full suite command | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS' 2>&1 \| tail -40` |
+| Quick run command | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS' -only-testing:SPRECHKRAFTTests/TranscriptionServiceTests 2>&1 \| tail -20` |
+| Full suite command | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS' 2>&1 \| tail -40` |
 
 ### Phase Requirements → Test Map
 
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| RECORD-04 | Resampling: 48 kHz Float-Array → 16 kHz Array korrekte Länge | unit | `xcodebuild test -only-testing:VoiceScribeTests/TranscriptionServiceTests/testResamplingProducesCorrectLength` | ❌ Wave 0 |
-| RECORD-04 | Minimum-Sample-Guard gibt nil zurück für zu kurzes Audio | unit | `xcodebuild test -only-testing:VoiceScribeTests/TranscriptionServiceTests/testMinimumSampleGuard` | ❌ Wave 0 |
-| RECORD-04 | Transkription gibt nil zurück wenn Modell nicht geladen | unit | `xcodebuild test -only-testing:VoiceScribeTests/TranscriptionServiceTests/testTranscribeReturnNilWhenNotReady` | ❌ Wave 0 |
-| RECORD-05 | isModelReady startet als false | unit | `xcodebuild test -only-testing:VoiceScribeTests/TranscriptionServiceTests/testInitialStateNotReady` | ❌ Wave 0 |
-| RECORD-05 | AppState.isModelReady existiert und ist @MainActor | unit | `xcodebuild test -only-testing:VoiceScribeTests/AppStateTests/testIsModelReadyInitiallyFalse` | ❌ Wave 0 (AppStateTests.swift existiert, Erweiterung nötig) |
+| RECORD-04 | Resampling: 48 kHz Float-Array → 16 kHz Array korrekte Länge | unit | `xcodebuild test -only-testing:SPRECHKRAFTTests/TranscriptionServiceTests/testResamplingProducesCorrectLength` | ❌ Wave 0 |
+| RECORD-04 | Minimum-Sample-Guard gibt nil zurück für zu kurzes Audio | unit | `xcodebuild test -only-testing:SPRECHKRAFTTests/TranscriptionServiceTests/testMinimumSampleGuard` | ❌ Wave 0 |
+| RECORD-04 | Transkription gibt nil zurück wenn Modell nicht geladen | unit | `xcodebuild test -only-testing:SPRECHKRAFTTests/TranscriptionServiceTests/testTranscribeReturnNilWhenNotReady` | ❌ Wave 0 |
+| RECORD-05 | isModelReady startet als false | unit | `xcodebuild test -only-testing:SPRECHKRAFTTests/TranscriptionServiceTests/testInitialStateNotReady` | ❌ Wave 0 |
+| RECORD-05 | AppState.isModelReady existiert und ist @MainActor | unit | `xcodebuild test -only-testing:SPRECHKRAFTTests/AppStateTests/testIsModelReadyInitiallyFalse` | ❌ Wave 0 (AppStateTests.swift existiert, Erweiterung nötig) |
 
 ### Sampling Rate
 
-- **Per task commit:** `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS' -only-testing:VoiceScribeTests/TranscriptionServiceTests 2>&1 | tail -20`
-- **Per wave merge:** Full suite — alle VoiceScribeTests
+- **Per task commit:** `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS' -only-testing:SPRECHKRAFTTests/TranscriptionServiceTests 2>&1 | tail -20`
+- **Per wave merge:** Full suite — alle SPRECHKRAFTTests
 - **Phase gate:** Full suite grün vor `/gsd-verify-work`
 
 ### Wave 0 Gaps
 
-- [ ] `VoiceScribeTests/TranscriptionServiceTests.swift` — RECORD-04 (Resampling, Guard, not-ready-Guard), RECORD-05 (isModelReady initial state)
-- [ ] `VoiceScribe/AppState.swift` Erweiterung — `isModelReady: Bool` Property (für Test in AppStateTests)
+- [ ] `SPRECHKRAFTTests/TranscriptionServiceTests.swift` — RECORD-04 (Resampling, Guard, not-ready-Guard), RECORD-05 (isModelReady initial state)
+- [ ] `SPRECHKRAFT/AppState.swift` Erweiterung — `isModelReady: Bool` Property (für Test in AppStateTests)
 
 *(AppStateTests.swift existiert bereits — Erweiterung um `testIsModelReadyInitiallyFalse`)*
 
@@ -630,7 +630,7 @@ updateIcon()
 - Standard Stack (WhisperKit API, model name, version): HIGH — Context7 + GitHub + HuggingFace verifiziert
 - Architecture (actor pattern, resampling flow): HIGH — WhisperKit-Docs + bewährte AVFoundation-Patterns
 - Pitfalls: HIGH (Resampling-Pflicht, Download-Zwei-Phasen) / MEDIUM (Swift 6 Compat) — aus Docs und Codebase-Kontext abgeleitet
-- Test-Strategie: HIGH — konsistent mit bestehenden VoiceScribeTests-Patterns
+- Test-Strategie: HIGH — konsistent mit bestehenden SPRECHKRAFTTests-Patterns
 
 **Research date:** 2026-04-18
 **Valid until:** 2026-05-18 (WhisperKit ist aktiv entwickelt; API vor Implementierung kurz re-checken)

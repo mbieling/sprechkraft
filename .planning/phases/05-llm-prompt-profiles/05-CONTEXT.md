@@ -94,11 +94,11 @@ Kein History in dieser Phase. Kein Streaming. Kein Multi-Provider.
 - `.planning/phases/02-audio-capture/02-CONTEXT.md` — AudioController-Architektur, Hotkey-Pattern
 
 ### Bestehendes Code
-- `VoiceScribe/Extensions/Defaults+Keys.swift` — Vorlage für neuen `profiles`-Key (Codable Array)
-- `VoiceScribe/Extensions/KeyboardShortcuts+Names.swift` — Vorlage für dynamische Profil-Hotkey-Namen
-- `VoiceScribe/AppState.swift` — `llmProcessing`-State bereits vorhanden (RecordingState.llmProcessing)
-- `VoiceScribe/AppDelegate.swift` — `onRecordingComplete`-Callback (Integrationspunkt: Groq-Pipeline einklinken)
-- `VoiceScribe/Views/SettingsView.swift` — bestehende Struktur, Permission-Banner-Pattern für Groq-API-Key-Feld
+- `SPRECHKRAFT/Extensions/Defaults+Keys.swift` — Vorlage für neuen `profiles`-Key (Codable Array)
+- `SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift` — Vorlage für dynamische Profil-Hotkey-Namen
+- `SPRECHKRAFT/AppState.swift` — `llmProcessing`-State bereits vorhanden (RecordingState.llmProcessing)
+- `SPRECHKRAFT/AppDelegate.swift` — `onRecordingComplete`-Callback (Integrationspunkt: Groq-Pipeline einklinken)
+- `SPRECHKRAFT/Views/SettingsView.swift` — bestehende Struktur, Permission-Banner-Pattern für Groq-API-Key-Feld
 
 </canonical_refs>
 

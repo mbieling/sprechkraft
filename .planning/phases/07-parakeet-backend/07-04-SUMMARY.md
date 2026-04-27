@@ -11,8 +11,8 @@ dependency_graph:
     - "ParakeetBackend actor fuer Wave-3 TranscriptionService-Facade"
     - "WhisperKitBackend.swift als dokumentierter Fallback-Pfad"
   affects:
-    - "VoiceScribe/Transcription/TranscriptionService.swift (Wave 3: default backend = ParakeetBackend())"
-    - "VoiceScribeTests/TranscriptionServiceTests.swift (Wave 0: ParakeetBackend-Tests via Mock-Protocol)"
+    - "SPRECHKRAFT/Transcription/TranscriptionService.swift (Wave 3: default backend = ParakeetBackend())"
+    - "SPRECHKRAFTTests/TranscriptionServiceTests.swift (Wave 0: ParakeetBackend-Tests via Mock-Protocol)"
 tech_stack:
   added:
     - "FluidAudio (AsrModels, AsrManager, AudioSource) — verwendet via import FluidAudio"
@@ -23,8 +23,8 @@ tech_stack:
     - "Block-Kommentar als Fallback-Dokumentations-Pattern (/* ... */)"
 key_files:
   created:
-    - VoiceScribe/Transcription/ParakeetBackend.swift
-    - VoiceScribe/Transcription/WhisperKitBackend.swift
+    - SPRECHKRAFT/Transcription/ParakeetBackend.swift
+    - SPRECHKRAFT/Transcription/WhisperKitBackend.swift
 decisions:
   - "progressHandler erhält nur 0.0 (Start) und 1.0 (Ende) — FluidAudio hat keinen nativen Progress-Handler (Pitfall 3, RESEARCH.md)"
   - "Warmup mit 16000 Samples (1s Stille @ 16kHz) — try? verhindert dass Warmup-Fehler die App blockiert"
@@ -89,7 +89,7 @@ Keine neuen Sicherheitsflächen eingeführt. T-7-06 (Input Validation) umgesetzt
 
 | Check | Ergebnis |
 |-------|---------|
-| VoiceScribe/Transcription/ParakeetBackend.swift | FOUND |
-| VoiceScribe/Transcription/WhisperKitBackend.swift | FOUND |
+| SPRECHKRAFT/Transcription/ParakeetBackend.swift | FOUND |
+| SPRECHKRAFT/Transcription/WhisperKitBackend.swift | FOUND |
 | Commit b9d7153 (Task 1 — ParakeetBackend) | FOUND |
 | Commit 3dffb4a (Task 2 — WhisperKitBackend) | FOUND |

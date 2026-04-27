@@ -18,8 +18,8 @@ created: 2026-04-20
 | Property | Value |
 |----------|-------|
 | **Framework** | Swift Testing (bereits im Projekt etabliert) |
-| **Config file** | VoiceScribeTests/ Target in project.pbxproj |
-| **Quick run command** | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS'` |
+| **Config file** | SPRECHKRAFTTests/ Target in project.pbxproj |
+| **Quick run command** | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS'` |
 | **Full suite command** | gleich — alle Tests im selben Target |
 | **Estimated runtime** | ~30 Sekunden |
 
@@ -38,7 +38,7 @@ created: 2026-04-20
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 6-01-01 | 01 | 0 | HIST-01, HIST-02, HIST-03 | — | N/A | unit (RED stubs) | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS'` | ❌ W0 | ⬜ pending |
+| 6-01-01 | 01 | 0 | HIST-01, HIST-02, HIST-03 | — | N/A | unit (RED stubs) | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS'` | ❌ W0 | ⬜ pending |
 | 6-02-01 | 02 | 1 | HIST-01, HIST-02 | — | `try?` silent-fail bei DB-Fehler | unit | `xcodebuild test ...` → `testInsertPersists`, `testBothTextsStored` | ❌ W0 | ⬜ pending |
 | 6-03-01 | 03 | 1 | HIST-03 | T6-FTS5 | FTS5Pattern-Binding (kein SQL-Injection) | unit + perf | `xcodebuild test ...` → `testFTS5SearchFindsMatch`, `testSearchPerformance` | ❌ W0 | ⬜ pending |
 | 6-04-01 | 04 | 2 | HIST-01, HIST-02 | — | N/A | manual (UI) | History-Fenster öffnen, Diktat durchführen, Eintrag sichtbar | — | ⬜ pending |
@@ -50,7 +50,7 @@ created: 2026-04-20
 
 ## Wave 0 Requirements
 
-- [ ] `VoiceScribeTests/HistoryStoreTests.swift` — RED-Stubs für HIST-01, HIST-02, HIST-03 (testInsertPersists, testBothTextsStored, testFTS5SearchFindsMatch, testSearchPerformance)
+- [ ] `SPRECHKRAFTTests/HistoryStoreTests.swift` — RED-Stubs für HIST-01, HIST-02, HIST-03 (testInsertPersists, testBothTextsStored, testFTS5SearchFindsMatch, testSearchPerformance)
 - [ ] In-Memory-DatabaseQueue für Tests (`DatabaseQueue()` ohne Pfad = In-Memory-DB, kein Filesystem-Zustand)
 
 *Bestehende Test-Infrastruktur deckt Phase-6-Tests nicht ab — Wave 0 muss Stubs anlegen.*

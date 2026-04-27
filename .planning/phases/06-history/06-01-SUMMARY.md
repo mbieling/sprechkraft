@@ -6,16 +6,16 @@ tags: ["grdb", "spm", "tdd", "wave-0", "pbxproj"]
 dependency_graph:
   requires: []
   provides: ["GRDB SPM-Dependency", "HistoryStore Wave-0-Stub", "HistoryStoreTests RED-Contract"]
-  affects: ["VoiceScribe.xcodeproj/project.pbxproj", "VoiceScribe/Models/HistoryStore.swift", "VoiceScribeTests/HistoryStoreTests.swift"]
+  affects: ["SPRECHKRAFT.xcodeproj/project.pbxproj", "SPRECHKRAFT/Models/HistoryStore.swift", "SPRECHKRAFTTests/HistoryStoreTests.swift"]
 tech_stack:
   added: ["GRDB.swift v7.5.0 (groue/GRDB.swift, SPM)"]
   patterns: ["Wave-0 RED-Stub Pattern: Compile-Scaffold mit notImplemented-Stubs"]
 key_files:
   created:
-    - "VoiceScribe/Models/HistoryStore.swift"
-    - "VoiceScribeTests/HistoryStoreTests.swift"
+    - "SPRECHKRAFT/Models/HistoryStore.swift"
+    - "SPRECHKRAFTTests/HistoryStoreTests.swift"
   modified:
-    - "VoiceScribe.xcodeproj/project.pbxproj"
+    - "SPRECHKRAFT.xcodeproj/project.pbxproj"
 decisions:
   - "Wave-0-Stub statt leerer Klasse: HistoryStore wirft notImplemented um RED-Tests zu erzwingen"
   - "HistoryEntry.copyText bereits im Stub implementiert (kein Datenbank-Zugriff noetig)"
@@ -34,8 +34,8 @@ metrics:
 
 | Task | Name | Commit | Files |
 |------|------|--------|-------|
-| 1 | GRDB SPM-Dependency in project.pbxproj | b5b7938 | VoiceScribe.xcodeproj/project.pbxproj |
-| 2 | HistoryStoreTests.swift RED-Stubs + Wave-0-Scaffold | 32e02a4 | VoiceScribeTests/HistoryStoreTests.swift, VoiceScribe/Models/HistoryStore.swift, VoiceScribe.xcodeproj/project.pbxproj |
+| 1 | GRDB SPM-Dependency in project.pbxproj | b5b7938 | SPRECHKRAFT.xcodeproj/project.pbxproj |
+| 2 | HistoryStoreTests.swift RED-Stubs + Wave-0-Scaffold | 32e02a4 | SPRECHKRAFTTests/HistoryStoreTests.swift, SPRECHKRAFT/Models/HistoryStore.swift, SPRECHKRAFT.xcodeproj/project.pbxproj |
 
 ## pbxproj-Aenderungen
 
@@ -64,7 +64,7 @@ GR060601 /* GRDB */ = {
 };
 ```
 
-**Stelle 3b — packageProductDependencies VoiceScribe-Target** (Zeile ~232, nach KC050501):
+**Stelle 3b — packageProductDependencies SPRECHKRAFT-Target** (Zeile ~232, nach KC050501):
 ```
 GR060601 /* GRDB */,
 ```
@@ -81,7 +81,7 @@ Neue Object-IDs:
 
 ## Test-Datei
 
-**Pfad:** `VoiceScribeTests/HistoryStoreTests.swift`
+**Pfad:** `SPRECHKRAFTTests/HistoryStoreTests.swift`
 **Anzahl Tests:** 5
 
 | Test | Anforderung | RED-Status |
@@ -111,27 +111,27 @@ Erwartete Signaturen fuer Wave 1:
 - **Found during:** Task 1 (erster Build-Versuch)
 - **Issue:** `repositoryURL = "https://github.com/kishikawakatsuki/KeychainAccess"` — Tippfehler im GitHub-Nutzernamen (`katsuki` statt `katsumi`), fuehrt zu `Repository not found` bei SPM-Aufloesung
 - **Fix:** URL auf `https://github.com/kishikawakatsumi/KeychainAccess` korrigiert
-- **Files modified:** VoiceScribe.xcodeproj/project.pbxproj
+- **Files modified:** SPRECHKRAFT.xcodeproj/project.pbxproj
 - **Commit:** b5b7938
 
 **2. [Rule 3 - Blocking] Wave-0-Stub fuer HistoryStore und HistoryEntry angelegt**
 - **Found during:** Task 2 (erster Test-Build)
 - **Issue:** HistoryStoreTests.swift referenziert `HistoryStore` und `HistoryEntry` die noch nicht existieren — Test-Target kann nicht kompilieren
-- **Fix:** `VoiceScribe/Models/HistoryStore.swift` als Wave-0-Stub angelegt (alle Methoden werfen `notImplemented`, `copyText` bereits implementiert)
-- **Files modified:** VoiceScribe/Models/HistoryStore.swift (neu), VoiceScribe.xcodeproj/project.pbxproj
+- **Fix:** `SPRECHKRAFT/Models/HistoryStore.swift` als Wave-0-Stub angelegt (alle Methoden werfen `notImplemented`, `copyText` bereits implementiert)
+- **Files modified:** SPRECHKRAFT/Models/HistoryStore.swift (neu), SPRECHKRAFT.xcodeproj/project.pbxproj
 - **Commit:** 32e02a4
 
 **3. [Rule 1 - Bug] Doppelte pbxproj-Object-ID korrigiert**
 - **Found during:** Task 2 (nach Stub-Anlage — Build-Fehler "project is damaged")
 - **Issue:** `HT060600` wurde gleichzeitig als PBXBuildFile und als PBXFileReference verwendet — fuehrt zu "unrecognized selector sent to instance"-Crash
 - **Fix:** PBXBuildFile fuer HistoryStore.swift auf neue ID `HT060603` umbenannt
-- **Files modified:** VoiceScribe.xcodeproj/project.pbxproj
+- **Files modified:** SPRECHKRAFT.xcodeproj/project.pbxproj
 - **Commit:** 32e02a4
 
 ## Self-Check: PASSED
 
-- FOUND: VoiceScribeTests/HistoryStoreTests.swift
-- FOUND: VoiceScribe/Models/HistoryStore.swift
+- FOUND: SPRECHKRAFTTests/HistoryStoreTests.swift
+- FOUND: SPRECHKRAFT/Models/HistoryStore.swift
 - FOUND: .planning/phases/06-history/06-01-SUMMARY.md
 - FOUND: commit b5b7938 (chore: GRDB SPM-Dependency)
 - FOUND: commit 32e02a4 (test: RED-Stubs)

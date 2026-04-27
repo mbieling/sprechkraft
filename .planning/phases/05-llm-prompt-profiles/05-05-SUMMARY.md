@@ -34,10 +34,10 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - VoiceScribe/AppState.swift
-    - VoiceScribe/AppDelegate.swift
-    - VoiceScribe.xcodeproj/project.pbxproj
-    - VoiceScribe.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+    - SPRECHKRAFT/AppState.swift
+    - SPRECHKRAFT/AppDelegate.swift
+    - SPRECHKRAFT.xcodeproj/project.pbxproj
+    - SPRECHKRAFT.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 
 key-decisions:
   - "KeyboardShortcuts.removeHandler(for:) statt disable(_:) zum Entfernen von onKeyDown-Callbacks — disable() deregistriert nur den Shortcut, entfernt aber nicht den Handler"
@@ -85,10 +85,10 @@ completed: 2026-04-20
 
 ## Files Created/Modified
 
-- `/Users/mbieling/claude/voice/VoiceScribe/AppState.swift` — activeProfileID + groqKeyMissing Properties hinzugefügt
-- `/Users/mbieling/claude/voice/VoiceScribe/AppDelegate.swift` — import KeychainAccess, keychain property, setupProfileHotkeys(), LLM-Routing in onRecordingComplete, Profil-Häkchen in showMenu(), setActiveProfileFromMenu Action
-- `/Users/mbieling/claude/voice/VoiceScribe.xcodeproj/project.pbxproj` — KeychainAccess als XCRemoteSwiftPackageReference (KC050500) + XCSwiftPackageProductDependency (KC050501) + packageReferences-Eintrag
-- `/Users/mbieling/claude/voice/VoiceScribe.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved` — keychainaccess@4.2.2 Pin hinzugefügt
+- `/Users/mbieling/claude/voice/SPRECHKRAFT/AppState.swift` — activeProfileID + groqKeyMissing Properties hinzugefügt
+- `/Users/mbieling/claude/voice/SPRECHKRAFT/AppDelegate.swift` — import KeychainAccess, keychain property, setupProfileHotkeys(), LLM-Routing in onRecordingComplete, Profil-Häkchen in showMenu(), setActiveProfileFromMenu Action
+- `/Users/mbieling/claude/voice/SPRECHKRAFT.xcodeproj/project.pbxproj` — KeychainAccess als XCRemoteSwiftPackageReference (KC050500) + XCSwiftPackageProductDependency (KC050501) + packageReferences-Eintrag
+- `/Users/mbieling/claude/voice/SPRECHKRAFT.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved` — keychainaccess@4.2.2 Pin hinzugefügt
 
 ## Decisions Made
 
@@ -103,7 +103,7 @@ completed: 2026-04-20
 - **Found during:** Task 2 (AppDelegate Build)
 - **Issue:** `import KeychainAccess` compilierte nicht — Package war nicht in `packageReferences` (PBXProject) registriert, obwohl `XCRemoteSwiftPackageReference` und `XCSwiftPackageProductDependency` korrekt angelegt wurden
 - **Fix:** KC050500 zu `packageReferences` im PBXProject hinzugefügt + Package.resolved mit keychainaccess@4.2.2 Pin ergänzt + originHash auf leer gesetzt damit Xcode neu berechnet
-- **Files modified:** VoiceScribe.xcodeproj/project.pbxproj, Package.resolved
+- **Files modified:** SPRECHKRAFT.xcodeproj/project.pbxproj, Package.resolved
 - **Verification:** `xcodebuild -resolvePackageDependencies` zeigt KeychainAccess in resolved source packages; BUILD SUCCEEDED
 - **Committed in:** 04288f7 (Task 2 commit)
 

@@ -1,6 +1,6 @@
 # Stack Research
 
-**Project:** VoiceScribe — macOS Menu Bar Dictation App
+**Project:** SPRECHKRAFT — macOS Menu Bar Dictation App
 **Researched:** 2026-04-15 (updated 2026-04-21: Parakeet + Settings Additions)
 **Overall confidence:** HIGH (most claims verified via Context7 official docs)
 
@@ -20,9 +20,9 @@
 
 ```swift
 @main
-struct VoiceScribeApp: App {
+struct SPRECHKRAFTApp: App {
     var body: some Scene {
-        MenuBarExtra("VoiceScribe", systemImage: "mic.fill") {
+        MenuBarExtra("SPRECHKRAFT", systemImage: "mic.fill") {
             AppMenu()
         }
     }
@@ -93,7 +93,7 @@ Bundle a minimal Python 3.12 environment (via `uv` + `python-build-standalone`) 
 
 Architecture:
 ```
-VoiceScribeApp (Swift)
+SPRECHKRAFTApp (Swift)
     ├─ writes raw PCM audio to temp WAV file
     ├─ writes WAV path as text line to subprocess stdin
     │      └─ bundled Python process (persistent daemon):
@@ -125,7 +125,7 @@ VoiceScribeApp (Swift)
 **Ziel-Layout im .app-Bundle:**
 
 ```
-VoiceScribe.app/
+SPRECHKRAFT.app/
   Contents/
     Resources/
       py-runtime/                  <- kopierte venv (Python-Binary + site-packages)
@@ -156,7 +156,7 @@ VoiceScribe.app/
 - Modell-ID: `mlx-community/parakeet-tdt-0.6b-v3`
 - Groesse: **~2.5 GB** (MLX quantisiertes Format; bestaetigt via Hugging Face Model Card)
 - 8-Bit-Variante: `animaslabs/parakeet-tdt-0.6b-v3-mlx-8bit` (kleiner, Qualitaet ungetestet)
-- Download-Strategie: **NICHT im .app-Bundle** — beim Erststart via `from_pretrained(..., cache_dir=...)` in `~/Library/Application Support/VoiceScribe/models/` laden
+- Download-Strategie: **NICHT im .app-Bundle** — beim Erststart via `from_pretrained(..., cache_dir=...)` in `~/Library/Application Support/SPRECHKRAFT/models/` laden
 - `cache_dir`-Parameter von parakeet-mlx unterstuetzt (Context7 bestaetigt)
 
 **Build-Phase-Script (Xcode Shell Script Build Phase):**
@@ -199,7 +199,7 @@ Das Python-Script laeuft als Daemon-Prozess (einmal starten, Modell laden, dann 
 import sys, json
 from parakeet_mlx import from_pretrained
 
-# cache_dir = erstes Argument (~/Library/Application Support/VoiceScribe/models/)
+# cache_dir = erstes Argument (~/Library/Application Support/SPRECHKRAFT/models/)
 model = from_pretrained("mlx-community/parakeet-tdt-0.6b-v3",
                         cache_dir=sys.argv[1])
 
@@ -224,7 +224,7 @@ class TranscriptionBridge {
             forResource: "py-runtime/bin/python3", withExtension: nil)!
         let scriptURL = Bundle.main.url(
             forResource: "transcribe", withExtension: "py")!
-        let modelCacheDir = /* ~/Library/Application Support/VoiceScribe/models */
+        let modelCacheDir = /* ~/Library/Application Support/SPRECHKRAFT/models */
 
         process.executableURL = pythonURL
         process.arguments = [scriptURL.path, modelCacheDir]

@@ -10,28 +10,28 @@
 
 | New/Modified File | Role | Data Flow | Closest Analog | Match Quality |
 |---|---|---|---|---|
-| `VoiceScribe/Models/PromptProfile.swift` | model | CRUD | `VoiceScribe/Extensions/Defaults+Keys.swift` (OutputMode-Enum) | role-match |
-| `VoiceScribe/Services/GroqService.swift` | service | request-response | `VoiceScribe/Transcription/TranscriptionService.swift` | role-match |
-| `VoiceScribe/Extensions/Defaults+Keys.swift` | config | — | sich selbst (Erweiterung) | exact |
-| `VoiceScribe/Extensions/KeyboardShortcuts+Names.swift` | config | event-driven | sich selbst (Erweiterung) | exact |
-| `VoiceScribe/Views/SettingsView.swift` | component | request-response | sich selbst (Erweiterung) | exact |
-| `VoiceScribe/Views/ProfileEditorSheet.swift` | component | CRUD | `VoiceScribe/Views/SettingsView.swift` | role-match |
-| `VoiceScribe/AppDelegate.swift` | controller | event-driven | sich selbst (Erweiterung) | exact |
-| `VoiceScribe/AppState.swift` | store | — | sich selbst (Erweiterung) | exact |
-| `VoiceScribeTests/PromptProfileTests.swift` | test | — | `VoiceScribeTests/DefaultsKeysTests.swift` | exact |
-| `VoiceScribeTests/GroqServiceTests.swift` | test | — | `VoiceScribeTests/TranscriptionServiceTests.swift` | role-match |
+| `SPRECHKRAFT/Models/PromptProfile.swift` | model | CRUD | `SPRECHKRAFT/Extensions/Defaults+Keys.swift` (OutputMode-Enum) | role-match |
+| `SPRECHKRAFT/Services/GroqService.swift` | service | request-response | `SPRECHKRAFT/Transcription/TranscriptionService.swift` | role-match |
+| `SPRECHKRAFT/Extensions/Defaults+Keys.swift` | config | — | sich selbst (Erweiterung) | exact |
+| `SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift` | config | event-driven | sich selbst (Erweiterung) | exact |
+| `SPRECHKRAFT/Views/SettingsView.swift` | component | request-response | sich selbst (Erweiterung) | exact |
+| `SPRECHKRAFT/Views/ProfileEditorSheet.swift` | component | CRUD | `SPRECHKRAFT/Views/SettingsView.swift` | role-match |
+| `SPRECHKRAFT/AppDelegate.swift` | controller | event-driven | sich selbst (Erweiterung) | exact |
+| `SPRECHKRAFT/AppState.swift` | store | — | sich selbst (Erweiterung) | exact |
+| `SPRECHKRAFTTests/PromptProfileTests.swift` | test | — | `SPRECHKRAFTTests/DefaultsKeysTests.swift` | exact |
+| `SPRECHKRAFTTests/GroqServiceTests.swift` | test | — | `SPRECHKRAFTTests/TranscriptionServiceTests.swift` | role-match |
 
 ---
 
 ## Pattern Assignments
 
-### `VoiceScribe/Models/PromptProfile.swift` (model, CRUD)
+### `SPRECHKRAFT/Models/PromptProfile.swift` (model, CRUD)
 
-**Analog:** `VoiceScribe/Extensions/Defaults+Keys.swift` — OutputMode als `Defaults.Serializable`
+**Analog:** `SPRECHKRAFT/Extensions/Defaults+Keys.swift` — OutputMode als `Defaults.Serializable`
 
 **Imports-Pattern** (Defaults+Keys.swift Zeilen 1–8):
 ```swift
-// VoiceScribe/Extensions/Defaults+Keys.swift
+// SPRECHKRAFT/Extensions/Defaults+Keys.swift
 import Defaults
 ```
 Neue Datei braucht zusätzlich `Foundation` (für UUID).
@@ -81,9 +81,9 @@ unter dem Key `"profile-\(id.uuidString)"` in UserDefaults (RESEARCH.md Zeile 23
 
 ---
 
-### `VoiceScribe/Services/GroqService.swift` (service, request-response)
+### `SPRECHKRAFT/Services/GroqService.swift` (service, request-response)
 
-**Analog:** `VoiceScribe/Transcription/TranscriptionService.swift` — async actor für
+**Analog:** `SPRECHKRAFT/Transcription/TranscriptionService.swift` — async actor für
 externe Verarbeitung (Netzwerk statt Python-Subprocess; gleiches Concurrency-Muster)
 
 **Imports-Pattern** (TranscriptionService — actor-Deklaration, Concurrency):
@@ -191,7 +191,7 @@ Task {
 
 ---
 
-### `VoiceScribe/Extensions/Defaults+Keys.swift` (config, Erweiterung)
+### `SPRECHKRAFT/Extensions/Defaults+Keys.swift` (config, Erweiterung)
 
 **Analog:** sich selbst — neuer Key nach demselben Schema
 
@@ -220,7 +220,7 @@ in `AppState` (nie zwischen App-Starts persistent, immer nil beim Start).
 
 ---
 
-### `VoiceScribe/Extensions/KeyboardShortcuts+Names.swift` (config, Erweiterung)
+### `SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift` (config, Erweiterung)
 
 **Analog:** sich selbst — neue dynamische Name-Hilfsfunktion nach demselben Schema
 
@@ -258,7 +258,7 @@ für benutzer-erstellte Profile).
 
 ---
 
-### `VoiceScribe/Views/SettingsView.swift` (component, Erweiterung)
+### `SPRECHKRAFT/Views/SettingsView.swift` (component, Erweiterung)
 
 **Analog:** sich selbst — neue Section nach dem Form-Section-Pattern
 
@@ -319,9 +319,9 @@ KeyboardShortcuts.Recorder("Aktivierungs-Hotkey", name: .profile(profile.id))
 
 ---
 
-### `VoiceScribe/Views/ProfileEditorSheet.swift` (component, CRUD)
+### `SPRECHKRAFT/Views/ProfileEditorSheet.swift` (component, CRUD)
 
-**Analog:** `VoiceScribe/Views/SettingsView.swift` — SwiftUI Form mit Sections,
+**Analog:** `SPRECHKRAFT/Views/SettingsView.swift` — SwiftUI Form mit Sections,
 @Default Bindings, KeyboardShortcuts.Recorder, Permission-Banner-Struktur
 
 **Imports-Pattern** (SettingsView.swift Zeilen 9–13 — identisch):
@@ -375,7 +375,7 @@ Button("Profil löschen", role: .destructive) { onDelete?() }
 
 ---
 
-### `VoiceScribe/AppDelegate.swift` (controller, Erweiterung)
+### `SPRECHKRAFT/AppDelegate.swift` (controller, Erweiterung)
 
 **Analog:** sich selbst — neue MARK-Sections nach dem Muster der bestehenden Sections
 
@@ -452,7 +452,7 @@ setupProfileHotkeys()
 
 ---
 
-### `VoiceScribe/AppState.swift` (store, Erweiterung)
+### `SPRECHKRAFT/AppState.swift` (store, Erweiterung)
 
 **Analog:** sich selbst — neue Properties nach dem Muster der bestehenden bool-Properties
 
@@ -487,9 +487,9 @@ var groqKeyMissing: Bool = false
 
 ---
 
-### `VoiceScribeTests/PromptProfileTests.swift` (test, CRUD)
+### `SPRECHKRAFTTests/PromptProfileTests.swift` (test, CRUD)
 
-**Analog:** `VoiceScribeTests/DefaultsKeysTests.swift` — Swift Testing @Suite/@Test,
+**Analog:** `SPRECHKRAFTTests/DefaultsKeysTests.swift` — Swift Testing @Suite/@Test,
 Defaults-Key-Prüfungen, @testable import
 
 **Test-Datei-Grundstruktur** (DefaultsKeysTests.swift Zeilen 1–12):
@@ -497,7 +497,7 @@ Defaults-Key-Prüfungen, @testable import
 import Testing
 import Defaults
 import KeyboardShortcuts    // falls Hotkey-Tests enthalten
-@testable import VoiceScribe
+@testable import SPRECHKRAFT
 
 @Suite("Prompt Profile (PROF-01, PROF-03, PROF-04)")
 struct PromptProfileTests {
@@ -537,16 +537,16 @@ func testProfilesDefaultKey() {
 
 ---
 
-### `VoiceScribeTests/GroqServiceTests.swift` (test, request-response)
+### `SPRECHKRAFTTests/GroqServiceTests.swift` (test, request-response)
 
-**Analog:** `VoiceScribeTests/TranscriptionServiceTests.swift` — async Tests für
+**Analog:** `SPRECHKRAFTTests/TranscriptionServiceTests.swift` — async Tests für
 Service-Actor, Guard-Logik, Nil-Rückgaben
 
 **Test-Datei-Grundstruktur** (TranscriptionServiceTests.swift Zeilen 1–11):
 ```swift
 import Testing
 import AVFoundation     // → stattdessen: keine Extra-Imports nötig außer Foundation implizit
-@testable import VoiceScribe
+@testable import SPRECHKRAFT
 
 @Suite("GroqService (PROF-05, SET-01)")
 struct GroqServiceTests {
@@ -582,7 +582,7 @@ func testNonThinkingRequest() throws {
 
 ### Permission-Banner (rot, systemRed)
 
-**Quelle:** `VoiceScribe/SettingsView.swift` Zeilen 119–145 (axPermissionDenied-Banner)
+**Quelle:** `SPRECHKRAFT/SettingsView.swift` Zeilen 119–145 (axPermissionDenied-Banner)
 **Anwenden auf:** Groq-API-Key-Banner in SettingsView (groqKeyMissing)
 
 ```swift
@@ -612,7 +612,7 @@ if appState?.axPermissionDenied == true {
 
 ### Swift 6 Strict Concurrency: Task + MainActor.run
 
-**Quelle:** `VoiceScribe/AppDelegate.swift` Zeilen 76–93 (onRecordingComplete)
+**Quelle:** `SPRECHKRAFT/AppDelegate.swift` Zeilen 76–93 (onRecordingComplete)
 **Anwenden auf:** GroqService-Aufruf in AppDelegate, alle AppState-Mutationen aus Tasks
 
 ```swift
@@ -629,7 +629,7 @@ Task {
 
 ### Defaults.Key Extension
 
-**Quelle:** `VoiceScribe/Extensions/Defaults+Keys.swift` Zeilen 18–30
+**Quelle:** `SPRECHKRAFT/Extensions/Defaults+Keys.swift` Zeilen 18–30
 **Anwenden auf:** `profiles`-Key in derselben Datei
 
 ```swift
@@ -640,7 +640,7 @@ extension Defaults.Keys {
 
 ### KeyboardShortcuts.onKeyUp / onKeyDown mit [weak self]
 
-**Quelle:** `VoiceScribe/AppDelegate.swift` Zeilen 281–291
+**Quelle:** `SPRECHKRAFT/AppDelegate.swift` Zeilen 281–291
 **Anwenden auf:** `setupProfileHotkeys()` — gleiche Struktur, aber `onKeyDown` statt `onKeyUp`
 
 ```swift
@@ -654,7 +654,7 @@ KeyboardShortcuts.onKeyUp(for: .toggleRecording) { [weak self] in
 
 ### Observation-B: manuelle updateIcon() nach State-Mutation
 
-**Quelle:** `VoiceScribe/AppDelegate.swift` Zeilen 108–113, 122–126
+**Quelle:** `SPRECHKRAFT/AppDelegate.swift` Zeilen 108–113, 122–126
 **Anwenden auf:** Jede Stelle in Phase 5 wo `appState?.recordingState` geändert wird
 
 ```swift
@@ -668,13 +668,13 @@ updateIcon()
 
 ### Swift Testing @Suite / @Test / #expect
 
-**Quelle:** `VoiceScribeTests/DefaultsKeysTests.swift` Zeilen 13–60
+**Quelle:** `SPRECHKRAFTTests/DefaultsKeysTests.swift` Zeilen 13–60
 **Anwenden auf:** Alle neuen Test-Dateien — identischer Import-Block, @Suite-Struktur
 
 ```swift
 import Testing
 import Defaults
-@testable import VoiceScribe
+@testable import SPRECHKRAFT
 
 @Suite("Thema (REQ-ID)")
 struct XyzTests {
@@ -695,6 +695,6 @@ Alle zehn Dateien haben einen Analog. Keine Datei ohne Vorlage.
 
 ## Metadata
 
-**Analog search scope:** `VoiceScribe/`, `VoiceScribeTests/`
+**Analog search scope:** `SPRECHKRAFT/`, `SPRECHKRAFTTests/`
 **Files scanned:** 12 Quelldateien + 8 Testdateien
 **Pattern extraction date:** 2026-04-19

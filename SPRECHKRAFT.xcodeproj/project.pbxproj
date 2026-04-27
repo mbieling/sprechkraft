@@ -1,0 +1,739 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AA000001 /* SPRECHKRAFTApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002 /* SPRECHKRAFTApp.swift */; };
+		AA000010 /* RecordingStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000011 /* RecordingStateTests.swift */; };
+		AA000012 /* AppStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000013 /* AppStateTests.swift */; };
+		AA000014 /* HotkeyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000015 /* HotkeyTests.swift */; };
+		AA000016 /* AudioControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000017 /* AudioControllerTests.swift */; };
+		AA000018 /* DefaultsKeysTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000019 /* DefaultsKeysTests.swift */; };
+		AA000020 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = AA000021 /* KeyboardShortcuts */; };
+		AA000022 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = AA000023 /* LaunchAtLogin */; };
+		AA000024 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = AA000025 /* Defaults */; };
+		AA000026 /* WaveformViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000027 /* WaveformViewTests.swift */; };
+		AA000200 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000201 /* AppState.swift */; };
+		AA000202 /* StatusBarIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000203 /* StatusBarIconView.swift */; };
+		AA000204 /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000205 /* DesignTokens.swift */; };
+		AA000207 /* KeyboardShortcuts+Names.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000208 /* KeyboardShortcuts+Names.swift */; };
+		AA000210 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000211 /* SettingsView.swift */; };
+		AA000212 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000213 /* AppDelegate.swift */; };
+		AA000214 /* Defaults+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000215 /* Defaults+Keys.swift */; };
+		AA000216 /* AudioController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000217 /* AudioController.swift */; };
+		AA000218 /* AudioDeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000219 /* AudioDeviceManager.swift */; };
+		BB040201 /* TextOutputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB040200 /* TextOutputService.swift */; };
+		BB040231 /* TextOutputServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB040232 /* TextOutputServiceTests.swift */; };
+		CAFE0030 /* TranscriptionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE0029 /* TranscriptionServiceTests.swift */; };
+		DDABE8382F9DFA590040E3E7 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = KC050501 /* KeychainAccess */; };
+		DDABE8392F9DFA590040E3E7 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = GR060601 /* GRDB */; };
+		DEAD0220 /* TranscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEAD0221 /* TranscriptionService.swift */; };
+		FA070700 /* FluidAudio in Frameworks */ = {isa = PBXBuildFile; productRef = FA070701 /* FluidAudio */; };
+		GS050400 /* GroqService.swift in Sources */ = {isa = PBXBuildFile; fileRef = GS050401 /* GroqService.swift */; };
+		GS050402 /* GroqServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = GS050403 /* GroqServiceTests.swift */; };
+		GS050404 /* GroqServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = GS050405 /* GroqServiceProtocol.swift */; };
+		HT060601 /* HistoryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = HT060600 /* HistoryStoreTests.swift */; };
+		HT060603 /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = HT060602 /* HistoryStore.swift */; };
+		HT060611 /* HistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = HT060610 /* HistoryEntry.swift */; };
+		HT060613 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HT060612 /* HistoryView.swift */; };
+		ONB08001 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ONB08002 /* OnboardingView.swift */; };
+		PB070803 /* ParakeetBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = PB070802 /* ParakeetBackend.swift */; };
+		PE050600 /* ProfileEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = PE050601 /* ProfileEditorSheet.swift */; };
+		PP050100 /* PromptProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = PP050101 /* PromptProfileTests.swift */; };
+		PP050300 /* PromptProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = PP050301 /* PromptProfile.swift */; };
+		TB070801 /* TranscriptionBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = TB070800 /* TranscriptionBackend.swift */; };
+		WK070805 /* WhisperKitBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK070804 /* WhisperKitBackend.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AA000081 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA000090 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA000050;
+			remoteInfo = SPRECHKRAFT;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		AA000002 /* SPRECHKRAFTApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SPRECHKRAFTApp.swift; sourceTree = "<group>"; };
+		AA000003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA000004 /* SPRECHKRAFT.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SPRECHKRAFT.entitlements; sourceTree = "<group>"; };
+		AA000005 /* SPRECHKRAFT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SPRECHKRAFT.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000006 /* SPRECHKRAFTTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SPRECHKRAFTTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000011 /* RecordingStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingStateTests.swift; sourceTree = "<group>"; };
+		AA000013 /* AppStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateTests.swift; sourceTree = "<group>"; };
+		AA000015 /* HotkeyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyTests.swift; sourceTree = "<group>"; };
+		AA000017 /* AudioControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioControllerTests.swift; sourceTree = "<group>"; };
+		AA000019 /* DefaultsKeysTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultsKeysTests.swift; sourceTree = "<group>"; };
+		AA000027 /* WaveformViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformViewTests.swift; sourceTree = "<group>"; };
+		AA000201 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		AA000203 /* StatusBarIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarIconView.swift; sourceTree = "<group>"; };
+		AA000205 /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
+		AA000208 /* KeyboardShortcuts+Names.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyboardShortcuts+Names.swift"; sourceTree = "<group>"; };
+		AA000211 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AA000213 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		AA000215 /* Defaults+Keys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Defaults+Keys.swift"; sourceTree = "<group>"; };
+		AA000217 /* AudioController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioController.swift; sourceTree = "<group>"; };
+		AA000219 /* AudioDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDeviceManager.swift; sourceTree = "<group>"; };
+		BB040200 /* TextOutputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOutputService.swift; sourceTree = "<group>"; };
+		BB040232 /* TextOutputServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOutputServiceTests.swift; sourceTree = "<group>"; };
+		CAFE0029 /* TranscriptionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionServiceTests.swift; sourceTree = "<group>"; };
+		DEAD0221 /* TranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionService.swift; sourceTree = "<group>"; };
+		GS050401 /* GroqService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqService.swift; sourceTree = "<group>"; };
+		GS050403 /* GroqServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqServiceTests.swift; sourceTree = "<group>"; };
+		GS050405 /* GroqServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqServiceProtocol.swift; sourceTree = "<group>"; };
+		HT060600 /* HistoryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStoreTests.swift; sourceTree = "<group>"; };
+		HT060602 /* HistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
+		HT060610 /* HistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntry.swift; sourceTree = "<group>"; };
+		HT060612 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		ONB08002 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		PB070802 /* ParakeetBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParakeetBackend.swift; sourceTree = "<group>"; };
+		PE050601 /* ProfileEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditorSheet.swift; sourceTree = "<group>"; };
+		PP050101 /* PromptProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptProfileTests.swift; sourceTree = "<group>"; };
+		PP050301 /* PromptProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptProfile.swift; sourceTree = "<group>"; };
+		TB070800 /* TranscriptionBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionBackend.swift; sourceTree = "<group>"; };
+		WK070804 /* WhisperKitBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperKitBackend.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AA000030 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DDABE8392F9DFA590040E3E7 /* GRDB in Frameworks */,
+				DDABE8382F9DFA590040E3E7 /* KeychainAccess in Frameworks */,
+				AA000020 /* KeyboardShortcuts in Frameworks */,
+				AA000022 /* LaunchAtLogin in Frameworks */,
+				AA000024 /* Defaults in Frameworks */,
+				FA070700 /* FluidAudio in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA000031 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AA000040 /* SPRECHKRAFT */ = {
+			isa = PBXGroup;
+			children = (
+				AA000002 /* SPRECHKRAFTApp.swift */,
+				AA000213 /* AppDelegate.swift */,
+				AA000201 /* AppState.swift */,
+				AA000203 /* StatusBarIconView.swift */,
+				AA000211 /* SettingsView.swift */,
+				ONB08002 /* OnboardingView.swift */,
+				PE050601 /* ProfileEditorSheet.swift */,
+				AA000220 /* Audio */,
+				DEAD0222 /* Transcription */,
+				BB040230 /* TextOutput */,
+				GS050410 /* Services */,
+				PP050302 /* Models */,
+				HT060620 /* History */,
+				AA000206 /* Constants */,
+				AA000209 /* Extensions */,
+				AA000003 /* Info.plist */,
+				AA000004 /* SPRECHKRAFT.entitlements */,
+			);
+			path = SPRECHKRAFT;
+			sourceTree = "<group>";
+		};
+		AA000041 /* SPRECHKRAFTTests */ = {
+			isa = PBXGroup;
+			children = (
+				AA000011 /* RecordingStateTests.swift */,
+				AA000013 /* AppStateTests.swift */,
+				AA000015 /* HotkeyTests.swift */,
+				AA000017 /* AudioControllerTests.swift */,
+				AA000019 /* DefaultsKeysTests.swift */,
+				AA000027 /* WaveformViewTests.swift */,
+				CAFE0029 /* TranscriptionServiceTests.swift */,
+				BB040232 /* TextOutputServiceTests.swift */,
+				PP050101 /* PromptProfileTests.swift */,
+				GS050403 /* GroqServiceTests.swift */,
+				HT060600 /* HistoryStoreTests.swift */,
+			);
+			path = SPRECHKRAFTTests;
+			sourceTree = "<group>";
+		};
+		AA000042 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AA000005 /* SPRECHKRAFT.app */,
+				AA000006 /* SPRECHKRAFTTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AA000043 = {
+			isa = PBXGroup;
+			children = (
+				AA000040 /* SPRECHKRAFT */,
+				AA000041 /* SPRECHKRAFTTests */,
+				AA000042 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AA000206 /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+				AA000205 /* DesignTokens.swift */,
+			);
+			path = Constants;
+			sourceTree = "<group>";
+		};
+		AA000209 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				AA000208 /* KeyboardShortcuts+Names.swift */,
+				AA000215 /* Defaults+Keys.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		AA000220 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				AA000217 /* AudioController.swift */,
+				AA000219 /* AudioDeviceManager.swift */,
+			);
+			path = Audio;
+			sourceTree = "<group>";
+		};
+		BB040230 /* TextOutput */ = {
+			isa = PBXGroup;
+			children = (
+				BB040200 /* TextOutputService.swift */,
+			);
+			path = TextOutput;
+			sourceTree = "<group>";
+		};
+		DEAD0222 /* Transcription */ = {
+			isa = PBXGroup;
+			children = (
+				TB070800 /* TranscriptionBackend.swift */,
+				DEAD0221 /* TranscriptionService.swift */,
+				PB070802 /* ParakeetBackend.swift */,
+				WK070804 /* WhisperKitBackend.swift */,
+			);
+			path = Transcription;
+			sourceTree = "<group>";
+		};
+		GS050410 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				GS050401 /* GroqService.swift */,
+				GS050405 /* GroqServiceProtocol.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		HT060620 /* History */ = {
+			isa = PBXGroup;
+			children = (
+				HT060610 /* HistoryEntry.swift */,
+				HT060602 /* HistoryStore.swift */,
+				HT060612 /* HistoryView.swift */,
+			);
+			path = History;
+			sourceTree = "<group>";
+		};
+		PP050302 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				PP050301 /* PromptProfile.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AA000050 /* SPRECHKRAFT */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA000060 /* Build configuration list for PBXNativeTarget "SPRECHKRAFT" */;
+			buildPhases = (
+				AA000070 /* Sources */,
+				AA000030 /* Frameworks */,
+				AA000071 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SPRECHKRAFT;
+			packageProductDependencies = (
+				AA000021 /* KeyboardShortcuts */,
+				AA000023 /* LaunchAtLogin */,
+				AA000025 /* Defaults */,
+				KC050501 /* KeychainAccess */,
+				GR060601 /* GRDB */,
+				FA070701 /* FluidAudio */,
+			);
+			productName = SPRECHKRAFT;
+			productReference = AA000005 /* SPRECHKRAFT.app */;
+			productType = "com.apple.product-type.application";
+		};
+		AA000051 /* SPRECHKRAFTTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA000061 /* Build configuration list for PBXNativeTarget "SPRECHKRAFTTests" */;
+			buildPhases = (
+				AA000072 /* Sources */,
+				AA000031 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AA000080 /* PBXTargetDependency */,
+			);
+			name = SPRECHKRAFTTests;
+			productName = SPRECHKRAFTTests;
+			productReference = AA000006 /* SPRECHKRAFTTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AA000090 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1700;
+				LastUpgradeCheck = 2640;
+				TargetAttributes = {
+					AA000050 = {
+						CreatedOnToolsVersion = 17.0;
+					};
+					AA000051 = {
+						CreatedOnToolsVersion = 17.0;
+						TestTargetID = AA000050;
+					};
+				};
+			};
+			buildConfigurationList = AA000062 /* Build configuration list for PBXProject "SPRECHKRAFT" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = de;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				de,
+				en,
+				Base,
+			);
+			mainGroup = AA000043;
+			packageReferences = (
+				AA000100 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				AA000101 /* XCRemoteSwiftPackageReference "LaunchAtLogin-modern" */,
+				AA000102 /* XCRemoteSwiftPackageReference "Defaults" */,
+				KC050500 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				GR060600 /* XCRemoteSwiftPackageReference "GRDB" */,
+				FA070702 /* XCRemoteSwiftPackageReference "FluidAudio" */,
+			);
+			productRefGroup = AA000042 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AA000050 /* SPRECHKRAFT */,
+				AA000051 /* SPRECHKRAFTTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AA000071 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AA000070 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000001 /* SPRECHKRAFTApp.swift in Sources */,
+				AA000200 /* AppState.swift in Sources */,
+				AA000202 /* StatusBarIconView.swift in Sources */,
+				AA000204 /* DesignTokens.swift in Sources */,
+				AA000207 /* KeyboardShortcuts+Names.swift in Sources */,
+				AA000214 /* Defaults+Keys.swift in Sources */,
+				AA000216 /* AudioController.swift in Sources */,
+				AA000218 /* AudioDeviceManager.swift in Sources */,
+				DEAD0220 /* TranscriptionService.swift in Sources */,
+				TB070801 /* TranscriptionBackend.swift in Sources */,
+				PB070803 /* ParakeetBackend.swift in Sources */,
+				WK070805 /* WhisperKitBackend.swift in Sources */,
+				BB040201 /* TextOutputService.swift in Sources */,
+				PP050300 /* PromptProfile.swift in Sources */,
+				HT060603 /* HistoryStore.swift in Sources */,
+				HT060611 /* HistoryEntry.swift in Sources */,
+				HT060613 /* HistoryView.swift in Sources */,
+				GS050400 /* GroqService.swift in Sources */,
+				GS050404 /* GroqServiceProtocol.swift in Sources */,
+				AA000210 /* SettingsView.swift in Sources */,
+				ONB08001 /* OnboardingView.swift in Sources */,
+				AA000212 /* AppDelegate.swift in Sources */,
+				PE050600 /* ProfileEditorSheet.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA000072 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000010 /* RecordingStateTests.swift in Sources */,
+				AA000012 /* AppStateTests.swift in Sources */,
+				AA000014 /* HotkeyTests.swift in Sources */,
+				AA000016 /* AudioControllerTests.swift in Sources */,
+				AA000018 /* DefaultsKeysTests.swift in Sources */,
+				AA000026 /* WaveformViewTests.swift in Sources */,
+				CAFE0030 /* TranscriptionServiceTests.swift in Sources */,
+				BB040231 /* TextOutputServiceTests.swift in Sources */,
+				PP050100 /* PromptProfileTests.swift in Sources */,
+				GS050402 /* GroqServiceTests.swift in Sources */,
+				HT060601 /* HistoryStoreTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AA000080 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA000050 /* SPRECHKRAFT */;
+			targetProxy = AA000081 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		AA000063 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+			};
+			name = Debug;
+		};
+		AA000064 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+			};
+			name = Release;
+		};
+		AA000065 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SPRECHKRAFT/SPRECHKRAFT.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SPRECHKRAFT/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sprechkraft.app;
+				PRODUCT_NAME = SPRECHKRAFT;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		AA000066 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SPRECHKRAFT/SPRECHKRAFT.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SPRECHKRAFT/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sprechkraft.app;
+				PRODUCT_NAME = SPRECHKRAFT;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		AA000067 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sprechkraft.app.tests;
+				PRODUCT_NAME = SPRECHKRAFTTests;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SPRECHKRAFT.app/Contents/MacOS/SPRECHKRAFT";
+			};
+			name = Debug;
+		};
+		AA000068 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sprechkraft.app.tests;
+				PRODUCT_NAME = SPRECHKRAFTTests;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SPRECHKRAFT.app/Contents/MacOS/SPRECHKRAFT";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AA000060 /* Build configuration list for PBXNativeTarget "SPRECHKRAFT" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA000065 /* Debug */,
+				AA000066 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA000061 /* Build configuration list for PBXNativeTarget "SPRECHKRAFTTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA000067 /* Debug */,
+				AA000068 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA000062 /* Build configuration list for PBXProject "SPRECHKRAFT" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA000063 /* Debug */,
+				AA000064 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AA000100 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+		AA000101 /* XCRemoteSwiftPackageReference "LaunchAtLogin-modern" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-modern";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		AA000102 /* XCRemoteSwiftPackageReference "Defaults" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/Defaults";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		FA070702 /* XCRemoteSwiftPackageReference "FluidAudio" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/FluidInference/FluidAudio";
+			requirement = {
+				kind = exactVersion;
+				version = 0.12.6;
+			};
+		};
+		GR060600 /* XCRemoteSwiftPackageReference "GRDB" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/groue/GRDB.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.5.0;
+			};
+		};
+		KC050500 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AA000021 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA000100 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
+		AA000023 /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA000101 /* XCRemoteSwiftPackageReference "LaunchAtLogin-modern" */;
+			productName = LaunchAtLogin;
+		};
+		AA000025 /* Defaults */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA000102 /* XCRemoteSwiftPackageReference "Defaults" */;
+			productName = Defaults;
+		};
+		FA070701 /* FluidAudio */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FA070702 /* XCRemoteSwiftPackageReference "FluidAudio" */;
+			productName = FluidAudio;
+		};
+		GR060601 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = GR060600 /* XCRemoteSwiftPackageReference "GRDB" */;
+			productName = GRDB;
+		};
+		KC050501 /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = KC050500 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = AA000090 /* Project object */;
+}

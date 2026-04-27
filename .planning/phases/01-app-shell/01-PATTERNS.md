@@ -21,20 +21,20 @@ Der Planner soll die unten dokumentierten Muster direkt in Implementierungsschri
 
 | Neu zu erstellende Datei | Rolle | Data Flow | Analog | Match-Qualität |
 |--------------------------|-------|-----------|--------|----------------|
-| `VoiceScribe/VoiceScribeApp.swift` | app-entry | event-driven | — | kein Analog (Greenfield) |
-| `VoiceScribe/AppDelegate.swift` | controller | event-driven | — | kein Analog (Greenfield) |
-| `VoiceScribe/AppState.swift` | store | event-driven | — | kein Analog (Greenfield) |
-| `VoiceScribe/StatusBarIconView.swift` | component | event-driven | — | kein Analog (Greenfield) |
-| `VoiceScribe/SettingsView.swift` | component | request-response | — | kein Analog (Greenfield) |
-| `VoiceScribe/Extensions/KeyboardShortcuts+Names.swift` | utility | — | — | kein Analog (Greenfield) |
-| `VoiceScribe/Constants/DesignTokens.swift` | config | — | — | kein Analog (Greenfield) |
-| `VoiceScribe/Info.plist` | config | — | — | kein Analog (Greenfield) |
+| `SPRECHKRAFT/SPRECHKRAFTApp.swift` | app-entry | event-driven | — | kein Analog (Greenfield) |
+| `SPRECHKRAFT/AppDelegate.swift` | controller | event-driven | — | kein Analog (Greenfield) |
+| `SPRECHKRAFT/AppState.swift` | store | event-driven | — | kein Analog (Greenfield) |
+| `SPRECHKRAFT/StatusBarIconView.swift` | component | event-driven | — | kein Analog (Greenfield) |
+| `SPRECHKRAFT/SettingsView.swift` | component | request-response | — | kein Analog (Greenfield) |
+| `SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift` | utility | — | — | kein Analog (Greenfield) |
+| `SPRECHKRAFT/Constants/DesignTokens.swift` | config | — | — | kein Analog (Greenfield) |
+| `SPRECHKRAFT/Info.plist` | config | — | — | kein Analog (Greenfield) |
 
 ---
 
 ## Pattern-Zuweisungen
 
-### `VoiceScribe/VoiceScribeApp.swift` (app-entry, event-driven)
+### `SPRECHKRAFT/SPRECHKRAFTApp.swift` (app-entry, event-driven)
 
 **Analog:** kein Codebase-Analog — Greenfield
 **Quelle:** Apple Developer Documentation (`NSApplicationDelegateAdaptor`) + RESEARCH.md Pattern 1
@@ -49,7 +49,7 @@ import AppKit
 ```swift
 // Quelle: RESEARCH.md Pattern 1 (verifiziert via Apple Docs + steipete.me)
 @main
-struct VoiceScribeApp: App {
+struct SPRECHKRAFTApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @State private var appState = AppState()
 
@@ -74,7 +74,7 @@ struct VoiceScribeApp: App {
         .defaultSize(width: 1, height: 1)
 
         // Einstellungsfenster
-        Window("VoiceScribe — Einstellungen", id: "settings") {
+        Window("SPRECHKRAFT — Einstellungen", id: "settings") {
             SettingsView()
                 .frame(minWidth: 400, minHeight: 300)
         }
@@ -87,7 +87,7 @@ struct VoiceScribeApp: App {
 
 ---
 
-### `VoiceScribe/AppDelegate.swift` (controller, event-driven)
+### `SPRECHKRAFT/AppDelegate.swift` (controller, event-driven)
 
 **Analog:** kein Codebase-Analog — Greenfield
 **Quelle:** RESEARCH.md Pattern 1 + Code Examples (verifiziert via medium.com/@clyapp + polpiella.dev)
@@ -137,7 +137,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showMenu() {
         let menu = NSMenu()
-        let titleItem = NSMenuItem(title: "VoiceScribe", action: nil, keyEquivalent: "")
+        let titleItem = NSMenuItem(title: "SPRECHKRAFT", action: nil, keyEquivalent: "")
         titleItem.isEnabled = false
         menu.addItem(titleItem)
         menu.addItem(.separator())
@@ -205,7 +205,7 @@ private func setupHotkey() {
 
 ---
 
-### `VoiceScribe/AppState.swift` (store, event-driven)
+### `SPRECHKRAFT/AppState.swift` (store, event-driven)
 
 **Analog:** kein Codebase-Analog — Greenfield
 **Quelle:** RESEARCH.md Pattern 2 (Swift 6 Observation framework)
@@ -248,10 +248,10 @@ enum RecordingState: Equatable {
     // UI-SPEC Accessibility Contract
     var accessibilityLabel: String {
         switch self {
-        case .idle:          return "VoiceScribe — Bereit"
-        case .recording:     return "VoiceScribe — Aufnahme läuft"
-        case .transcribing:  return "VoiceScribe — Transkribiert"
-        case .llmProcessing: return "VoiceScribe — KI verarbeitet"
+        case .idle:          return "SPRECHKRAFT — Bereit"
+        case .recording:     return "SPRECHKRAFT — Aufnahme läuft"
+        case .transcribing:  return "SPRECHKRAFT — Transkribiert"
+        case .llmProcessing: return "SPRECHKRAFT — KI verarbeitet"
         }
     }
 }
@@ -278,7 +278,7 @@ final class AppState {
 
 ---
 
-### `VoiceScribe/StatusBarIconView.swift` (component, event-driven)
+### `SPRECHKRAFT/StatusBarIconView.swift` (component, event-driven)
 
 **Analog:** kein Codebase-Analog — Greenfield
 **Quelle:** RESEARCH.md Pattern 3 (NSHostingView + SwiftUI Animations)
@@ -323,7 +323,7 @@ struct StatusBarIconView: View {
 
 ---
 
-### `VoiceScribe/SettingsView.swift` (component, request-response)
+### `SPRECHKRAFT/SettingsView.swift` (component, request-response)
 
 **Analog:** kein Codebase-Analog — Greenfield
 **Quelle:** RESEARCH.md Pattern 1 (Window-Scene), UI-SPEC Einstellungsfenster Contract
@@ -335,7 +335,7 @@ import SwiftUI
 
 **Kern-Pattern — Placeholder-Fenster:**
 ```swift
-// UI-SPEC: Fenster-Titel "VoiceScribe — Einstellungen" (Em-Dash, macOS-Konvention)
+// UI-SPEC: Fenster-Titel "SPRECHKRAFT — Einstellungen" (Em-Dash, macOS-Konvention)
 // UI-SPEC: Mindestgröße 400×300 pt
 // UI-SPEC: Copywriting "Einstellungen folgen in weiteren Phasen."
 struct SettingsView: View {
@@ -351,11 +351,11 @@ struct SettingsView: View {
 }
 ```
 
-**Fenster-Bindung:** Die `minWidth/minHeight`-Constraint wird im `Window`-Scene in VoiceScribeApp.swift gesetzt (`.frame(minWidth: 400, minHeight: 300)`), nicht in der View selbst.
+**Fenster-Bindung:** Die `minWidth/minHeight`-Constraint wird im `Window`-Scene in SPRECHKRAFTApp.swift gesetzt (`.frame(minWidth: 400, minHeight: 300)`), nicht in der View selbst.
 
 ---
 
-### `VoiceScribe/Extensions/KeyboardShortcuts+Names.swift` (utility)
+### `SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift` (utility)
 
 **Analog:** kein Codebase-Analog — Greenfield
 **Quelle:** RESEARCH.md Pattern 4 (KeyboardShortcuts readme.md)
@@ -364,7 +364,7 @@ struct SettingsView: View {
 ```swift
 // Quelle: https://github.com/sindresorhus/keyboardshortcuts/blob/main/readme.md
 // HINWEIS: initial: Parameter ist nur für nicht-App-Store-Apps erlaubt (Pitfall 6)
-// VoiceScribe ist kein App-Store-Release (Sandbox inkompatibel mit globalem Hotkey + AX)
+// SPRECHKRAFT ist kein App-Store-Release (Sandbox inkompatibel mit globalem Hotkey + AX)
 import KeyboardShortcuts
 
 extension KeyboardShortcuts.Name {
@@ -377,7 +377,7 @@ extension KeyboardShortcuts.Name {
 
 ---
 
-### `VoiceScribe/Constants/DesignTokens.swift` (config)
+### `SPRECHKRAFT/Constants/DesignTokens.swift` (config)
 
 **Analog:** kein Codebase-Analog — Greenfield
 **Quelle:** UI-SPEC Spacing Scale + Color Contract
@@ -407,7 +407,7 @@ enum DesignTokens {
 
 ---
 
-### `VoiceScribe/Info.plist` (config)
+### `SPRECHKRAFT/Info.plist` (config)
 
 **Analog:** kein Codebase-Analog — Greenfield
 **Quelle:** RESEARCH.md Pitfall 4 (LSUIElement), RESEARCH.md Security Domain
@@ -429,7 +429,7 @@ enum DesignTokens {
 ## Gemeinsame Muster (Shared Patterns)
 
 ### Swift 6 Concurrency — @MainActor
-**Gilt für:** VoiceScribeApp.swift, AppDelegate.swift, AppState.swift, alle Callbacks
+**Gilt für:** SPRECHKRAFTApp.swift, AppDelegate.swift, AppState.swift, alle Callbacks
 **Quelle:** RESEARCH.md Pitfall 3
 
 ```swift
@@ -457,7 +457,7 @@ statusItem.menu = nil  // KRITISCH
 ```
 
 ### Aktivierungspolicy-Umschaltung für Settings
-**Gilt für:** VoiceScribeApp.swift (hidden window receiver), AppDelegate.openSettings()
+**Gilt für:** SPRECHKRAFTApp.swift (hidden window receiver), AppDelegate.openSettings()
 **Quelle:** RESEARCH.md Pitfall 2 + Pattern 1
 
 ```swift
@@ -470,14 +470,14 @@ NSApp.setActivationPolicy(.accessory)
 ```
 
 ### Notification für Settings-Öffnung
-**Gilt für:** AppDelegate.swift → VoiceScribeApp.swift
+**Gilt für:** AppDelegate.swift → SPRECHKRAFTApp.swift
 **Quelle:** RESEARCH.md Pattern 1 (NotificationCenter-Brücke)
 
 ```swift
 // In AppDelegate — Brücke zwischen AppKit und SwiftUI-Scene:
 NotificationCenter.default.post(name: .openSettings, object: nil)
 
-// In VoiceScribeApp — Empfang im hidden Window:
+// In SPRECHKRAFTApp — Empfang im hidden Window:
 .onReceive(NotificationCenter.default.publisher(for: .openSettings)) { _ in
     // Aktivierungssequenz (siehe oben)
 }
@@ -491,7 +491,7 @@ Alle geplanten Dateien sind neu (Greenfield). Der Planner verwendet die RESEARCH
 
 | Datei | Rolle | Data Flow | Grund |
 |-------|-------|-----------|-------|
-| `VoiceScribeApp.swift` | app-entry | event-driven | Erster Swift-Code im Projekt |
+| `SPRECHKRAFTApp.swift` | app-entry | event-driven | Erster Swift-Code im Projekt |
 | `AppDelegate.swift` | controller | event-driven | Erster Swift-Code im Projekt |
 | `AppState.swift` | store | event-driven | Erster Swift-Code im Projekt |
 | `StatusBarIconView.swift` | component | event-driven | Erster Swift-Code im Projekt |

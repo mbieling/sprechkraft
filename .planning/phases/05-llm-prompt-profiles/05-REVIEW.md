@@ -4,16 +4,16 @@ reviewed: 2026-04-19T00:00:00Z
 depth: standard
 files_reviewed: 10
 files_reviewed_list:
-  - VoiceScribe/Models/PromptProfile.swift
-  - VoiceScribe/Services/GroqService.swift
-  - VoiceScribe/AppState.swift
-  - VoiceScribe/AppDelegate.swift
-  - VoiceScribe/Extensions/Defaults+Keys.swift
-  - VoiceScribe/Extensions/KeyboardShortcuts+Names.swift
-  - VoiceScribe/ProfileEditorSheet.swift
-  - VoiceScribe/SettingsView.swift
-  - VoiceScribeTests/PromptProfileTests.swift
-  - VoiceScribeTests/GroqServiceTests.swift
+  - SPRECHKRAFT/Models/PromptProfile.swift
+  - SPRECHKRAFT/Services/GroqService.swift
+  - SPRECHKRAFT/AppState.swift
+  - SPRECHKRAFT/AppDelegate.swift
+  - SPRECHKRAFT/Extensions/Defaults+Keys.swift
+  - SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift
+  - SPRECHKRAFT/ProfileEditorSheet.swift
+  - SPRECHKRAFT/SettingsView.swift
+  - SPRECHKRAFTTests/PromptProfileTests.swift
+  - SPRECHKRAFTTests/GroqServiceTests.swift
 findings:
   critical: 0
   warning: 4
@@ -43,7 +43,7 @@ No critical security issues were found.
 
 ### WR-01: HTTP error responses decoded as JSON, silently producing raw-text fallback
 
-**File:** `VoiceScribe/Services/GroqService.swift:100-101`
+**File:** `SPRECHKRAFT/Services/GroqService.swift:100-101`
 
 **Issue:** The service calls `URLSession.shared.data(for:)` and immediately passes `data` to `JSONDecoder().decode(ChatResponse.self, from:)` without first checking the HTTP status code. When Groq returns a 4xx or 5xx error (invalid key, rate-limit, quota exceeded), the response body is an error JSON like `{"error":{"message":"..."}}`, not a `ChatResponse`. The decoder throws, the `catch` block in AppDelegate silently falls back to `rawText` — which is the intended behavior per D-10. However, the caller has no way to distinguish a transient 429/503 from an invalid key (401), so the `groqKeyMissing` banner can remain visible after the key is entered and the first request fails for a different reason, misleading the user. More practically: if Groq ever returns a 200 with a body that partially matches `ChatResponse` (malformed streaming leak, etc.) the decoder will silently return incomplete content.
 
@@ -62,7 +62,7 @@ Add `case httpError(Int)` to `GroqError`. The AppDelegate catch block can then d
 
 ### WR-02: New profile with empty name can be saved via sheet keyboard shortcut
 
-**File:** `VoiceScribe/SettingsView.swift:237-245`, `VoiceScribe/ProfileEditorSheet.swift:101-108`
+**File:** `SPRECHKRAFT/SettingsView.swift:237-245`, `SPRECHKRAFT/ProfileEditorSheet.swift:101-108`
 
 **Issue:** In `SettingsView`, the "Profil hinzufügen" button creates a `PromptProfile` with `name: ""` and immediately sets `editingProfile = newProfile`. The "Profil sichern" button in `ProfileEditorSheet` is correctly `.disabled(draft.name.trimmingCharacters(in: .whitespaces).isEmpty)`. However, if the user opens the sheet and immediately presses Return (or submits via the default button keyboard binding on macOS), macOS may activate the first non-disabled button — in practice the Form's default action can bypass the disabled check. Additionally, a profile with an empty name would produce an empty `Text("")` row in the ForEach list and an empty `NSMenuItem` title in the menu, causing invisible UI entries.
 
@@ -82,7 +82,7 @@ This is a second line of defense and makes the invariant explicit at the data la
 
 ### WR-03: Double Keychain read creates a subtle TOCTOU window
 
-**File:** `VoiceScribe/AppDelegate.swift:58`
+**File:** `SPRECHKRAFT/AppDelegate.swift:58`
 
 **Issue:** In `applicationDidFinishLaunching`, the Keychain is read twice in one expression:
 ```swift
@@ -100,7 +100,7 @@ appState?.groqKeyMissing = storedKey == nil || storedKey?.isEmpty == true
 
 ### WR-04: Thinking-mode responses may include `<think>...</think>` block in output text
 
-**File:** `VoiceScribe/Services/GroqService.swift:103-106`
+**File:** `SPRECHKRAFT/Services/GroqService.swift:103-106`
 
 **Issue:** When `isThinkingEnabled == true` and `reasoning_effort` is omitted from the request, qwen3-32b's thinking mode produces a response where `choices[0].message.content` may contain a `<think>…</think>` prefix block followed by the actual answer. The current code returns `content` verbatim. If this block is injected into a text field, the user sees the raw chain-of-thought XML. The RESEARCH.md mentions the `/no_think` prefix as "unstable" and opts for `reasoning_effort` instead, but does not address stripping the response-side `<think>` block.
 
@@ -121,7 +121,7 @@ This is safe to apply unconditionally (non-thinking responses never contain `</t
 
 ### IN-01: `PromptProfile.defaultProfile` generates a new UUID on every call
 
-**File:** `VoiceScribe/Models/PromptProfile.swift:22-31`
+**File:** `SPRECHKRAFT/Models/PromptProfile.swift:22-31`
 
 **Issue:** `defaultProfile` is a computed `static var`, not a `static let`. Each call to `PromptProfile.defaultProfile` produces a `PromptProfile` with a freshly generated `UUID()`. This is intentional for use as the `Defaults.Keys.profiles` default value (each fresh install gets a unique ID), but it means that calling `defaultProfile` twice — e.g., in tests or in two places during setup — returns structurally identical profiles with different IDs. A test comparing `defaultProfile.id == defaultProfile.id` would fail. The current test suite does not do this, but it is a non-obvious footgun.
 
@@ -131,7 +131,7 @@ This is safe to apply unconditionally (non-thinking responses never contain `</t
 
 ### IN-02: `updateIcon()` allocates a new `NSHostingView` on every audio level update
 
-**File:** `VoiceScribe/AppDelegate.swift:333-348`
+**File:** `SPRECHKRAFT/AppDelegate.swift:333-348`
 
 **Issue:** `updateIcon()` creates a new `NSHostingView` every time it is called, including on every `onLevelUpdate` callback during recording. During active recording this can be called at 10–60 Hz depending on the tap buffer size. The old subview is removed and the new one is added, but the NSHostingView allocation and SwiftUI graph creation occurs on every call. This is an existing pattern (not introduced in Phase 5), but Phase 5 adds the `llmProcessing` state which also calls `updateIcon()` after state transitions.
 
@@ -141,7 +141,7 @@ This is safe to apply unconditionally (non-thinking responses never contain `</t
 
 ### IN-03: `GroqServiceTests.testEndpointIsHTTPS` does not actually test the service's endpoint
 
-**File:** `VoiceScribeTests/GroqServiceTests.swift:66-73`
+**File:** `SPRECHKRAFTTests/GroqServiceTests.swift:66-73`
 
 **Issue:** The test constructs a local `URL(string: "https://...")` and checks its scheme. It does not access the `private let endpoint` property of `GroqService`. The test would pass even if the production endpoint were changed to `http://`. The `@testable import` does not help here because `endpoint` is `private`. The comment acknowledges this limitation.
 

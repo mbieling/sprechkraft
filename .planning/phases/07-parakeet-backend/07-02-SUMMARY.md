@@ -12,10 +12,10 @@ dependency_graph:
     - "AppState.isModelError fuer Wave-0 AppStateTests und Wave-4 AppDelegate"
     - "StatusBarIconView Preview-Bloecke fuer neue Model-Lifecycle-States"
   affects:
-    - "VoiceScribe/Transcription/ParakeetBackend.swift (Wave 2: actor ParakeetBackend: TranscriptionBackend)"
-    - "VoiceScribe/AppDelegate.swift (Wave 4: appState?.isModelError = true)"
-    - "VoiceScribeTests/RecordingStateTests.swift (Wave-0 Tests kompilieren jetzt)"
-    - "VoiceScribeTests/AppStateTests.swift (Wave-0 Tests kompilieren jetzt)"
+    - "SPRECHKRAFT/Transcription/ParakeetBackend.swift (Wave 2: actor ParakeetBackend: TranscriptionBackend)"
+    - "SPRECHKRAFT/AppDelegate.swift (Wave 4: appState?.isModelError = true)"
+    - "SPRECHKRAFTTests/RecordingStateTests.swift (Wave-0 Tests kompilieren jetzt)"
+    - "SPRECHKRAFTTests/AppStateTests.swift (Wave-0 Tests kompilieren jetzt)"
 tech_stack:
   added: []
   patterns:
@@ -24,10 +24,10 @@ tech_stack:
     - "systemImage als computed property auf RecordingState — Icon-Logik zentral"
 key_files:
   created:
-    - VoiceScribe/Transcription/TranscriptionBackend.swift
+    - SPRECHKRAFT/Transcription/TranscriptionBackend.swift
   modified:
-    - VoiceScribe/AppState.swift
-    - VoiceScribe/StatusBarIconView.swift
+    - SPRECHKRAFT/AppState.swift
+    - SPRECHKRAFT/StatusBarIconView.swift
 decisions:
   - "systemImage als neue computed property auf RecordingState eingefuehrt — StatusBarIconView.body delegiert bereits an state.color/pulseSpeed, systemImage passt in dasselbe Muster"
   - "warmingUp erhaelt hourglass (nicht mic.fill) — visuell unterschiedbar vom normalen Bereit-Zustand"
@@ -61,14 +61,14 @@ metrics:
 
 ## Kompilier-Status
 
-Wave-0-Tests (RecordingStateTests, AppStateTests) koennen jetzt gegen die neuen Symbole kompilieren. Der Build scheitert an einem pre-existierenden Fehler in `VoiceScribeApp.swift` (`.hasCompletedOnboarding` und `OnboardingView` aus einem parallelen Wave-1-Agenten — nicht von diesem Plan eingefuehrt).
+Wave-0-Tests (RecordingStateTests, AppStateTests) koennen jetzt gegen die neuen Symbole kompilieren. Der Build scheitert an einem pre-existierenden Fehler in `SPRECHKRAFTApp.swift` (`.hasCompletedOnboarding` und `OnboardingView` aus einem parallelen Wave-1-Agenten — nicht von diesem Plan eingefuehrt).
 
 | Datei | Status | Notiz |
 |-------|--------|-------|
 | RecordingStateTests.swift | Symbole vorhanden | .modelLoading, .warmingUp, .modelError bekannt |
 | AppStateTests.swift | Symbole vorhanden | isModelError bekannt |
 | TranscriptionServiceTests.swift | Noch nicht kompilierbar | TranscriptionService(backend:) kommt in Wave 3 |
-| VoiceScribeApp.swift | Pre-existing Fehler | Anderer Wave-1-Agent (OnboardingView) |
+| SPRECHKRAFTApp.swift | Pre-existing Fehler | Anderer Wave-1-Agent (OnboardingView) |
 
 ## Deviations from Plan
 
@@ -78,14 +78,14 @@ Wave-0-Tests (RecordingStateTests, AppStateTests) koennen jetzt gegen die neuen 
 - **Gefunden bei:** Task 2
 - **Problem:** Der Plan beschreibt systemImage-Werte pro State in der Action-Sektion, aber die bestehende Datei hatte keine `systemImage`-Property auf RecordingState. StatusBarIconView.body nutzt `Image(systemName: "mic.fill")` hardcoded — die neuen States brauchten eine zentrale Icon-Quelle.
 - **Fix:** `var systemImage: String` als sechste computed property eingefuehrt, exhaustiver switch ueber alle 8 Cases. StatusBarIconView nutzt aktuell noch den hardcoded String — die Nutzung der Property erfolgt in Wave 3/4 beim Umbau der View. Property ist aber jetzt vorhanden und korrekt.
-- **Dateien:** VoiceScribe/AppState.swift
+- **Dateien:** SPRECHKRAFT/AppState.swift
 - **Commit:** c035357
 
 **2. [Rule 2 - Missing Case] .error in color/systemImage/accessibilityLabel ergaenzt**
 - **Gefunden bei:** Task 2
 - **Problem:** `.error`-Case existierte nicht in der originalen Enum, war aber im Plan als fuenfter Case impliziert (neben den 3 neuen Cases). Swift 6 Exhaustiveness erzwang Behandlung.
 - **Fix:** `.error` in alle computed properties aufgenommen.
-- **Dateien:** VoiceScribe/AppState.swift
+- **Dateien:** SPRECHKRAFT/AppState.swift
 - **Commit:** c035357
 
 ## Known Stubs
@@ -100,10 +100,10 @@ Keine neuen Sicherheitsflaechen eingefuehrt. `TranscriptionBackend`-Protokoll is
 
 | Check | Ergebnis |
 |-------|---------|
-| VoiceScribe/Transcription/TranscriptionBackend.swift | FOUND |
-| VoiceScribe/AppState.swift — case modelLoading | FOUND |
-| VoiceScribe/AppState.swift — isModelError | FOUND |
-| VoiceScribe/StatusBarIconView.swift — 8 #Preview-Bloecke | FOUND |
+| SPRECHKRAFT/Transcription/TranscriptionBackend.swift | FOUND |
+| SPRECHKRAFT/AppState.swift — case modelLoading | FOUND |
+| SPRECHKRAFT/AppState.swift — isModelError | FOUND |
+| SPRECHKRAFT/StatusBarIconView.swift — 8 #Preview-Bloecke | FOUND |
 | Commit f7d100f (Task 1) | FOUND |
 | Commit c035357 (Task 2) | FOUND |
 | Commit 099ccd5 (Task 3) | FOUND |

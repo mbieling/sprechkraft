@@ -7,9 +7,9 @@ dependency_graph:
   requires: ["06-01 (GRDB SPM-Dependency, HistoryStore Wave-0-Stub)"]
   provides: ["HistoryEntry GRDB-Record", "HistoryStore DatabaseQueue", "FTS5-Volltextsuche", "Migration v1"]
   affects:
-    - "VoiceScribe/History/HistoryEntry.swift"
-    - "VoiceScribe/History/HistoryStore.swift"
-    - "VoiceScribe.xcodeproj/project.pbxproj"
+    - "SPRECHKRAFT/History/HistoryEntry.swift"
+    - "SPRECHKRAFT/History/HistoryStore.swift"
+    - "SPRECHKRAFT.xcodeproj/project.pbxproj"
 tech_stack:
   added: []
   patterns:
@@ -19,16 +19,16 @@ tech_stack:
     - "AsyncThrowingStream ueber ValueObservation via Task-Wrapper"
 key_files:
   created:
-    - "VoiceScribe/History/HistoryEntry.swift"
-    - "VoiceScribe/History/HistoryStore.swift"
+    - "SPRECHKRAFT/History/HistoryEntry.swift"
+    - "SPRECHKRAFT/History/HistoryStore.swift"
   modified:
-    - "VoiceScribe.xcodeproj/project.pbxproj"
+    - "SPRECHKRAFT.xcodeproj/project.pbxproj"
   deleted:
-    - "VoiceScribe/Models/HistoryStore.swift (Wave-0-Stub ersetzt)"
+    - "SPRECHKRAFT/Models/HistoryStore.swift (Wave-0-Stub ersetzt)"
 decisions:
   - "observeAll() gibt AsyncThrowingStream via Task-Wrapper zurueck statt AsyncValueObservation — Konsistenz mit bestehenden Swift-Concurrency-Patterns im Projekt"
   - "HistoryEntry und HistoryStore in separates History/-Verzeichnis statt Models/ — klarere Modul-Abgrenzung fuer Wave 2 (HistoryView)"
-  - "Wave-0-Stub VoiceScribe/Models/HistoryStore.swift geloescht — pbxproj-Referenz auf History/HistoryStore.swift umgeleitet"
+  - "Wave-0-Stub SPRECHKRAFT/Models/HistoryStore.swift geloescht — pbxproj-Referenz auf History/HistoryStore.swift umgeleitet"
 metrics:
   duration_minutes: 6
   tasks_completed: 2
@@ -44,12 +44,12 @@ metrics:
 
 | Task | Name | Commit | Files |
 |------|------|--------|-------|
-| 1 | HistoryEntry.swift — GRDB Datenmodell | e8f65a9 | VoiceScribe/History/HistoryEntry.swift, VoiceScribe.xcodeproj/project.pbxproj, (loescht VoiceScribe/Models/HistoryStore.swift) |
-| 2 | HistoryStore.swift — Datenbankschicht | c6aa444 | VoiceScribe/History/HistoryStore.swift |
+| 1 | HistoryEntry.swift — GRDB Datenmodell | e8f65a9 | SPRECHKRAFT/History/HistoryEntry.swift, SPRECHKRAFT.xcodeproj/project.pbxproj, (loescht SPRECHKRAFT/Models/HistoryStore.swift) |
+| 2 | HistoryStore.swift — Datenbankschicht | c6aa444 | SPRECHKRAFT/History/HistoryStore.swift |
 
 ## Erstellte Dateien
 
-### VoiceScribe/History/HistoryEntry.swift (56 Zeilen)
+### SPRECHKRAFT/History/HistoryEntry.swift (56 Zeilen)
 
 - `struct HistoryEntry: Codable, Identifiable, Sendable`
 - `FetchableRecord, PersistableRecord` mit `databaseTableName = "transcription_entries"`
@@ -57,7 +57,7 @@ metrics:
 - `copyText`: `llmText ?? originalText` (D-09)
 - `preview`: `prefix(80) + "…"` wenn Text laenger als 80 Zeichen (D-03)
 
-### VoiceScribe/History/HistoryStore.swift (152 Zeilen)
+### SPRECHKRAFT/History/HistoryStore.swift (152 Zeilen)
 
 - `@MainActor final class HistoryStore`
 - `static let shared` Produktions-Singleton (Application Support)
@@ -83,7 +83,7 @@ metrics:
 
 - `PP050302 /* Models */`: HT060602 (HistoryStore.swift) entfernt
 - `HT060620 /* History */`: HT060610 (HistoryEntry.swift) + HT060602 (HistoryStore.swift) hinzugefuegt
-- `AA000040 /* VoiceScribe */`: HT060620-Gruppe hinzugefuegt
+- `AA000040 /* SPRECHKRAFT */`: HT060620-Gruppe hinzugefuegt
 - `AA000070 /* Sources */`: HT060611 (HistoryEntry.swift in Sources) hinzugefuegt
 
 ## Test-Ergebnisse
@@ -121,7 +121,7 @@ return try HistoryEntry.fetchAll(db, sql: "... WHERE transcription_entries_fts M
 - **Found during:** Task 2 (erster Build-Versuch)
 - **Issue:** `ValueObservation.values(in:)` liefert `AsyncValueObservation<[HistoryEntry]>`, nicht `AsyncThrowingStream<[HistoryEntry], Error>` — Compiler-Fehler
 - **Fix:** Task-Wrapper implementiert: `AsyncThrowingStream { continuation in ... }` mit `for try await` ueber `observation.values(in: dbQueue)` und `continuation.onTermination` fuer sauberes Cancellation-Handling
-- **Files modified:** VoiceScribe/History/HistoryStore.swift
+- **Files modified:** SPRECHKRAFT/History/HistoryStore.swift
 - **Commit:** c6aa444
 
 ## Known Stubs
@@ -134,8 +134,8 @@ Keine neuen Threat-Surfaces — alle relevanten Boundaries waren im Plan-Threat-
 
 ## Self-Check: PASSED
 
-- FOUND: VoiceScribe/History/HistoryEntry.swift
-- FOUND: VoiceScribe/History/HistoryStore.swift
+- FOUND: SPRECHKRAFT/History/HistoryEntry.swift
+- FOUND: SPRECHKRAFT/History/HistoryStore.swift
 - FOUND: .planning/phases/06-history/06-02-SUMMARY.md
 - FOUND: commit e8f65a9 (feat(06-02): HistoryEntry.swift)
 - FOUND: commit c6aa444 (feat(06-02): HistoryStore.swift)

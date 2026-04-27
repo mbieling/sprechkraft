@@ -4,12 +4,12 @@ reviewed: 2026-04-21T00:00:00Z
 depth: standard
 files_reviewed: 6
 files_reviewed_list:
-  - VoiceScribe/AppDelegate.swift
-  - VoiceScribe/History/HistoryEntry.swift
-  - VoiceScribe/History/HistoryStore.swift
-  - VoiceScribe/History/HistoryView.swift
-  - VoiceScribe/VoiceScribeApp.swift
-  - VoiceScribeTests/HistoryStoreTests.swift
+  - SPRECHKRAFT/AppDelegate.swift
+  - SPRECHKRAFT/History/HistoryEntry.swift
+  - SPRECHKRAFT/History/HistoryStore.swift
+  - SPRECHKRAFT/History/HistoryView.swift
+  - SPRECHKRAFT/SPRECHKRAFTApp.swift
+  - SPRECHKRAFTTests/HistoryStoreTests.swift
 findings:
   critical: 1
   warning: 5
@@ -42,7 +42,7 @@ an unretained strong-capture in a nested fire-and-forget Task, and missing delet
 
 ### CR-01: `try!` in HistoryStore singleton crashes on DB init failure
 
-**File:** `VoiceScribe/History/HistoryStore.swift:17`
+**File:** `SPRECHKRAFT/History/HistoryStore.swift:17`
 
 **Issue:** `HistoryStore.shared` is initialized with `try!`. If `FileManager` cannot create the
 Application Support directory (sandboxing denial, disk full, permission error) or `DatabaseQueue`
@@ -77,7 +77,7 @@ is unavailable. The key fix is replacing `try!` with structured error handling.
 
 ### WR-01: Synchronous DatabaseQueue calls block the main thread
 
-**File:** `VoiceScribe/History/HistoryStore.swift:78-97` and `HistoryStore.swift:104-126`
+**File:** `SPRECHKRAFT/History/HistoryStore.swift:78-97` and `HistoryStore.swift:104-126`
 
 **Issue:** `HistoryStore` is `@MainActor`. Every `dbQueue.write { }` and `dbQueue.read { }` call
 is a synchronous blocking operation that GRDB dispatches on a serial writer/reader queue but
@@ -106,7 +106,7 @@ equally straightforward.
 
 ### WR-02: Silent swallowing of DB insert errors with no diagnostics
 
-**File:** `VoiceScribe/AppDelegate.swift:159` and `AppDelegate.swift:176`
+**File:** `SPRECHKRAFT/AppDelegate.swift:159` and `AppDelegate.swift:176`
 
 **Issue:** `try? HistoryStore.shared.insert(historyEntry)` silently discards all errors. The
 comment documents the intent (insert failure must not block transcription output), which is
@@ -130,7 +130,7 @@ This preserves the fire-and-forget semantics while making errors diagnosable.
 
 ### WR-03: Strong `self` capture in inner fire-and-forget Task (LLM path)
 
-**File:** `VoiceScribe/AppDelegate.swift:126-163`
+**File:** `SPRECHKRAFT/AppDelegate.swift:126-163`
 
 **Issue:** The LLM path creates an inner unstructured `Task` (line 126) inside
 `await MainActor.run`. This inner Task captures `self` (the AppDelegate) strongly via
@@ -159,7 +159,7 @@ Task { [weak self] in
 
 ### WR-04: `DateFormatter` allocated on every SwiftUI render pass
 
-**File:** `VoiceScribe/History/HistoryView.swift:152-154` and `HistoryView.swift:247-249`
+**File:** `SPRECHKRAFT/History/HistoryView.swift:152-154` and `HistoryView.swift:247-249`
 
 **Issue:** `groupedEntries` creates a new `DateFormatter` inside its `Dictionary(grouping:)`
 closure on every render — one allocation per entry per render cycle for all non-today/non-yesterday
@@ -190,7 +190,7 @@ Reference these from `groupedEntries`, `timeString`, and `accessibilityLabel(for
 
 ### WR-05: Missing test coverage for `delete()` and `deleteAll()`
 
-**File:** `VoiceScribeTests/HistoryStoreTests.swift` (absent)
+**File:** `SPRECHKRAFTTests/HistoryStoreTests.swift` (absent)
 
 **Issue:** `HistoryStore.delete(_:)` and `HistoryStore.deleteAll()` have no tests. The FTS5
 virtual table uses `synchronize(withTable:)` triggers — a trigger synchronization bug on delete
@@ -237,7 +237,7 @@ Add two tests:
 
 ### IN-01: `task(id: searchText.isEmpty)` is a fragile observation trigger
 
-**File:** `VoiceScribe/History/HistoryView.swift:84`
+**File:** `SPRECHKRAFT/History/HistoryView.swift:84`
 
 **Issue:** `task(id: searchText.isEmpty)` uses a `Bool` as the task identity. The observation
 task is only restarted when the `isEmpty` state toggles (twice possible: `true→false`,
@@ -256,7 +256,7 @@ Consider logging the error and using a retry mechanism:
 
 ### IN-02: `HistoryStore.shared` not injectable in HistoryView (no preview support)
 
-**File:** `VoiceScribe/History/HistoryView.swift:19`
+**File:** `SPRECHKRAFT/History/HistoryView.swift:19`
 
 **Issue:** `private let historyStore = HistoryStore.shared` hardcodes the singleton. SwiftUI
 Previews for `HistoryView` will attempt to open the production SQLite database, which fails in
@@ -275,7 +275,7 @@ struct HistoryView: View {
 
 ### IN-03: `debounceTask` stored in `@State` without `.onDisappear` cancellation
 
-**File:** `VoiceScribe/History/HistoryView.swift:18`
+**File:** `SPRECHKRAFT/History/HistoryView.swift:18`
 
 **Issue:** `@State private var debounceTask: Task<Void, Never>?` is cancelled via `onChange`
 before each new task is created, but is never cancelled when the view disappears. If the view
@@ -292,7 +292,7 @@ struct views, but the dangling Task wastes CPU and holds the `@MainActor` for th
 
 ### IN-04: Performance test uses wall-clock time (fragile in CI)
 
-**File:** `VoiceScribeTests/HistoryStoreTests.swift:83-87`
+**File:** `SPRECHKRAFTTests/HistoryStoreTests.swift:83-87`
 
 **Issue:** `testSearchPerformance` asserts `elapsed < 0.2` using `Date().timeIntervalSince(start)`.
 Wall-clock measurement includes OS scheduling latency and will produce spurious failures on a
@@ -304,7 +304,7 @@ using `XCTMeasure` if performance regression detection is important.
 
 ### IN-05: No test for invalid FTS5Pattern input returning empty results safely
 
-**File:** `VoiceScribeTests/HistoryStoreTests.swift` (absent)
+**File:** `SPRECHKRAFTTests/HistoryStoreTests.swift` (absent)
 
 **Issue:** The `guard let pattern = FTS5Pattern(matchingAllTokensIn: query)` on
 `HistoryStore.swift:110` is the safety valve for malformed FTS5 queries (e.g., `"*"`, `"OR OR"`,

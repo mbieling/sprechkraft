@@ -10,19 +10,19 @@
 
 | Neue / Modifizierte Datei | Rolle | Data Flow | Naechster Analog | Match-Qualitaet |
 |---------------------------|-------|-----------|------------------|-----------------|
-| `VoiceScribe/Transcription/TranscriptionService.swift` | service (actor) | request-response (async ML inference) | `VoiceScribe/Audio/AudioController.swift` | role-match (service, @unchecked Sendable → actor) |
-| `VoiceScribe/Audio/AudioController.swift` | service | event-driven (render thread tap) | sich selbst (Erweiterung) | exact |
-| `VoiceScribe/AppState.swift` | model / state | — | sich selbst (Erweiterung) | exact |
-| `VoiceScribe/AppDelegate.swift` | controller / orchestration | request-response | sich selbst (Erweiterung) | exact |
-| `VoiceScribeTests/TranscriptionServiceTests.swift` | test | — | `VoiceScribeTests/AudioControllerTests.swift` | exact |
+| `SPRECHKRAFT/Transcription/TranscriptionService.swift` | service (actor) | request-response (async ML inference) | `SPRECHKRAFT/Audio/AudioController.swift` | role-match (service, @unchecked Sendable → actor) |
+| `SPRECHKRAFT/Audio/AudioController.swift` | service | event-driven (render thread tap) | sich selbst (Erweiterung) | exact |
+| `SPRECHKRAFT/AppState.swift` | model / state | — | sich selbst (Erweiterung) | exact |
+| `SPRECHKRAFT/AppDelegate.swift` | controller / orchestration | request-response | sich selbst (Erweiterung) | exact |
+| `SPRECHKRAFTTests/TranscriptionServiceTests.swift` | test | — | `SPRECHKRAFTTests/AudioControllerTests.swift` | exact |
 
 ---
 
 ## Pattern Assignments
 
-### `VoiceScribe/Transcription/TranscriptionService.swift` (actor, request-response)
+### `SPRECHKRAFT/Transcription/TranscriptionService.swift` (actor, request-response)
 
-**Analog:** `VoiceScribe/Audio/AudioController.swift`
+**Analog:** `SPRECHKRAFT/Audio/AudioController.swift`
 
 **Imports-Pattern** (AudioController.swift Zeilen 16–19 — adaptieren):
 ```swift
@@ -94,7 +94,7 @@ In TranscriptionService `transcribe()`: `guard let pipe = whisperKit, isModelRea
 
 ---
 
-### `VoiceScribe/Audio/AudioController.swift` — Erweiterung (event-driven, render thread)
+### `SPRECHKRAFT/Audio/AudioController.swift` — Erweiterung (event-driven, render thread)
 
 **Analog:** sich selbst — additive Erweiterung, kein Pattern-Bruch
 
@@ -151,7 +151,7 @@ Das `Task { @MainActor [weak self] in }` ist identisch mit dem `onAutoStop`-Disp
 
 ---
 
-### `VoiceScribe/AppState.swift` — Erweiterung (model/state)
+### `SPRECHKRAFT/AppState.swift` — Erweiterung (model/state)
 
 **Analog:** sich selbst — eine neue Property
 
@@ -169,7 +169,7 @@ var isModelReady: Bool = false
 
 ---
 
-### `VoiceScribe/AppDelegate.swift` — Erweiterung (controller, request-response)
+### `SPRECHKRAFT/AppDelegate.swift` — Erweiterung (controller, request-response)
 
 **Analog:** sich selbst — drei Erweiterungspunkte
 
@@ -259,16 +259,16 @@ Nach Phase 3: `audioController?.stopRecording()` loest via `onRecordingComplete`
 
 ---
 
-### `VoiceScribeTests/TranscriptionServiceTests.swift` (test)
+### `SPRECHKRAFTTests/TranscriptionServiceTests.swift` (test)
 
-**Analog:** `VoiceScribeTests/AudioControllerTests.swift`
+**Analog:** `SPRECHKRAFTTests/AudioControllerTests.swift`
 
 **Test-Suite-Deklaration** (AudioControllerTests.swift Zeilen 14–15):
 ```swift
 // AudioControllerTests.swift:14-15
 import Testing
 import AVFoundation
-@testable import VoiceScribe
+@testable import SPRECHKRAFT
 
 @Suite("AudioController (RECORD-01, RECORD-02)")
 struct AudioControllerTests {
@@ -276,7 +276,7 @@ struct AudioControllerTests {
 // TranscriptionServiceTests — gleiches Pattern:
 import Testing
 import AVFoundation
-@testable import VoiceScribe
+@testable import SPRECHKRAFT
 
 @Suite("TranscriptionService (RECORD-04, RECORD-05)")
 struct TranscriptionServiceTests {
@@ -325,7 +325,7 @@ private func makeSamples(count: Int, value: Float = 0.5) -> [Float] {
 ## Shared Patterns
 
 ### Swift 6 Strict Concurrency (@unchecked Sendable / actor)
-**Quelle:** `VoiceScribe/Audio/AudioController.swift` Zeile 20
+**Quelle:** `SPRECHKRAFT/Audio/AudioController.swift` Zeile 20
 **Anwenden auf:** `TranscriptionService.swift`
 ```swift
 // AudioController.swift:20 — Render-Thread macht @unchecked Sendable noetig
@@ -336,7 +336,7 @@ actor TranscriptionService { ... }
 ```
 
 ### Task { @MainActor [weak self] in } Dispatch
-**Quelle:** `VoiceScribe/Audio/AudioController.swift` Zeilen 114–117, 171–173
+**Quelle:** `SPRECHKRAFT/Audio/AudioController.swift` Zeilen 114–117, 171–173
 **Anwenden auf:** `TranscriptionService.swift` (progressHandler-Dispatch), `AudioController.swift` (onRecordingComplete-Dispatch)
 ```swift
 // AudioController.swift:114-117
@@ -347,7 +347,7 @@ Task { @MainActor [weak self] in
 ```
 
 ### guard + return Fehlerbehandlung (keine throws-Propagation)
-**Quelle:** `VoiceScribe/Audio/AudioController.swift` Zeilen 62–83, 150–153
+**Quelle:** `SPRECHKRAFT/Audio/AudioController.swift` Zeilen 62–83, 150–153
 **Anwenden auf:** `TranscriptionService.swift` (transcribe, resampleIfNeeded)
 ```swift
 // AudioController.swift:150-152
@@ -357,7 +357,7 @@ guard frameLength > 0 else { return 0 }
 ```
 
 ### [weak self] Callback-Closure
-**Quelle:** `VoiceScribe/AppDelegate.swift` Zeilen 53–59
+**Quelle:** `SPRECHKRAFT/AppDelegate.swift` Zeilen 53–59
 **Anwenden auf:** `AppDelegate.swift` (onRecordingComplete), `TranscriptionService.swift` (progressHandler)
 ```swift
 // AppDelegate.swift:53-54
@@ -367,7 +367,7 @@ audioController?.onAutoStop = { [weak self] in
 ```
 
 ### @MainActor final class (AppDelegate-Konvention)
-**Quelle:** `VoiceScribe/AppDelegate.swift` Zeile 19
+**Quelle:** `SPRECHKRAFT/AppDelegate.swift` Zeile 19
 **Anwenden auf:** Alle neuen `@MainActor`-Methoden in AppDelegate bleiben im gleichen Kontext
 ```swift
 // AppDelegate.swift:19
@@ -376,7 +376,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 ```
 
 ### AppState @Observable @MainActor Property-Deklaration
-**Quelle:** `VoiceScribe/AppState.swift` Zeilen 58–69
+**Quelle:** `SPRECHKRAFT/AppState.swift` Zeilen 58–69
 **Anwenden auf:** Neue `isModelReady: Bool`-Property in AppState
 ```swift
 // AppState.swift:58-62
@@ -396,13 +396,13 @@ Alle Dateien haben klare Analogs im bestehenden Codebase.
 
 | Datei | Bemerkung |
 |-------|-----------|
-| `VoiceScribe/Transcription/TranscriptionService.swift` | Kein exakter actor-Service existiert noch — AudioController ist naechster Analog (Sendable-Service-Pattern), aber `actor`-Schlueesselwort ist neu in Phase 3 |
+| `SPRECHKRAFT/Transcription/TranscriptionService.swift` | Kein exakter actor-Service existiert noch — AudioController ist naechster Analog (Sendable-Service-Pattern), aber `actor`-Schlueesselwort ist neu in Phase 3 |
 
 ---
 
 ## Metadata
 
-**Analog-Suchbereich:** `VoiceScribe/`, `VoiceScribeTests/`
+**Analog-Suchbereich:** `SPRECHKRAFT/`, `SPRECHKRAFTTests/`
 **Dateien gescannt:** 6 Quelldateien + 2 Context-/Research-Dokumente
 **Pattern-Extraktion:** 2026-04-18
 ```

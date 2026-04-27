@@ -10,25 +10,25 @@
 
 | Neue/Modifizierte Datei | Role | Data Flow | Nächstes Analog | Match-Qualität |
 |-------------------------|------|-----------|-----------------|----------------|
-| `VoiceScribe/History/HistoryEntry.swift` | model | CRUD | `VoiceScribe/Models/PromptProfile.swift` | role-match |
-| `VoiceScribe/History/HistoryStore.swift` | service | CRUD | `VoiceScribe/Services/GroqService.swift` | role-match |
-| `VoiceScribe/History/HistoryView.swift` | component | request-response | `VoiceScribe/SettingsView.swift` | role-match |
-| `VoiceScribe/AppDelegate.swift` | controller | event-driven | selbst (onRecordingComplete-Erweiterung) | exact |
-| `VoiceScribe/VoiceScribeApp.swift` | config | request-response | selbst (zweites Window analog „settings") | exact |
-| `VoiceScribe.xcodeproj/project.pbxproj` | config | — | KeychainAccess-Block KC050500/KC050501 | exact |
-| `VoiceScribeTests/HistoryStoreTests.swift` | test | CRUD | (kein Test-Analog vorhanden) | kein Analog |
+| `SPRECHKRAFT/History/HistoryEntry.swift` | model | CRUD | `SPRECHKRAFT/Models/PromptProfile.swift` | role-match |
+| `SPRECHKRAFT/History/HistoryStore.swift` | service | CRUD | `SPRECHKRAFT/Services/GroqService.swift` | role-match |
+| `SPRECHKRAFT/History/HistoryView.swift` | component | request-response | `SPRECHKRAFT/SettingsView.swift` | role-match |
+| `SPRECHKRAFT/AppDelegate.swift` | controller | event-driven | selbst (onRecordingComplete-Erweiterung) | exact |
+| `SPRECHKRAFT/SPRECHKRAFTApp.swift` | config | request-response | selbst (zweites Window analog „settings") | exact |
+| `SPRECHKRAFT.xcodeproj/project.pbxproj` | config | — | KeychainAccess-Block KC050500/KC050501 | exact |
+| `SPRECHKRAFTTests/HistoryStoreTests.swift` | test | CRUD | (kein Test-Analog vorhanden) | kein Analog |
 
 ---
 
 ## Pattern Assignments
 
-### `VoiceScribe/History/HistoryEntry.swift` (model, CRUD)
+### `SPRECHKRAFT/History/HistoryEntry.swift` (model, CRUD)
 
-**Analog:** `VoiceScribe/Models/PromptProfile.swift`
+**Analog:** `SPRECHKRAFT/Models/PromptProfile.swift`
 
 **Imports pattern** (PromptProfile.swift Zeilen 1–10):
 ```swift
-// VoiceScribe/Models/PromptProfile.swift
+// SPRECHKRAFT/Models/PromptProfile.swift
 import Foundation
 import Defaults
 ```
@@ -83,9 +83,9 @@ extension HistoryEntry: FetchableRecord, PersistableRecord {
 
 ---
 
-### `VoiceScribe/History/HistoryStore.swift` (service, CRUD)
+### `SPRECHKRAFT/History/HistoryStore.swift` (service, CRUD)
 
-**Analog:** `VoiceScribe/Services/GroqService.swift`
+**Analog:** `SPRECHKRAFT/Services/GroqService.swift`
 
 **Singleton-Pattern** (GroqService.swift Zeilen 12–13):
 ```swift
@@ -113,7 +113,7 @@ final class HistoryStore {
             for: .applicationSupportDirectory, in: .userDomainMask,
             appropriateFor: nil, create: true
         )
-        let dir = appSupport.appendingPathComponent("VoiceScribe", isDirectory: true)
+        let dir = appSupport.appendingPathComponent("SPRECHKRAFT", isDirectory: true)
         try! fileManager.createDirectory(at: dir, withIntermediateDirectories: true)
         let dbURL = dir.appendingPathComponent("history.sqlite")
         dbQueue = try! DatabaseQueue(path: dbURL.path)
@@ -208,9 +208,9 @@ final class HistoryStore {
 
 ---
 
-### `VoiceScribe/History/HistoryView.swift` (component, request-response)
+### `SPRECHKRAFT/History/HistoryView.swift` (component, request-response)
 
-**Analog:** `VoiceScribe/SettingsView.swift`
+**Analog:** `SPRECHKRAFT/SettingsView.swift`
 
 **Imports pattern** (SettingsView.swift Zeilen 1–15):
 ```swift
@@ -363,18 +363,18 @@ Text("KI")
 
 ---
 
-### `VoiceScribe/AppDelegate.swift` — Modifikation (controller, event-driven)
+### `SPRECHKRAFT/AppDelegate.swift` — Modifikation (controller, event-driven)
 
 **Analog:** AppDelegate.swift selbst — Erweiterung des bestehenden Musters
 
 **Notification.Name-Extension** (AppDelegate.swift Zeilen 18–22):
 ```swift
 extension Notification.Name {
-    static let openSettings = Notification.Name("com.voicescribe.openSettings")
-    static let refreshProfileHotkeys = Notification.Name("com.voicescribe.refreshProfileHotkeys")
+    static let openSettings = Notification.Name("com.sprechkraft.openSettings")
+    static let refreshProfileHotkeys = Notification.Name("com.sprechkraft.refreshProfileHotkeys")
 }
 // Neues Eintrag analog:
-    static let openHistory = Notification.Name("com.voicescribe.openHistory")
+    static let openHistory = Notification.Name("com.sprechkraft.openHistory")
 ```
 
 **Neuer NSMenuItem in showMenu()** (AppDelegate.swift Zeilen 213–300 — genau vor „Einstellungen…"):
@@ -430,13 +430,13 @@ try? HistoryStore.shared.insert(entry)
 
 ---
 
-### `VoiceScribe/VoiceScribeApp.swift` — Modifikation (config, request-response)
+### `SPRECHKRAFT/SPRECHKRAFTApp.swift` — Modifikation (config, request-response)
 
-**Analog:** VoiceScribeApp.swift selbst — zweites Window analog dem bestehenden „settings"-Window
+**Analog:** SPRECHKRAFTApp.swift selbst — zweites Window analog dem bestehenden „settings"-Window
 
-**Window-Scene-Muster** (VoiceScribeApp.swift Zeilen 25–30):
+**Window-Scene-Muster** (SPRECHKRAFTApp.swift Zeilen 25–30):
 ```swift
-Window("VoiceScribe — Einstellungen", id: "settings") {
+Window("SPRECHKRAFT — Einstellungen", id: "settings") {
     SettingsView(appState: appState)
         .frame(minWidth: 400, minHeight: 300)
 }
@@ -444,14 +444,14 @@ Window("VoiceScribe — Einstellungen", id: "settings") {
 ```
 Analog für History:
 ```swift
-Window("VoiceScribe — Verlauf", id: "history") {
+Window("SPRECHKRAFT — Verlauf", id: "history") {
     HistoryView()
         .frame(minWidth: 600, minHeight: 400)  // Claude's Discretion: ~600×400
 }
 .windowResizability(.contentSize)
 ```
 
-**HiddenActivationView — onReceive-Erweiterung** (VoiceScribeApp.swift Zeilen 53–77):
+**HiddenActivationView — onReceive-Erweiterung** (SPRECHKRAFTApp.swift Zeilen 53–77):
 ```swift
 // Bestehendes openSettings-Pattern (Zeilen 53–77) 1:1 kopieren für openHistory:
 .onReceive(NotificationCenter.default.publisher(for: .openHistory)) { _ in
@@ -473,7 +473,7 @@ Dieses Pattern ist aus Phase 1 und Phase 5 bekannt und bewährt (RESEARCH.md Pit
 
 ---
 
-### `VoiceScribe.xcodeproj/project.pbxproj` — Modifikation (config, —)
+### `SPRECHKRAFT.xcodeproj/project.pbxproj` — Modifikation (config, —)
 
 **Analog:** KeychainAccess-Block KC050500/KC050501 (project.pbxproj Zeilen 623–658)
 
@@ -511,14 +511,14 @@ GR060601 /* GRDB */ = {
 
 ---
 
-### `VoiceScribeTests/HistoryStoreTests.swift` (test, CRUD)
+### `SPRECHKRAFTTests/HistoryStoreTests.swift` (test, CRUD)
 
 **Analog:** kein Test-Analog im Projekt vorhanden. Muster aus RESEARCH.md Validation Architecture.
 
 **In-Memory-Setup für Tests:**
 ```swift
 import Testing
-@testable import VoiceScribe
+@testable import SPRECHKRAFT
 import GRDB
 
 @MainActor
@@ -547,7 +547,7 @@ struct HistoryStoreTests {
 ## Shared Patterns
 
 ### Shared Pattern 1: @MainActor Singleton
-**Quelle:** `VoiceScribe/AppState.swift` Zeilen 58–60, `VoiceScribe/Services/GroqService.swift` Zeilen 12–13
+**Quelle:** `SPRECHKRAFT/AppState.swift` Zeilen 58–60, `SPRECHKRAFT/Services/GroqService.swift` Zeilen 12–13
 **Gilt für:** `HistoryStore.swift`
 ```swift
 @MainActor
@@ -557,19 +557,19 @@ final class HistoryStore {
 }
 ```
 
-### Shared Pattern 2: NotificationCenter-Brücke (AppDelegate → VoiceScribeApp)
-**Quelle:** `VoiceScribe/AppDelegate.swift` Zeilen 18–22, 304–309; `VoiceScribe/VoiceScribeApp.swift` Zeilen 53–77
-**Gilt für:** `AppDelegate.swift` (openHistoryMenu), `VoiceScribeApp.swift` (onReceive openHistory)
+### Shared Pattern 2: NotificationCenter-Brücke (AppDelegate → SPRECHKRAFTApp)
+**Quelle:** `SPRECHKRAFT/AppDelegate.swift` Zeilen 18–22, 304–309; `SPRECHKRAFT/SPRECHKRAFTApp.swift` Zeilen 53–77
+**Gilt für:** `AppDelegate.swift` (openHistoryMenu), `SPRECHKRAFTApp.swift` (onReceive openHistory)
 ```swift
 // AppDelegate: post
 NotificationCenter.default.post(name: .openHistory, object: nil)
-// VoiceScribeApp HiddenActivationView: receive
+// SPRECHKRAFTApp HiddenActivationView: receive
 .onReceive(NotificationCenter.default.publisher(for: .openHistory)) { _ in ... }
 ```
 
 ### Shared Pattern 3: Activation-Policy-Workaround
-**Quelle:** `VoiceScribe/VoiceScribeApp.swift` Zeilen 55–76
-**Gilt für:** `VoiceScribeApp.swift` — History-Window-Aktivierung
+**Quelle:** `SPRECHKRAFT/SPRECHKRAFTApp.swift` Zeilen 55–76
+**Gilt für:** `SPRECHKRAFTApp.swift` — History-Window-Aktivierung
 ```swift
 NSApp.setActivationPolicy(.regular)
 NSApp.activate(ignoringOtherApps: true)
@@ -580,14 +580,14 @@ NSApp.setActivationPolicy(.accessory)
 ```
 
 ### Shared Pattern 4: try? für nicht-kritische Operationen
-**Quelle:** `VoiceScribe/AppDelegate.swift` Zeilen 97 (`try await`), 171 (kein try — Fehler wird catch-gehandelt)
+**Quelle:** `SPRECHKRAFT/AppDelegate.swift` Zeilen 97 (`try await`), 171 (kein try — Fehler wird catch-gehandelt)
 **Gilt für:** GRDB-Insert in AppDelegate (Insert-Fehler darf Transkription nicht blockieren)
 ```swift
 try? HistoryStore.shared.insert(entry)  // Fehler still schlucken ist gewollt (RESEARCH.md Open Questions #2)
 ```
 
 ### Shared Pattern 5: DesignTokens.Spacing
-**Quelle:** `VoiceScribe/Constants/DesignTokens.swift` Zeilen 13–24
+**Quelle:** `SPRECHKRAFT/Constants/DesignTokens.swift` Zeilen 13–24
 **Gilt für:** `HistoryView.swift` — alle Abstände
 ```swift
 DesignTokens.Spacing.xs  // 4pt — Badge-Padding
@@ -597,7 +597,7 @@ DesignTokens.Spacing.xl  // 32pt — Fensterkanten
 ```
 
 ### Shared Pattern 6: systemPurple für LLM-Badge
-**Quelle:** `VoiceScribe/AppState.swift` Zeile 23 (`Color(.systemPurple)` für `.llmProcessing`)
+**Quelle:** `SPRECHKRAFT/AppState.swift` Zeile 23 (`Color(.systemPurple)` für `.llmProcessing`)
 **Gilt für:** `HistoryView.swift` — KI-Badge auf Listenzeilen mit `isLLMProcessed == true`
 
 ---
@@ -606,12 +606,12 @@ DesignTokens.Spacing.xl  // 32pt — Fensterkanten
 
 | Datei | Role | Data Flow | Grund |
 |-------|------|-----------|-------|
-| `VoiceScribeTests/HistoryStoreTests.swift` | test | CRUD | Keine Tests im Projekt vorhanden; Muster aus RESEARCH.md Validation Architecture |
+| `SPRECHKRAFTTests/HistoryStoreTests.swift` | test | CRUD | Keine Tests im Projekt vorhanden; Muster aus RESEARCH.md Validation Architecture |
 
 ---
 
 ## Metadata
 
-**Analog-Suchscope:** `VoiceScribe/`, `VoiceScribeTests/`, `VoiceScribe.xcodeproj/project.pbxproj`
-**Gescannte Dateien:** 9 (AppDelegate, VoiceScribeApp, SettingsView, AppState, PromptProfile, GroqService, Defaults+Keys, DesignTokens, project.pbxproj)
+**Analog-Suchscope:** `SPRECHKRAFT/`, `SPRECHKRAFTTests/`, `SPRECHKRAFT.xcodeproj/project.pbxproj`
+**Gescannte Dateien:** 9 (AppDelegate, SPRECHKRAFTApp, SettingsView, AppState, PromptProfile, GroqService, Defaults+Keys, DesignTokens, project.pbxproj)
 **Pattern-Extraction-Datum:** 2026-04-20

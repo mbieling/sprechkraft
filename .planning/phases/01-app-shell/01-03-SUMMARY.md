@@ -9,9 +9,9 @@ dependency_graph:
     - 01-02 (AppState, RecordingState, StatusBarIconView, KeyboardShortcuts+Names, DesignTokens)
   provides:
     - AppDelegate (NSStatusItem, Split-Click, NSMenu, Hotkey, Login-Toggle)
-    - VoiceScribeApp (@main, NSApplicationDelegateAdaptor, Window-Scenes)
+    - SPRECHKRAFTApp (@main, NSApplicationDelegateAdaptor, Window-Scenes)
     - SettingsView (Placeholder-Fenster)
-    - Notification.Name.openSettings (AppDelegate → VoiceScribeApp Brücke)
+    - Notification.Name.openSettings (AppDelegate → SPRECHKRAFTApp Brücke)
   affects:
     - 01-04 (Human-Verify-Checkpoint — visuelles Testen der lauffähigen App)
 tech_stack:
@@ -29,11 +29,11 @@ tech_stack:
     - "Guard in updateIcon() gegen nil-statusItem bei Test-Host-Startup"
 key_files:
   created:
-    - VoiceScribe/AppDelegate.swift
-    - VoiceScribe/SettingsView.swift
+    - SPRECHKRAFT/AppDelegate.swift
+    - SPRECHKRAFT/SettingsView.swift
   modified:
-    - VoiceScribe/VoiceScribeApp.swift (Placeholder aus Plan 01 überschrieben)
-    - VoiceScribe.xcodeproj/project.pbxproj (AppDelegate + SettingsView registriert)
+    - SPRECHKRAFT/SPRECHKRAFTApp.swift (Placeholder aus Plan 01 überschrieben)
+    - SPRECHKRAFT.xcodeproj/project.pbxproj (AppDelegate + SettingsView registriert)
 decisions:
   - "Observation-Strategie B (manueller updateIcon()-Aufruf) statt withObservationTracking — robuster für Swift 6 strict concurrency"
   - "Guard statusItem != nil in updateIcon() — verhindert Crash wenn onAppear vor applicationDidFinishLaunching feuert"
@@ -51,7 +51,7 @@ requirements_satisfied:
   - SET-06
 ---
 
-# Phase 01 Plan 03: Integration — AppDelegate, VoiceScribeApp und SettingsView Summary
+# Phase 01 Plan 03: Integration — AppDelegate, SPRECHKRAFTApp und SettingsView Summary
 
 Integrationsschicht, die alle Plan-02-Bausteine zu einer lauffähigen macOS-Menu-Bar-App verbindet: NSStatusItem mit Split-Click, NSMenu mit 4 Einträgen, globaler Hotkey ⌥⌘R via KeyboardShortcuts, LaunchAtLogin-Toggle, SwiftUI Window-Scenes für Einstellungsfenster und Notification-Brücke für Settings-Aktivierung — alle 12 Tests grün, Build erfolgreich.
 
@@ -59,10 +59,10 @@ Integrationsschicht, die alle Plan-02-Bausteine zu einer lauffähigen macOS-Menu
 
 | Task | Name | Commit | Files |
 |------|------|--------|-------|
-| 1 | KeyboardShortcuts.Name-Extension mit ⌥⌘R | (in Plan 02 vorgezogen: e5d542b) | VoiceScribe/Extensions/KeyboardShortcuts+Names.swift |
-| 2 | SettingsView als leerer SwiftUI-Placeholder | 1888302 | VoiceScribe/SettingsView.swift, project.pbxproj |
-| 3 | AppDelegate mit NSStatusItem, Split-Click, NSMenu, Hotkey, Login-Toggle | f737087 | VoiceScribe/AppDelegate.swift |
-| 4 | VoiceScribeApp @main mit Window-Scenes und Settings-Aktivierung | 1b5bef9 | VoiceScribe/VoiceScribeApp.swift |
+| 1 | KeyboardShortcuts.Name-Extension mit ⌥⌘R | (in Plan 02 vorgezogen: e5d542b) | SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift |
+| 2 | SettingsView als leerer SwiftUI-Placeholder | 1888302 | SPRECHKRAFT/SettingsView.swift, project.pbxproj |
+| 3 | AppDelegate mit NSStatusItem, Split-Click, NSMenu, Hotkey, Login-Toggle | f737087 | SPRECHKRAFT/AppDelegate.swift |
+| 4 | SPRECHKRAFTApp @main mit Window-Scenes und Settings-Aktivierung | 1b5bef9 | SPRECHKRAFT/SPRECHKRAFTApp.swift |
 
 ## Build Status
 
@@ -107,7 +107,7 @@ Integrationsschicht, die alle Plan-02-Bausteine zu einer lauffähigen macOS-Menu
 | T-01-10 (Hotkey Tampering) | KeyboardShortcuts-Library übernimmt Konflikt-Erkennung; kein eigener CGEventTap |
 | T-01-12 (Policy-Wechsel Elevation) | Wechsel zu .regular nur im Settings-Öffnungs-Scope; nach 300ms zurück zu .accessory |
 | T-01-13 (statusItem.menu nil) | statusItem.menu = nil direkt nach performClick(nil) in showMenu() |
-| T-01-15 (Notification Spoofing) | com.voicescribe.openSettings Bundle-ID-Präfix; NotificationCenter.default ist prozess-lokal |
+| T-01-15 (Notification Spoofing) | com.sprechkraft.openSettings Bundle-ID-Präfix; NotificationCenter.default ist prozess-lokal |
 
 ## Deviations from Plan
 
@@ -117,7 +117,7 @@ Integrationsschicht, die alle Plan-02-Bausteine zu einer lauffähigen macOS-Menu
 - **Gefunden während:** Task 3/4 Verifikation (Tests nach App-Build)
 - **Problem:** `updateIcon()` wird von `HiddenActivationView.onAppear` aufgerufen. Wenn die App als Test-Host startet, feuert `onAppear` vor `applicationDidFinishLaunching` abgeschlossen ist — `statusItem` ist noch `nil`. Zugriff auf `NSStatusItem!` mit nil → `Fatal error: Unexpectedly found nil while implicitly unwrapping an Optional value` → Test-Runner-Crash.
 - **Fix:** Guard `guard statusItem != nil, let button = statusItem.button else { return }` am Anfang von `updateIcon()`. Außerdem direkte Button-Variable statt wiederholtem `statusItem.button?`-Zugriff.
-- **Dateien:** VoiceScribe/AppDelegate.swift
+- **Dateien:** SPRECHKRAFT/AppDelegate.swift
 - **Commit:** f737087
 
 ### Nicht umgesetzte Punkte (plangemäß)
@@ -133,7 +133,7 @@ Integrationsschicht, die alle Plan-02-Bausteine zu einer lauffähigen macOS-Menu
 
 ```swift
 @MainActor final class AppDelegate: NSObject, NSApplicationDelegate {
-    var appState: AppState?   // Property Injection durch VoiceScribeApp
+    var appState: AppState?   // Property Injection durch SPRECHKRAFTApp
     func updateIcon()         // Öffentlich für HiddenActivationView.onAppear
 }
 ```
@@ -142,7 +142,7 @@ Integrationsschicht, die alle Plan-02-Bausteine zu einer lauffähigen macOS-Menu
 
 ```swift
 extension Notification.Name {
-    static let openSettings = Notification.Name("com.voicescribe.openSettings")
+    static let openSettings = Notification.Name("com.sprechkraft.openSettings")
     // Gepostet von AppDelegate.openSettingsMenu()
     // Empfangen von HiddenActivationView.onReceive(_:)
 }
@@ -161,9 +161,9 @@ Plan 04 wird folgende manuelle Verifikations-Punkte prüfen:
 1. **App startet ohne Dock-Icon** — nur Menu-Bar-Icon, kein Eintrag im Dock
 2. **Menu-Bar-Icon erscheint** — `mic.fill` in Grau (#8E8E93) in der Menüleiste
 3. **Linksklick auf Icon** — Icon wechselt Farbe (grau → rot → blau → lila → grau zyklisch)
-4. **Rechtsklick auf Icon** — Menü erscheint mit: "VoiceScribe" (disabled), Trennlinie, "Einstellungen…", "Beim Login starten" (mit/ohne Haken), Trennlinie, "Beenden"
+4. **Rechtsklick auf Icon** — Menü erscheint mit: "SPRECHKRAFT" (disabled), Trennlinie, "Einstellungen…", "Beim Login starten" (mit/ohne Haken), Trennlinie, "Beenden"
 5. **Hotkey ⌥⌘R** — Icon cycelt (gleiche Wirkung wie Linksklick, systemweit)
-6. **"Einstellungen…" Klick** — Fenster "VoiceScribe — Einstellungen" öffnet sich, Placeholder-Text sichtbar
+6. **"Einstellungen…" Klick** — Fenster "SPRECHKRAFT — Einstellungen" öffnet sich, Placeholder-Text sichtbar
 7. **"Beenden"** — App beendet sich vollständig
 
 ## Known Stubs
@@ -172,12 +172,12 @@ Keine — alle implementierten Features sind vollständig verdrahtet. Das Einste
 
 ## Self-Check: PASSED
 
-- [x] VoiceScribe/SettingsView.swift: FOUND
-- [x] VoiceScribe/AppDelegate.swift: FOUND
-- [x] VoiceScribe/VoiceScribeApp.swift: FOUND (überschrieben)
+- [x] SPRECHKRAFT/SettingsView.swift: FOUND
+- [x] SPRECHKRAFT/AppDelegate.swift: FOUND
+- [x] SPRECHKRAFT/SPRECHKRAFTApp.swift: FOUND (überschrieben)
 - [x] Commit 1888302: FOUND (feat(01-03): add SettingsView placeholder)
 - [x] Commit f737087: FOUND (feat(01-03): add AppDelegate...)
-- [x] Commit 1b5bef9: FOUND (feat(01-03): implement VoiceScribeApp @main...)
+- [x] Commit 1b5bef9: FOUND (feat(01-03): implement SPRECHKRAFTApp @main...)
 - [x] BUILD SUCCEEDED (App-Target)
 - [x] TEST SUCCEEDED (12/12 Tests grün)
 - [x] SET-02 implementiert: KeyboardShortcuts.onKeyUp(for: .toggleRecording) in AppDelegate

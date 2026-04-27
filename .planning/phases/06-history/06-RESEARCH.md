@@ -86,7 +86,7 @@ FTS5 mit `synchronize(withTable: "transcription_entries")` sorgt für automatisc
 |------------|-------------|----------------|-----------|
 | History-Persistenz (Insert, Delete) | HistoryStore (Service-Schicht) | AppDelegate (Aufruf-Punkt) | Datenbanklogik gehört in eine dedizierte Service-Klasse, nicht in AppDelegate |
 | FTS5-Volltextsuche | HistoryStore | — | Alle DB-Operationen zentralisiert; View fragt nur an |
-| History-Fenster öffnen | AppDelegate (NSMenuItem) | VoiceScribeApp (Window-Scene) | Analoges Muster zu openSettings (NotificationCenter-Brücke) |
+| History-Fenster öffnen | AppDelegate (NSMenuItem) | SPRECHKRAFTApp (Window-Scene) | Analoges Muster zu openSettings (NotificationCenter-Brücke) |
 | History-UI (Liste, Suche, Gruppen) | HistoryView (SwiftUI) | — | Reines UI-Layer, kein Datenbankzugriff direkt |
 | Clipboard-Kopieren | HistoryView | HistoryStore (bestimmt welcher Text) | NSPasteboard-Aufruf im View-Action-Handler; welcher Text (LLM vs. Original) ist View-Logik per D-09 |
 | Grün-Blink-Feedback | HistoryView | — | Rein visueller State (`@State flashingEntryID`) |
@@ -172,13 +172,13 @@ GRDB DatabaseQueue (SQLite)
 
 ### Recommended Project Structure
 ```
-VoiceScribe/
+SPRECHKRAFT/
 ├── History/
 │   ├── HistoryStore.swift       # @MainActor class, DatabaseQueue, GRDB-Operationen
 │   ├── HistoryEntry.swift       # Struct: Codable, FetchableRecord, PersistableRecord
 │   └── HistoryView.swift        # SwiftUI-View: Liste, Suche, Datum-Gruppen, Copy-Flash
 ├── AppDelegate.swift            # onRecordingComplete: HistoryStore.insert() Aufruf hinzufügen
-├── VoiceScribeApp.swift         # Neues Window("Verlauf", id: "history") hinzufügen
+├── SPRECHKRAFTApp.swift         # Neues Window("Verlauf", id: "history") hinzufügen
 └── Extensions/
     └── Defaults+Keys.swift      # unverändert — Profile bleiben in Defaults
 ```
@@ -203,7 +203,7 @@ final class HistoryStore {
             for: .applicationSupportDirectory, in: .userDomainMask,
             appropriateFor: nil, create: true
         )
-        let dir = appSupport.appendingPathComponent("VoiceScribe", isDirectory: true)
+        let dir = appSupport.appendingPathComponent("SPRECHKRAFT", isDirectory: true)
         try! fileManager.createDirectory(at: dir, withIntermediateDirectories: true)
         let dbURL = dir.appendingPathComponent("history.sqlite")
         dbQueue = try! DatabaseQueue(path: dbURL.path)
@@ -356,7 +356,7 @@ Dieser AsyncStream wird in HistoryView mit `for try await` konsumiert und füllt
 ```swift
 // Notification.Name Extension (analog .openSettings)
 extension Notification.Name {
-    static let openHistory = Notification.Name("com.voicescribe.openHistory")
+    static let openHistory = Notification.Name("com.sprechkraft.openHistory")
 }
 
 // AppDelegate.showMenu():
@@ -372,7 +372,7 @@ historyItem.target = self
     NotificationCenter.default.post(name: .openHistory, object: nil)
 }
 
-// VoiceScribeApp.swift — HiddenActivationView.onReceive:
+// SPRECHKRAFTApp.swift — HiddenActivationView.onReceive:
 .onReceive(NotificationCenter.default.publisher(for: .openHistory)) { _ in
     Task { @MainActor in
         NSApp.setActivationPolicy(.regular)
@@ -486,7 +486,7 @@ func copyEntry(_ entry: HistoryEntry) {
 
 **Was schiefgeht:** History-Fenster öffnet sich nicht oder kommt nicht in den Vordergrund.
 **Warum:** Bereits bekanntes Problem aus Phase 1/Phase 5 — `.accessory`-Activation-Policy blockiert Fensteraktivierung.
-**Wie vermeiden:** Exakt das gleiche Muster wie `openSettings`: `NSApp.setActivationPolicy(.regular)` → `NSApp.activate` → `openWindow` → 300ms → `.accessory`. [VERIFIED: Codebase — VoiceScribeApp.swift, STATE.md]
+**Wie vermeiden:** Exakt das gleiche Muster wie `openSettings`: `NSApp.setActivationPolicy(.regular)` → `NSApp.activate` → `openWindow` → 300ms → `.accessory`. [VERIFIED: Codebase — SPRECHKRAFTApp.swift, STATE.md]
 
 ### Pitfall 5: onDelete in SwiftUI List vs. Kontextmenü
 
@@ -633,8 +633,8 @@ List {
 | Property | Value |
 |----------|-------|
 | Framework | Swift Testing (bereits im Projekt etabliert) |
-| Config file | VoiceScribeTests/ Target in pbxproj |
-| Quick run command | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS'` |
+| Config file | SPRECHKRAFTTests/ Target in pbxproj |
+| Quick run command | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS'` |
 | Full suite command | gleich — alle Tests im selben Target |
 
 ### Phase Requirements → Test Map
@@ -653,7 +653,7 @@ List {
 - **Phase gate:** Alle Tests grün vor `/gsd-verify-work`
 
 ### Wave 0 Gaps
-- [ ] `VoiceScribeTests/HistoryStoreTests.swift` — deckt HIST-01, HIST-02, HIST-03
+- [ ] `SPRECHKRAFTTests/HistoryStoreTests.swift` — deckt HIST-01, HIST-02, HIST-03
 - [ ] In-Memory-DatabaseQueue für Tests (kein Filesystem-Zustand)
 
 *(Wave 0 muss In-Memory-Variante von HistoryStore für Tests vorbereiten — `DatabaseQueue()` ohne Pfad erzeugt In-Memory-DB)*
@@ -685,9 +685,9 @@ List {
 
 ### Primary (HIGH confidence)
 - `/groue/grdb.swift` (Context7) — FTS5 creation, synchronize, FTS5Pattern, ValueObservation, Swift 6 Sendable, Migrations, DatabaseQueue setup, Application Support path
-- `VoiceScribe/AppDelegate.swift` (Codebase) — onRecordingComplete Pipeline, openSettingsMenu-Muster, NotificationCenter-Brücke
-- `VoiceScribe/VoiceScribeApp.swift` (Codebase) — Window-Scene-Muster, HiddenActivationView, Activation-Policy-Workaround
-- `VoiceScribe/.planning/STATE.md` (Codebase) — Phase 5 pbxproj-Pitfall (3-Stellen-Problem bei SPM)
+- `SPRECHKRAFT/AppDelegate.swift` (Codebase) — onRecordingComplete Pipeline, openSettingsMenu-Muster, NotificationCenter-Brücke
+- `SPRECHKRAFT/SPRECHKRAFTApp.swift` (Codebase) — Window-Scene-Muster, HiddenActivationView, Activation-Policy-Workaround
+- `SPRECHKRAFT/.planning/STATE.md` (Codebase) — Phase 5 pbxproj-Pitfall (3-Stellen-Problem bei SPM)
 
 ### Secondary (MEDIUM confidence)
 - CLAUDE.md — Technology Stack decisions, GRDB v7.5.0 als Zielversion

@@ -50,7 +50,7 @@
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| Minimal: nur das Nötigste | VoiceScribe / Einstellungen / Login-Toggle / Beenden | ✓ |
+| Minimal: nur das Nötigste | SPRECHKRAFT / Einstellungen / Login-Toggle / Beenden | ✓ |
 | Mit Statuszeile oben | Zusätzlich Status-Zeile (z.B. "Bereit") unter App-Namen | |
 
 **User's choice:** Minimal  

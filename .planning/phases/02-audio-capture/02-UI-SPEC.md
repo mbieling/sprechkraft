@@ -166,7 +166,7 @@ klar voneinander unterscheiden. Kein AVAudioEngine-Ton; kein Bundle-Asset.
 | Berechtigung erteilt | Kein Banner — normaler Settings-Inhalt |
 | Berechtigung verweigert | Roter Banner am oberen Rand von SettingsView |
 | Banner-Text | „Mikrofonzugriff verweigert" (Label-Größe, weiß auf systemRed) |
-| Banner-Subtext | „Öffne die Datenschutz-Einstellungen, um VoiceScribe Zugriff zu erteilen." (Caption, weiß) |
+| Banner-Subtext | „Öffne die Datenschutz-Einstellungen, um SPRECHKRAFT Zugriff zu erteilen." (Caption, weiß) |
 | Banner-Button | „Einstellungen öffnen" — öffnet `NSWorkspace.shared.open(privacyURL)` |
 | Banner-Padding | sm (8 pt) innen, md (16 pt) seitlich |
 | Banner-Höhe | intrinsisch (min. 44 pt) |
@@ -185,7 +185,7 @@ klar voneinander unterscheiden. Kein AVAudioEngine-Ton; kein Bundle-Asset.
 | Slider-Wert-Suffix | „s" (z.B. „1,5 s") |
 | Slider-Hilftext | „Aufnahme stoppt automatisch, wenn für diese Dauer keine Sprache erkannt wird." |
 | Permission-Banner-Titel | „Mikrofonzugriff verweigert" |
-| Permission-Banner-Body | „Öffne die Datenschutz-Einstellungen, um VoiceScribe Zugriff zu erteilen." |
+| Permission-Banner-Body | „Öffne die Datenschutz-Einstellungen, um SPRECHKRAFT Zugriff zu erteilen." |
 | Permission-Banner-Button | „Einstellungen öffnen" |
 | Settings Placeholder (Phase 1, wird ersetzt) | _(entfernt)_ |
 
@@ -203,10 +203,10 @@ Fortgeführt aus Phase 1:
 
 | Element | accessibilityLabel |
 |---------|-------------------|
-| Menu-Bar-Icon (`.idle`) | „VoiceScribe — Bereit" |
-| Menu-Bar-Icon (`.recording`) | „VoiceScribe — Aufnahme läuft" |
-| Menu-Bar-Icon (`.transcribing`) | „VoiceScribe — Transkribiert" |
-| Menu-Bar-Icon (`.llmProcessing`) | „VoiceScribe — KI verarbeitet" |
+| Menu-Bar-Icon (`.idle`) | „SPRECHKRAFT — Bereit" |
+| Menu-Bar-Icon (`.recording`) | „SPRECHKRAFT — Aufnahme läuft" |
+| Menu-Bar-Icon (`.transcribing`) | „SPRECHKRAFT — Transkribiert" |
+| Menu-Bar-Icon (`.llmProcessing`) | „SPRECHKRAFT — KI verarbeitet" |
 | Waveform-Linie | `.accessibilityHidden(true)` — dekorativ, kein eigener Label |
 | Mikrofon-Picker | `accessibilityLabel("Eingabegerät")` |
 | Stille-Slider | `accessibilityLabel("Automatischer Stopp nach \(wert) Sekunden")` |

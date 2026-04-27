@@ -13,7 +13,7 @@ tech_stack:
 key_files:
   created: []
   modified:
-    - VoiceScribe/Transcription/TranscriptionService.swift
+    - SPRECHKRAFT/Transcription/TranscriptionService.swift
 decisions:
   - "Replace NaN/Inf with 0.0 (silence) rather than dropping samples or aborting transcription — preserves the rest of the audio"
 metrics:
@@ -29,7 +29,7 @@ metrics:
 
 | # | Name | Commit | Files |
 |---|------|--------|-------|
-| 1 | Sanitize non-finite samples after resampling | 9f1e14d | VoiceScribe/Transcription/TranscriptionService.swift |
+| 1 | Sanitize non-finite samples after resampling | 9f1e14d | SPRECHKRAFT/Transcription/TranscriptionService.swift |
 
 ## What Was Done
 
@@ -56,7 +56,7 @@ None — no new network endpoints, auth paths, file access, or schema changes in
 
 ## Self-Check: PASSED
 
-- File exists: VoiceScribe/Transcription/TranscriptionService.swift — FOUND
+- File exists: SPRECHKRAFT/Transcription/TranscriptionService.swift — FOUND
 - Commit 9f1e14d — FOUND
 - `isFinite` on line 58 — VERIFIED
 - `sanitized` passed to backend on line 59 — VERIFIED

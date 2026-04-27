@@ -58,11 +58,11 @@ Diese Abweichung ist dokumentiert und bewusst: RESEARCH.md §Locked Decisions D-
 
 | Artefakt | Erwartet | Status | Details |
 |----------|----------|--------|---------|
-| `VoiceScribe/Transcription/TranscriptionService.swift` | actor mit downloadAndLoad, transcribe, resampleTo16kHz, transcribeWithResampling | VERIFIED | 156 Zeilen, vollstaendige Implementierung, keine Stubs |
-| `VoiceScribe/Audio/AudioController.swift` | Float-Sample-Akkumulation + onRecordingComplete Callback | VERIFIED | `recordedSamples: [Float]`, `onRecordingComplete: (([Float], Double) -> Void)?`, installTap-Akkumulation, stopRecording-Dispatch |
-| `VoiceScribe/AppState.swift` | isModelReady: Bool = false Property | VERIFIED | Zeile 74: `var isModelReady: Bool = false` mit Dokumentation |
-| `VoiceScribeTests/TranscriptionServiceTests.swift` | 5 Tests fuer RECORD-04/05 | VERIFIED | testInitialStateNotReady, testResamplingProducesCorrectLength, testResamplingIdentityAt16kHz, testMinimumSampleGuardReturnsNil, testTranscribeReturnsNilWhenNotReady |
-| `VoiceScribe/AppDelegate.swift` | Download-Kickoff, onRecordingComplete-Wiring, isModelReady-Guard | VERIFIED | setupTranscription(), guard isModelReady, onRecordingComplete-Callback mit transcribeWithResampling |
+| `SPRECHKRAFT/Transcription/TranscriptionService.swift` | actor mit downloadAndLoad, transcribe, resampleTo16kHz, transcribeWithResampling | VERIFIED | 156 Zeilen, vollstaendige Implementierung, keine Stubs |
+| `SPRECHKRAFT/Audio/AudioController.swift` | Float-Sample-Akkumulation + onRecordingComplete Callback | VERIFIED | `recordedSamples: [Float]`, `onRecordingComplete: (([Float], Double) -> Void)?`, installTap-Akkumulation, stopRecording-Dispatch |
+| `SPRECHKRAFT/AppState.swift` | isModelReady: Bool = false Property | VERIFIED | Zeile 74: `var isModelReady: Bool = false` mit Dokumentation |
+| `SPRECHKRAFTTests/TranscriptionServiceTests.swift` | 5 Tests fuer RECORD-04/05 | VERIFIED | testInitialStateNotReady, testResamplingProducesCorrectLength, testResamplingIdentityAt16kHz, testMinimumSampleGuardReturnsNil, testTranscribeReturnsNilWhenNotReady |
+| `SPRECHKRAFT/AppDelegate.swift` | Download-Kickoff, onRecordingComplete-Wiring, isModelReady-Guard | VERIFIED | setupTranscription(), guard isModelReady, onRecordingComplete-Callback mit transcribeWithResampling |
 
 ---
 

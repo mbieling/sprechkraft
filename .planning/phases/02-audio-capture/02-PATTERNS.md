@@ -10,26 +10,26 @@
 
 | Neue / Modifizierte Datei | Rolle | Data Flow | Nächster Analog | Match-Qualität |
 |---------------------------|-------|-----------|-----------------|----------------|
-| `VoiceScribe/Audio/AudioController.swift` | service | event-driven | `VoiceScribe/AppDelegate.swift` | partial (Background-Lifecycle, Task-Dispatch) |
-| `VoiceScribe/Audio/AudioDeviceManager.swift` | utility | request-response | `VoiceScribe/Extensions/KeyboardShortcuts+Names.swift` | partial (Extension-Pattern, keine echte Logik-Analog) |
-| `VoiceScribe/AppState.swift` | model | — | `VoiceScribe/AppState.swift` | exact (eigene Datei, Erweiterung bestehender Klasse) |
-| `VoiceScribe/AppDelegate.swift` | controller | request-response | `VoiceScribe/AppDelegate.swift` | exact (eigene Datei, Erweiterung) |
-| `VoiceScribe/StatusBarIconView.swift` | component | event-driven | `VoiceScribe/StatusBarIconView.swift` | exact (eigene Datei, Erweiterung um zweites Layer) |
-| `VoiceScribe/SettingsView.swift` | component | request-response | `VoiceScribe/SettingsView.swift` | exact (eigene Datei, Erweiterung um Controls) |
-| `VoiceScribe/Info.plist` | config | — | `VoiceScribe/Info.plist` | exact (eigene Datei, Ergänzung eines Keys) |
+| `SPRECHKRAFT/Audio/AudioController.swift` | service | event-driven | `SPRECHKRAFT/AppDelegate.swift` | partial (Background-Lifecycle, Task-Dispatch) |
+| `SPRECHKRAFT/Audio/AudioDeviceManager.swift` | utility | request-response | `SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift` | partial (Extension-Pattern, keine echte Logik-Analog) |
+| `SPRECHKRAFT/AppState.swift` | model | — | `SPRECHKRAFT/AppState.swift` | exact (eigene Datei, Erweiterung bestehender Klasse) |
+| `SPRECHKRAFT/AppDelegate.swift` | controller | request-response | `SPRECHKRAFT/AppDelegate.swift` | exact (eigene Datei, Erweiterung) |
+| `SPRECHKRAFT/StatusBarIconView.swift` | component | event-driven | `SPRECHKRAFT/StatusBarIconView.swift` | exact (eigene Datei, Erweiterung um zweites Layer) |
+| `SPRECHKRAFT/SettingsView.swift` | component | request-response | `SPRECHKRAFT/SettingsView.swift` | exact (eigene Datei, Erweiterung um Controls) |
+| `SPRECHKRAFT/Info.plist` | config | — | `SPRECHKRAFT/Info.plist` | exact (eigene Datei, Ergänzung eines Keys) |
 
 ---
 
 ## Pattern Assignments
 
-### `VoiceScribe/Audio/AudioController.swift` (service, event-driven)
+### `SPRECHKRAFT/Audio/AudioController.swift` (service, event-driven)
 
-**Analog:** `VoiceScribe/AppDelegate.swift` — enthält das einzige existierende Beispiel
+**Analog:** `SPRECHKRAFT/AppDelegate.swift` — enthält das einzige existierende Beispiel
 für Background→MainActor-Dispatch via `Task { @MainActor in }`.
 
 **Imports-Pattern** (AppDelegate.swift, Zeilen 1–10):
 ```swift
-// VoiceScribe/Audio/AudioController.swift
+// SPRECHKRAFT/Audio/AudioController.swift
 import AVFoundation
 import CoreAudio
 import Defaults
@@ -136,14 +136,14 @@ func playStopCue()  { NSSound(named: NSSound.Name("Pop"))?.play() }
 
 ---
 
-### `VoiceScribe/Audio/AudioDeviceManager.swift` (utility, request-response)
+### `SPRECHKRAFT/Audio/AudioDeviceManager.swift` (utility, request-response)
 
-**Analog:** `VoiceScribe/Extensions/KeyboardShortcuts+Names.swift` — einzige Utility-Datei
+**Analog:** `SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift` — einzige Utility-Datei
 im Projekt (Extension-Pattern); strukturell ähnlich (reiner Namespace, keine Klasse).
 
 **Datei-Struktur-Pattern** (KeyboardShortcuts+Names.swift — Konvention):
 ```swift
-// VoiceScribe/Audio/AudioDeviceManager.swift
+// SPRECHKRAFT/Audio/AudioDeviceManager.swift
 // Zweck: AVCaptureDevice-Enumeration + Core-Audio-Bridge für Gerätewechsel.
 // Kein eigener Lifecycle — wird von AudioController und SettingsView genutzt.
 
@@ -192,9 +192,9 @@ func uniqueIDToAudioObjectID(_ uid: String) -> AudioObjectID? {
 
 ---
 
-### `VoiceScribe/AppState.swift` (model, Erweiterung)
+### `SPRECHKRAFT/AppState.swift` (model, Erweiterung)
 
-**Analog:** `VoiceScribe/AppState.swift` selbst (Zeilen 58–75) — exakt; neue Properties
+**Analog:** `SPRECHKRAFT/AppState.swift` selbst (Zeilen 58–75) — exakt; neue Properties
 werden nach dem etablierten `var recordingState`-Pattern ergänzt.
 
 **Bestehende Klassen-Signatur** (AppState.swift, Zeilen 57–63):
@@ -225,9 +225,9 @@ func toggleRecording() {
 
 ---
 
-### `VoiceScribe/AppDelegate.swift` (controller, Erweiterung)
+### `SPRECHKRAFT/AppDelegate.swift` (controller, Erweiterung)
 
-**Analog:** `VoiceScribe/AppDelegate.swift` selbst — exakt.
+**Analog:** `SPRECHKRAFT/AppDelegate.swift` selbst — exakt.
 
 **updateIcon()-Signatur erweitern** (AppDelegate.swift, Zeilen 122–136):
 ```swift
@@ -263,7 +263,7 @@ func applicationDidFinishLaunching(_ notification: Notification) {
     updateIcon()
     setupHotkey()
     // Phase 2 ergänzt:
-    // audioController wird in VoiceScribeApp als @State gehalten und via Property injiziert,
+    // audioController wird in SPRECHKRAFTApp als @State gehalten und via Property injiziert,
     // analog zu appState — oder als lazy var in AppDelegate deklariert, initialisiert
     // sobald appState gesetzt ist.
 }
@@ -287,9 +287,9 @@ func applicationDidFinishLaunching(_ notification: Notification) {
 
 ---
 
-### `VoiceScribe/StatusBarIconView.swift` (component, Erweiterung)
+### `SPRECHKRAFT/StatusBarIconView.swift` (component, Erweiterung)
 
-**Analog:** `VoiceScribe/StatusBarIconView.swift` selbst — exakt.
+**Analog:** `SPRECHKRAFT/StatusBarIconView.swift` selbst — exakt.
 
 **Bestehende Signatur + View-Aufbau** (StatusBarIconView.swift, Zeilen 11–29):
 ```swift
@@ -376,9 +376,9 @@ struct WaveformView: View {
 
 ---
 
-### `VoiceScribe/SettingsView.swift` (component, Erweiterung)
+### `SPRECHKRAFT/SettingsView.swift` (component, Erweiterung)
 
-**Analog:** `VoiceScribe/SettingsView.swift` selbst + `VoiceScribe/AppDelegate.swift` für
+**Analog:** `SPRECHKRAFT/SettingsView.swift` selbst + `SPRECHKRAFT/AppDelegate.swift` für
 Notification-Pattern.
 
 **Bestehende SettingsView-Struktur** (SettingsView.swift, Zeilen 8–18):
@@ -463,16 +463,16 @@ extension Defaults.Keys {
 
 ---
 
-### `VoiceScribe/Info.plist` (config, Ergänzung)
+### `SPRECHKRAFT/Info.plist` (config, Ergänzung)
 
-**Analog:** `VoiceScribe/Info.plist` selbst — exakt.
+**Analog:** `SPRECHKRAFT/Info.plist` selbst — exakt.
 
 **Bestehende Plist-Struktur** (Info.plist, Zeilen 1–28):
 ```xml
 <!-- Bestehend: LSUIElement, LSMinimumSystemVersion 14.0, CFBundleIdentifier etc. -->
 <!-- Phase 2 ergänzt nach <key>LSUIElement</key><true/> (Zeile 24): -->
 <key>NSMicrophoneUsageDescription</key>
-<string>VoiceScribe benötigt Mikrofonzugriff für die lokale Spracherkennung. Die Aufnahme wird ausschließlich lokal verarbeitet und nicht übertragen.</string>
+<string>SPRECHKRAFT benötigt Mikrofonzugriff für die lokale Spracherkennung. Die Aufnahme wird ausschließlich lokal verarbeitet und nicht übertragen.</string>
 ```
 
 **Pitfall 6 aus RESEARCH.md:** Ohne diesen Key zeigt `AVAudioApplication.requestRecordPermission()`
@@ -484,7 +484,7 @@ keinen Dialog — die App gilt sofort als "denied".
 
 ### Swift 6 @MainActor-Bridge (gilt für AudioController, AppDelegate)
 
-**Quelle:** `VoiceScribe/AppDelegate.swift`, Zeilen 141–147
+**Quelle:** `SPRECHKRAFT/AppDelegate.swift`, Zeilen 141–147
 ```swift
 // Etabliertes Pattern in AppDelegate.setupHotkey():
 // Nicht-@MainActor-Kontext → @MainActor via Task { @MainActor [weak self] in }
@@ -500,7 +500,7 @@ KeyboardShortcuts.onKeyUp(for: .toggleRecording) { [weak self] in
 
 ### Observation-B: manueller updateIcon()-Aufruf (gilt für AppDelegate, AudioController-Bridge)
 
-**Quelle:** `VoiceScribe/AppDelegate.swift`, Zeilen 45–52 (handleClick) und 141–147 (setupHotkey)
+**Quelle:** `SPRECHKRAFT/AppDelegate.swift`, Zeilen 45–52 (handleClick) und 141–147 (setupHotkey)
 ```swift
 // Jede State-Änderung endet mit updateIcon().
 // AudioController → Task { @MainActor in appState.audioLevel = x; appDelegate?.updateIcon() }
@@ -511,7 +511,7 @@ updateIcon()
 
 ### Defaults-Zugriffspattern (gilt für AudioController, SettingsView)
 
-**Quelle:** `VoiceScribe/AppDelegate.swift`, Zeile 83 (LaunchAtLogin als Referenz-Pattern):
+**Quelle:** `SPRECHKRAFT/AppDelegate.swift`, Zeile 83 (LaunchAtLogin als Referenz-Pattern):
 ```swift
 // Bestehend: LaunchAtLogin.isEnabled (ähnlicher globaler State-Zugriff)
 loginItem.state = LaunchAtLogin.isEnabled ? .on : .off
@@ -522,7 +522,7 @@ loginItem.state = LaunchAtLogin.isEnabled ? .on : .off
 
 ### DesignTokens-Spacing (gilt für SettingsView)
 
-**Quelle:** `VoiceScribe/Constants/DesignTokens.swift`, Zeilen 11–25
+**Quelle:** `SPRECHKRAFT/Constants/DesignTokens.swift`, Zeilen 11–25
 ```swift
 // Alle Abstände in SettingsView über DesignTokens.Spacing.*
 // xl = 32pt für Fensterkanten-Padding (bereits in SettingsView bestehend, Zeile 16)
@@ -531,10 +531,10 @@ loginItem.state = LaunchAtLogin.isEnabled ? .on : .off
 
 ### Test-Datei-Struktur — Swift Testing (gilt für alle neuen Test-Dateien)
 
-**Quelle:** `VoiceScribeTests/AppStateTests.swift`, Zeilen 1–25
+**Quelle:** `SPRECHKRAFTTests/AppStateTests.swift`, Zeilen 1–25
 ```swift
 import Testing
-@testable import VoiceScribe
+@testable import SPRECHKRAFT
 
 @Suite("AudioController (RECORD-01, RECORD-02)")
 @MainActor  // nur wenn Test @MainActor-Klassen testet
@@ -546,11 +546,11 @@ struct AudioControllerTests {
 }
 ```
 
-**Quelle:** `VoiceScribeTests/RecordingStateTests.swift`, Zeilen 1–10 (für Defaults-Tests):
+**Quelle:** `SPRECHKRAFTTests/RecordingStateTests.swift`, Zeilen 1–10 (für Defaults-Tests):
 ```swift
 import Testing
 import SwiftUI
-@testable import VoiceScribe
+@testable import SPRECHKRAFT
 
 @Suite("Defaults Keys (SET-03, SET-04)")
 struct DefaultsKeysTests {
@@ -570,9 +570,9 @@ Planner muss RESEARCH.md-Patterns direkt verwenden:
 
 | Datei | Rolle | Data Flow | Begründung |
 |-------|-------|-----------|-----------|
-| `VoiceScribe/Audio/AudioController.swift` | service | event-driven | Kein Background-Service mit Audio-Engine existiert; AppDelegate ist nächste Analog nur für Task-Pattern |
-| `VoiceScribe/Audio/AudioDeviceManager.swift` | utility | request-response | Kein Core-Audio-Bridge-Code im Projekt; Pattern vollständig aus RESEARCH.md |
-| `VoiceScribe/Extensions/Defaults+Keys.swift` (neu) | config | — | Defaults-Keys existieren noch nicht; Pattern aus RESEARCH.md Code Examples |
+| `SPRECHKRAFT/Audio/AudioController.swift` | service | event-driven | Kein Background-Service mit Audio-Engine existiert; AppDelegate ist nächste Analog nur für Task-Pattern |
+| `SPRECHKRAFT/Audio/AudioDeviceManager.swift` | utility | request-response | Kein Core-Audio-Bridge-Code im Projekt; Pattern vollständig aus RESEARCH.md |
+| `SPRECHKRAFT/Extensions/Defaults+Keys.swift` (neu) | config | — | Defaults-Keys existieren noch nicht; Pattern aus RESEARCH.md Code Examples |
 
 ---
 
@@ -583,7 +583,7 @@ Planner muss RESEARCH.md-Patterns direkt verwenden:
 | installTap auf Bluetooth schweigt (macOS 26) | AudioController | Hinweis-Kommentar im Code; Picker-Label für Bluetooth-Geräte |
 | outputFormat nach setDeviceID veraltet | AudioController, AudioDeviceManager | `nil` als format-Parameter an installTap; nach setDeviceID Format neu abfragen |
 | Tap-Callback auf Render-Thread → @MainActor-State | AudioController | `nonisolated @unchecked Sendable`; `Task { @MainActor in }` |
-| Ad-hoc-Signierung setzt TCC-Berechtigung zurück | Info.plist, AudioController | `open -a VoiceScribe.app`; nicht direkt Binary starten |
+| Ad-hoc-Signierung setzt TCC-Berechtigung zurück | Info.plist, AudioController | `open -a SPRECHKRAFT.app`; nicht direkt Binary starten |
 | removeTap vergessen beim Stopp | AudioController | `removeTap(onBus: 0)` als erstes in stopRecording(); auch in startRecording() als Sicherheit |
 | NSMicrophoneUsageDescription fehlt | Info.plist | Key zwingend vor erstem Permission-Request |
 | setDeviceID während laufender Engine | AudioDeviceManager | Lazy-Strategie: Gerätewechsel nur vor nächstem startRecording() anwenden |
@@ -592,6 +592,6 @@ Planner muss RESEARCH.md-Patterns direkt verwenden:
 
 ## Metadata
 
-**Analog-Suchbereich:** `/Users/mbieling/claude/voice/VoiceScribe/`, `/Users/mbieling/claude/voice/VoiceScribeTests/`
-**Gescannte Dateien:** 9 (AppState, AppDelegate, StatusBarIconView, SettingsView, VoiceScribeApp, DesignTokens, KeyboardShortcuts+Names, Info.plist + 3 Test-Dateien)
+**Analog-Suchbereich:** `/Users/mbieling/claude/voice/SPRECHKRAFT/`, `/Users/mbieling/claude/voice/SPRECHKRAFTTests/`
+**Gescannte Dateien:** 9 (AppState, AppDelegate, StatusBarIconView, SettingsView, SPRECHKRAFTApp, DesignTokens, KeyboardShortcuts+Names, Info.plist + 3 Test-Dateien)
 **Pattern-Extraktion:** 2026-04-17

@@ -18,9 +18,9 @@ created: 2026-04-18
 | Property | Value |
 |----------|-------|
 | **Framework** | Swift Testing / XCTest (native Xcode) |
-| **Config file** | VoiceScribeTests/VoiceScribeTests.swift |
-| **Quick run command** | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS' -only-testing VoiceScribeTests` |
-| **Full suite command** | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS'` |
+| **Config file** | SPRECHKRAFTTests/SPRECHKRAFTTests.swift |
+| **Quick run command** | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS' -only-testing SPRECHKRAFTTests` |
+| **Full suite command** | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS'` |
 | **Estimated runtime** | ~30 seconds |
 
 ---
@@ -38,10 +38,10 @@ created: 2026-04-18
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 3-SPM | TBD | 0 | RECORD-04 | — | N/A | build | `xcodebuild build -scheme VoiceScribe` | ✅ | ⬜ pending |
-| 3-resampling | TBD | 1 | RECORD-04 | — | N/A | unit | `xcodebuild test -only-testing VoiceScribeTests/TranscriptionServiceTests` | ❌ W0 | ⬜ pending |
+| 3-SPM | TBD | 0 | RECORD-04 | — | N/A | build | `xcodebuild build -scheme SPRECHKRAFT` | ✅ | ⬜ pending |
+| 3-resampling | TBD | 1 | RECORD-04 | — | N/A | unit | `xcodebuild test -only-testing SPRECHKRAFTTests/TranscriptionServiceTests` | ❌ W0 | ⬜ pending |
 | 3-download | TBD | 1 | RECORD-05 | — | N/A | manual | See Manual-Only Verifications | — | ⬜ pending |
-| 3-transcribe | TBD | 2 | RECORD-04 | — | N/A | integration | `xcodebuild test -only-testing VoiceScribeTests/TranscriptionServiceTests` | ❌ W0 | ⬜ pending |
+| 3-transcribe | TBD | 2 | RECORD-04 | — | N/A | integration | `xcodebuild test -only-testing SPRECHKRAFTTests/TranscriptionServiceTests` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -49,7 +49,7 @@ created: 2026-04-18
 
 ## Wave 0 Requirements
 
-- [ ] `VoiceScribeTests/TranscriptionServiceTests.swift` — stubs for RECORD-04 (TranscriptionService unit tests)
+- [ ] `SPRECHKRAFTTests/TranscriptionServiceTests.swift` — stubs for RECORD-04 (TranscriptionService unit tests)
 - [ ] Resampling test: AVAudioConverter 44.1kHz → 16kHz output validates length and silence
 
 *Existing infrastructure covers build and basic app-launch tests.*

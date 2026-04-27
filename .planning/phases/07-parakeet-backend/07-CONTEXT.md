@@ -63,9 +63,9 @@ Nicht in Phase 7: Retry-Button (Phase 8), Settings-Erweiterungen (Phase 8), End-
 - `.planning/ROADMAP.md` §Phase 7 — Goal, Success Criteria, Requirements
 
 ### Bestehende Implementierung (lesen vor Umbau)
-- `VoiceScribe/Transcription/TranscriptionService.swift` — aktueller WhisperKit-Wrapper, API-Kontrakt, resampleTo16kHz-Implementierung
-- `VoiceScribe/AppDelegate.swift` §setupTranscription, §onRecordingComplete — Aufruf-Kontext der API-stabilen Methoden
-- `VoiceScribe/AppState.swift` — isModelReady-Property, RecordingState-Enum
+- `SPRECHKRAFT/Transcription/TranscriptionService.swift` — aktueller WhisperKit-Wrapper, API-Kontrakt, resampleTo16kHz-Implementierung
+- `SPRECHKRAFT/AppDelegate.swift` §setupTranscription, §onRecordingComplete — Aufruf-Kontext der API-stabilen Methoden
+- `SPRECHKRAFT/AppState.swift` — isModelReady-Property, RecordingState-Enum
 
 ### Prior Phase Context
 - `.planning/phases/03-transcription/03-CONTEXT.md` — D-01 (WhisperKit-Entscheidung), D-13 (stille Rückkehr bei Fehler)

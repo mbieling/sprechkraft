@@ -6,7 +6,7 @@ tags: [tdd, green-phase, groq, urlsession, actor, wave-1]
 dependency_graph:
   requires: [05-02, 05-03]
   provides: [PROF-05, SET-01, GroqService-actor, GroqServiceTests-GREEN]
-  affects: [VoiceScribe/Services/GroqService.swift, VoiceScribe.xcodeproj/project.pbxproj]
+  affects: [SPRECHKRAFT/Services/GroqService.swift, SPRECHKRAFT.xcodeproj/project.pbxproj]
 tech_stack:
   added: []
   patterns:
@@ -16,9 +16,9 @@ tech_stack:
     - "Services/-Gruppenstruktur in project.pbxproj"
 key_files:
   created:
-    - VoiceScribe/Services/GroqService.swift
+    - SPRECHKRAFT/Services/GroqService.swift
   modified:
-    - VoiceScribe.xcodeproj/project.pbxproj
+    - SPRECHKRAFT.xcodeproj/project.pbxproj
 decisions:
   - "Custom encode(to:) mit encodeIfPresent statt Standard-JSONEncoder — verhindert reasoning_effort:null fuer Thinking-Mode (Pitfall 5)"
   - "API-Key ausschliesslich als Parameter, kein stored property im actor (T-5-01/T-5-02)"
@@ -37,7 +37,7 @@ metrics:
 
 ## What Was Built
 
-`VoiceScribe/Services/GroqService.swift` — vollstaendig implementierter `actor GroqService`:
+`SPRECHKRAFT/Services/GroqService.swift` — vollstaendig implementierter `actor GroqService`:
 
 | Komponente | Beschreibung |
 |-----------|--------------|
@@ -70,7 +70,7 @@ metrics:
 
 | Criterion | Status |
 |-----------|--------|
-| VoiceScribe/Services/GroqService.swift existiert | PASS |
+| SPRECHKRAFT/Services/GroqService.swift existiert | PASS |
 | `actor GroqService` — 1 Treffer | PASS |
 | `https://api.groq.com/openai/v1/chat/completions` — 1 Treffer | PASS |
 | `encodeIfPresent` — 2 Treffer (Definition + Aufruf) | PASS (Pitfall 5 geschlossen) |
@@ -102,5 +102,5 @@ Keine neuen sicherheitsrelevanten Flaechen ausserhalb des Plans. T-5-01/T-5-02/T
 
 ## Self-Check: PASSED
 
-- FOUND: /Users/mbieling/claude/voice/VoiceScribe/Services/GroqService.swift
+- FOUND: /Users/mbieling/claude/voice/SPRECHKRAFT/Services/GroqService.swift
 - FOUND: commit 62a212c (feat(05-04): implement GroqService actor — GREEN-Phase)

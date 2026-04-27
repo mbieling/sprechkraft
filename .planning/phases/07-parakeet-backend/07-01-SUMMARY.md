@@ -10,8 +10,8 @@ dependency_graph:
     - "TranscriptionServiceTests kompiliert gegen TranscriptionBackend-Protokoll + Facade (nach Wave 1+3)"
     - "AppStateTests prueft isModelError-Initialwert (nach Wave 1)"
   affects:
-    - "VoiceScribe/AppState.swift (Wave 1 muss neue RecordingState-Cases liefern)"
-    - "VoiceScribe/TranscriptionService.swift (Wave 3 muss backend:-Init liefern)"
+    - "SPRECHKRAFT/AppState.swift (Wave 1 muss neue RecordingState-Cases liefern)"
+    - "SPRECHKRAFT/TranscriptionService.swift (Wave 3 muss backend:-Init liefern)"
 tech_stack:
   added: []
   patterns:
@@ -20,9 +20,9 @@ tech_stack:
 key_files:
   created: []
   modified:
-    - VoiceScribeTests/RecordingStateTests.swift
-    - VoiceScribeTests/TranscriptionServiceTests.swift
-    - VoiceScribeTests/AppStateTests.swift
+    - SPRECHKRAFTTests/RecordingStateTests.swift
+    - SPRECHKRAFTTests/TranscriptionServiceTests.swift
+    - SPRECHKRAFTTests/AppStateTests.swift
 decisions:
   - "MockTranscriptionBackend als Struct (nicht Class) in Testdatei — Sendable ohne explizite Annotation, kein Risiko fuer Produktion"
   - "Wave-0-Gate akzeptiert Kompilierungsfehler bis Wave 1 — bewusste Strategie aus RESEARCH.md Pitfall 5+6"
@@ -82,9 +82,9 @@ Keine neuen Sicherheitsflaechen eingefuehrt. `MockTranscriptionBackend` ist auss
 
 | Check | Ergebnis |
 |-------|---------|
-| VoiceScribeTests/RecordingStateTests.swift | FOUND |
-| VoiceScribeTests/TranscriptionServiceTests.swift | FOUND |
-| VoiceScribeTests/AppStateTests.swift | FOUND |
+| SPRECHKRAFTTests/RecordingStateTests.swift | FOUND |
+| SPRECHKRAFTTests/TranscriptionServiceTests.swift | FOUND |
+| SPRECHKRAFTTests/AppStateTests.swift | FOUND |
 | .planning/phases/07-parakeet-backend/07-01-SUMMARY.md | FOUND |
 | Commit 82012a0 (Task 1) | FOUND |
 | Commit d8b3036 (Task 2) | FOUND |

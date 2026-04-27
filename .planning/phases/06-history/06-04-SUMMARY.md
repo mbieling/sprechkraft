@@ -12,7 +12,7 @@ dependency_graph:
   provides:
     - "NSMenuItem 'Verlauf…' im Rechtsklick-Menü (D-02)"
     - "Notification.Name .openHistory als AppDelegate→SwiftUI-Brücke"
-    - "Window-Scene 'history' (640×480 / min 480×320) in VoiceScribeApp"
+    - "Window-Scene 'history' (640×480 / min 480×320) in SPRECHKRAFTApp"
     - "GRDB-Insert in onRecordingComplete (LLM-Pfad + Direkt-Pfad) — D-15"
     - "Vollständige Pipeline: Diktat → TranscriptionService → TextOutputService → HistoryStore → HistoryView"
   affects:
@@ -27,8 +27,8 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - "VoiceScribe/AppDelegate.swift"
-    - "VoiceScribe/VoiceScribeApp.swift"
+    - "SPRECHKRAFT/AppDelegate.swift"
+    - "SPRECHKRAFT/SPRECHKRAFTApp.swift"
 
 key-decisions:
   - "activeProfile.name (non-optional) im LLM-Pfad innerhalb if let activeProfile Binding — activeProfile?.name wäre Compiler-Fehler"
@@ -47,7 +47,7 @@ duration: 8min
 completed: "2026-04-21"
 ---
 
-# Phase 6 Plan 4: AppDelegate + VoiceScribeApp Wiring Summary
+# Phase 6 Plan 4: AppDelegate + SPRECHKRAFTApp Wiring Summary
 
 **Vollständige History-Pipeline verdrahtet: NSMenuItem 'Verlauf…' → NotificationCenter → Window-Scene 'history' + GRDB-Insert nach jedem Diktat in beiden onRecordingComplete-Pfaden (LLM + Direkt).**
 
@@ -62,20 +62,20 @@ completed: "2026-04-21"
 ## Accomplishments
 
 - AppDelegate.swift: 4 Änderungen — Notification.Name .openHistory, NSMenuItem "Verlauf…" vor "Einstellungen…", @objc openHistoryMenu(), GRDB-Insert in beiden onRecordingComplete-Pfaden
-- VoiceScribeApp.swift: 2 Änderungen — Window-Scene "history" (640×480, min 480×320) + onReceive(.openHistory) mit Activation-Policy-Workaround
+- SPRECHKRAFTApp.swift: 2 Änderungen — Window-Scene "history" (640×480, min 480×320) + onReceive(.openHistory) mit Activation-Policy-Workaround
 - Alle 5 HistoryStoreTests grün nach Wiring (keine Regression)
 
 ## Task Commits
 
 | Task | Name | Commit | Files |
 |------|------|--------|-------|
-| 1 | AppDelegate — openHistory + GRDB-Insert | d011b1b | VoiceScribe/AppDelegate.swift |
-| 2 | VoiceScribeApp — Window-Scene history + onReceive | 312eb3d | VoiceScribe/VoiceScribeApp.swift |
+| 1 | AppDelegate — openHistory + GRDB-Insert | d011b1b | SPRECHKRAFT/AppDelegate.swift |
+| 2 | SPRECHKRAFTApp — Window-Scene history + onReceive | 312eb3d | SPRECHKRAFT/SPRECHKRAFTApp.swift |
 
 ## Files Created/Modified
 
-- `VoiceScribe/AppDelegate.swift` — Notification.Name .openHistory, NSMenuItem "Verlauf…", @objc openHistoryMenu(), HistoryStore.shared.insert() in LLM- und Direkt-Pfad
-- `VoiceScribe/VoiceScribeApp.swift` — Window("VoiceScribe — Verlauf", id: "history") + onReceive(.openHistory) Handler
+- `SPRECHKRAFT/AppDelegate.swift` — Notification.Name .openHistory, NSMenuItem "Verlauf…", @objc openHistoryMenu(), HistoryStore.shared.insert() in LLM- und Direkt-Pfad
+- `SPRECHKRAFT/SPRECHKRAFTApp.swift` — Window("SPRECHKRAFT — Verlauf", id: "history") + onReceive(.openHistory) Handler
 
 ## Entscheidungen
 
@@ -91,7 +91,7 @@ completed: "2026-04-21"
 - **Found during:** Task 1 (erster Build nach GRDB-Insert-Einbau)
 - **Issue:** `activeProfile?.name` im inneren `Task {}` Block (Zeile 156) — aber `activeProfile` war durch `if let activeProfile` bereits auf non-optional gebunden; Swift 6 Compiler: "cannot use optional chaining on non-optional value of type 'PromptProfile'"
 - **Fix:** `activeProfile?.name` → `activeProfile.name`
-- **Files modified:** VoiceScribe/AppDelegate.swift
+- **Files modified:** SPRECHKRAFT/AppDelegate.swift
 - **Verification:** BUILD SUCCEEDED nach Fix
 - **Committed in:** d011b1b (Task 1 commit)
 
@@ -134,13 +134,13 @@ Bereit für Wave 4 (06-05: Human-Verify). Die Pipeline ist vollständig verdraht
 
 ## Self-Check: PASSED
 
-- FOUND: VoiceScribe/AppDelegate.swift (modifiziert)
-- FOUND: VoiceScribe/VoiceScribeApp.swift (modifiziert)
+- FOUND: SPRECHKRAFT/AppDelegate.swift (modifiziert)
+- FOUND: SPRECHKRAFT/SPRECHKRAFTApp.swift (modifiziert)
 - FOUND: commit d011b1b (feat(06-04): AppDelegate)
-- FOUND: commit 312eb3d (feat(06-04): VoiceScribeApp)
+- FOUND: commit 312eb3d (feat(06-04): SPRECHKRAFTApp)
 - VERIFIED: grep "openHistory" AppDelegate.swift | wc -l = 4 (>= 3 erwartet)
 - VERIFIED: grep "HistoryStore.shared.insert" AppDelegate.swift | wc -l = 2
-- VERIFIED: grep '"VoiceScribe — Verlauf"' VoiceScribeApp.swift = vorhanden
+- VERIFIED: grep '"SPRECHKRAFT — Verlauf"' SPRECHKRAFTApp.swift = vorhanden
 - VERIFIED: 5/5 HistoryStoreTests grün
 - VERIFIED: BUILD SUCCEEDED
 

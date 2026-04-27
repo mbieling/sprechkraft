@@ -78,9 +78,9 @@ No external ADRs — requirements fully captured in decisions above.
 ## Existing Code Insights
 
 ### Reusable Assets
-- `VoiceScribe/AppState.swift` — `@MainActor @Observable final class AppState`, `RecordingState` enum mit `.idle/.recording/.transcribing/.llmProcessing`; `toggleRecording()` wird in Phase 2 durch echte Audio-Logik ersetzt
-- `VoiceScribe/StatusBarIconView.swift` — `mic.fill` + Pulse-Animation; Phase 2 fügt Waveform-Linie als zweites View-Layer hinzu
-- `VoiceScribe/AppDelegate.swift` — NSStatusItem + NSHostingView; Audio-Controller wird hier initialisiert
+- `SPRECHKRAFT/AppState.swift` — `@MainActor @Observable final class AppState`, `RecordingState` enum mit `.idle/.recording/.transcribing/.llmProcessing`; `toggleRecording()` wird in Phase 2 durch echte Audio-Logik ersetzt
+- `SPRECHKRAFT/StatusBarIconView.swift` — `mic.fill` + Pulse-Animation; Phase 2 fügt Waveform-Linie als zweites View-Layer hinzu
+- `SPRECHKRAFT/AppDelegate.swift` — NSStatusItem + NSHostingView; Audio-Controller wird hier initialisiert
 
 ### Established Patterns
 - Swift 6 Strict Concurrency: `SWIFT_STRICT_CONCURRENCY = complete` — alle Audio-Callbacks müssen @MainActor-konform sein oder explizit per `Task { @MainActor in … }` dispatchen

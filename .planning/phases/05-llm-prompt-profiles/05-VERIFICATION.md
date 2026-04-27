@@ -54,16 +54,16 @@ human_verification:
 
 | Artefakt | Erwartet | Status | Details |
 |----------|---------|--------|---------|
-| `VoiceScribe/Models/PromptProfile.swift` | Codable & Defaults.Serializable & Identifiable Struct | VERIFIED | 6 Felder: id, name, prompt, isLLMEnabled, isThinkingEnabled, isDefault; `defaultProfile` mit "Rohe Transkription" |
-| `VoiceScribe/Extensions/Defaults+Keys.swift` | profiles Key für UserDefaults-Persistenz | VERIFIED | `static let profiles = Key<[PromptProfile]>("profiles", default: [PromptProfile.defaultProfile])` vorhanden |
-| `VoiceScribe/Extensions/KeyboardShortcuts+Names.swift` | Dynamische UUID-basierte Profil-Hotkey-Namen | VERIFIED | `static func profile(_ id: UUID) -> Self` mit `"profile-\(id.uuidString)"` |
-| `VoiceScribe/Services/GroqService.swift` | URLSession-basierter Groq-LLM-Client | VERIFIED | `actor GroqService` mit `process(transcript:profile:apiKey:)`, custom `encode(to:)` mit `encodeIfPresent` |
-| `VoiceScribe/AppState.swift` | activeProfileID + groqKeyMissing Properties | VERIFIED | Beide Properties vorhanden (Zeilen 87+93), kein API-Key gecacht (T-5-01/T-5-02) |
-| `VoiceScribe/AppDelegate.swift` | setupProfileHotkeys + LLM-Routing + Keychain-Init | VERIFIED | `setupProfileHotkeys()` mit `onKeyDown`, vollständiges LLM-Routing in `onRecordingComplete`, Keychain-Check in `applicationDidFinishLaunching` |
-| `VoiceScribe/ProfileEditorSheet.swift` | Sheet-Modal für Profil-CRUD | VERIFIED | 5 Sektionen (Name, Hotkey, KI, Prompt, Aktionen), D-06/D-09/D-13 implementiert |
-| `VoiceScribe/SettingsView.swift` | Section("Prompt-Profile") + Groq-Banner + Sheet | VERIFIED | Section "Prompt-Profile" mit Groq-Banner (groqKeyMissing), SecureField → Keychain onChange, Profilliste mit ⭐, `.sheet(item:)` |
-| `VoiceScribeTests/PromptProfileTests.swift` | 5 TDD-Tests für PROF-01/03/04 | VERIFIED | 5 `@Test`-Stubs vorhanden; laut SUMMARY alle grün nach Wave 1 |
-| `VoiceScribeTests/GroqServiceTests.swift` | 4 TDD-Tests für PROF-05 | VERIFIED | 4 `@Test`-Stubs vorhanden; laut SUMMARY alle grün nach Wave 1 |
+| `SPRECHKRAFT/Models/PromptProfile.swift` | Codable & Defaults.Serializable & Identifiable Struct | VERIFIED | 6 Felder: id, name, prompt, isLLMEnabled, isThinkingEnabled, isDefault; `defaultProfile` mit "Rohe Transkription" |
+| `SPRECHKRAFT/Extensions/Defaults+Keys.swift` | profiles Key für UserDefaults-Persistenz | VERIFIED | `static let profiles = Key<[PromptProfile]>("profiles", default: [PromptProfile.defaultProfile])` vorhanden |
+| `SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift` | Dynamische UUID-basierte Profil-Hotkey-Namen | VERIFIED | `static func profile(_ id: UUID) -> Self` mit `"profile-\(id.uuidString)"` |
+| `SPRECHKRAFT/Services/GroqService.swift` | URLSession-basierter Groq-LLM-Client | VERIFIED | `actor GroqService` mit `process(transcript:profile:apiKey:)`, custom `encode(to:)` mit `encodeIfPresent` |
+| `SPRECHKRAFT/AppState.swift` | activeProfileID + groqKeyMissing Properties | VERIFIED | Beide Properties vorhanden (Zeilen 87+93), kein API-Key gecacht (T-5-01/T-5-02) |
+| `SPRECHKRAFT/AppDelegate.swift` | setupProfileHotkeys + LLM-Routing + Keychain-Init | VERIFIED | `setupProfileHotkeys()` mit `onKeyDown`, vollständiges LLM-Routing in `onRecordingComplete`, Keychain-Check in `applicationDidFinishLaunching` |
+| `SPRECHKRAFT/ProfileEditorSheet.swift` | Sheet-Modal für Profil-CRUD | VERIFIED | 5 Sektionen (Name, Hotkey, KI, Prompt, Aktionen), D-06/D-09/D-13 implementiert |
+| `SPRECHKRAFT/SettingsView.swift` | Section("Prompt-Profile") + Groq-Banner + Sheet | VERIFIED | Section "Prompt-Profile" mit Groq-Banner (groqKeyMissing), SecureField → Keychain onChange, Profilliste mit ⭐, `.sheet(item:)` |
+| `SPRECHKRAFTTests/PromptProfileTests.swift` | 5 TDD-Tests für PROF-01/03/04 | VERIFIED | 5 `@Test`-Stubs vorhanden; laut SUMMARY alle grün nach Wave 1 |
+| `SPRECHKRAFTTests/GroqServiceTests.swift` | 4 TDD-Tests für PROF-05 | VERIFIED | 4 `@Test`-Stubs vorhanden; laut SUMMARY alle grün nach Wave 1 |
 
 ---
 

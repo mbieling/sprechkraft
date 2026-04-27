@@ -171,7 +171,7 @@ Settings-Fenster (parallel, unabhängig)
 ### Recommended Project Structure
 
 ```
-VoiceScribe/
+SPRECHKRAFT/
 ├── Audio/
 │   ├── AudioController.swift         # AVAudioEngine-Wrapper, Tap, RMS, Silence
 │   └── AudioDeviceManager.swift      # AVCaptureDevice-Enumeration + setDeviceID
@@ -409,7 +409,7 @@ NSSound(named: NSSound.Name("Pop"))?.play()   // Stopp (tiefer, kurz ~150ms)
 ### Pitfall 4: Ad-hoc-Signierung setzt TCC-Berechtigungen zurück
 **Was schief geht:** Jeder Build mit ad-hoc-Signierung (`codesign --sign -`) generiert einen anderen Code-Directory-Hash. macOS TCC betrachtet die App als "neue" App und entzieht alle Berechtigungen.
 **Warum:** TCC bindet Berechtigungen an den Code-Signing-Hash, nicht an den Bundle-Identifier.
-**Wie vermeiden:** App immer via `open -a VoiceScribe.app` starten (nicht direktes Binary). Mikrofon-Berechtigung einmalig im Dialog erteilen. Bekannte Einschränkung der ad-hoc-Entwicklungsphase (aus STATE.md).
+**Wie vermeiden:** App immer via `open -a SPRECHKRAFT.app` starten (nicht direktes Binary). Mikrofon-Berechtigung einmalig im Dialog erteilen. Bekannte Einschränkung der ad-hoc-Entwicklungsphase (aus STATE.md).
 **Warnsignale:** `AVAudioApplication.recordPermission` ist `.denied` obwohl Nutzer noch nie gefragt wurde; kein System-Dialog erscheint.
 
 ### Pitfall 5: engine.start() ohne installTap vorher / doppeltes installTap
@@ -421,7 +421,7 @@ NSSound(named: NSSound.Name("Pop"))?.play()   // Stopp (tiefer, kurz ~150ms)
 ### Pitfall 6: NSMicrophoneUsageDescription fehlt in Info.plist
 **Was schief geht:** AVAudioApplication.requestRecordPermission() zeigt keinen Dialog — App wird direkt als "denied" behandelt oder crasht.
 **Warum:** macOS erzwingt Privacy-Usage-Description im Info.plist für Mikrofon-Zugriff.
-**Wie vermeiden:** `NSMicrophoneUsageDescription` in `VoiceScribe/Info.plist` eintragen.
+**Wie vermeiden:** `NSMicrophoneUsageDescription` in `SPRECHKRAFT/Info.plist` eintragen.
 **Warnsignale:** Permission-Anfrage schlägt sofort fehl ohne Dialog.
 
 ### Pitfall 7: setDeviceID muss vor engine.prepare()/start() oder nach engine.stop() aufgerufen werden
@@ -576,10 +576,10 @@ func updateSilenceDetection(rms: Float, bufferDuration: TimeInterval) {
 
 | Property | Value |
 |----------|-------|
-| Framework | Swift Testing (import Testing) — bereits in VoiceScribeTests eingesetzt |
-| Config file | Xcode-Testziel (VoiceScribeTests) — kein separates Config-File |
-| Quick run command | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS' -only-testing:VoiceScribeTests/AudioControllerTests 2>&1 \| tail -20` |
-| Full suite command | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS' 2>&1 \| tail -40` |
+| Framework | Swift Testing (import Testing) — bereits in SPRECHKRAFTTests eingesetzt |
+| Config file | Xcode-Testziel (SPRECHKRAFTTests) — kein separates Config-File |
+| Quick run command | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS' -only-testing:SPRECHKRAFTTests/AudioControllerTests 2>&1 \| tail -20` |
+| Full suite command | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS' 2>&1 \| tail -40` |
 
 ### Phase Requirements → Test Map
 
@@ -597,15 +597,15 @@ func updateSilenceDetection(rms: Float, bufferDuration: TimeInterval) {
 | FEED-03 | WaveformView ist hidden bei .idle | unit | Full suite | Wave 0 |
 
 ### Sampling Rate
-- **Per task commit:** `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS' -only-testing:VoiceScribeTests 2>&1 | grep -E "(passed|failed|error)"`
+- **Per task commit:** `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS' -only-testing:SPRECHKRAFTTests 2>&1 | grep -E "(passed|failed|error)"`
 - **Per wave merge:** Full suite command (oben)
 - **Phase gate:** Full suite green before `/gsd-verify-work`
 
 ### Wave 0 Gaps
 
-- [ ] `VoiceScribeTests/AudioControllerTests.swift` — deckt RECORD-01, RECORD-02 (Silence-Logic unit-testbar ohne echtes Mikrofon durch RMS-Injection)
-- [ ] `VoiceScribeTests/DefaultsKeysTests.swift` — deckt SET-03, SET-04 (Defaults-Keys initial values)
-- [ ] `VoiceScribeTests/WaveformViewTests.swift` — deckt FEED-03 (SwiftUI View state)
+- [ ] `SPRECHKRAFTTests/AudioControllerTests.swift` — deckt RECORD-01, RECORD-02 (Silence-Logic unit-testbar ohne echtes Mikrofon durch RMS-Injection)
+- [ ] `SPRECHKRAFTTests/DefaultsKeysTests.swift` — deckt SET-03, SET-04 (Defaults-Keys initial values)
+- [ ] `SPRECHKRAFTTests/WaveformViewTests.swift` — deckt FEED-03 (SwiftUI View state)
 - [ ] AppStateTests.swift erweitern — RECORD-01 Toggle-Logik (echte Audio-Logik statt Demo-Cycle)
 
 **Hinweis:** `AVAudioEngine`-Tests mit echtem Mikrofon sind keine Unit-Tests — sie sind Integrationstests die nur auf echtem macOS-Hardware mit Mikrofon-Berechtigung laufen. AudioController so designen dass RMS-Calculation und Silence-Logic ohne echten Engine-Start testbar sind (Dependency-Inversion).

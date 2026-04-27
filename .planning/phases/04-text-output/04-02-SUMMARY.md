@@ -6,14 +6,14 @@ tags: ["accessibility", "ax-injection", "clipboard", "unit-tests", "swift6"]
 
 dependency_graph:
   requires:
-    - "VoiceScribe/AppState.swift (axPermissionDenied — wird in Plan 01 ergaenzt)"
-    - "VoiceScribe/Extensions/Defaults+Keys.swift (OutputMode — wird in Plan 01 ergaenzt)"
+    - "SPRECHKRAFT/AppState.swift (axPermissionDenied — wird in Plan 01 ergaenzt)"
+    - "SPRECHKRAFT/Extensions/Defaults+Keys.swift (OutputMode — wird in Plan 01 ergaenzt)"
   provides:
     - "TextOutputServiceProtocol — testbares Interface fuer Text-Ausgabe"
     - "TextOutputService.shared — @MainActor Singleton fuer AX + Clipboard"
     - "insertText() — interne Unicode-Scalar-Insert-Hilfsfunktion"
   affects:
-    - "VoiceScribe/AppDelegate.swift (Plan 03 ersetzt print()-Stub durch TextOutputService.output())"
+    - "SPRECHKRAFT/AppDelegate.swift (Plan 03 ersetzt print()-Stub durch TextOutputService.output())"
 
 tech_stack:
   added: []
@@ -25,16 +25,16 @@ tech_stack:
 
 key_files:
   created:
-    - "VoiceScribe/TextOutput/TextOutputService.swift"
-    - "VoiceScribeTests/TextOutputServiceTests.swift"
+    - "SPRECHKRAFT/TextOutput/TextOutputService.swift"
+    - "SPRECHKRAFTTests/TextOutputServiceTests.swift"
   modified:
-    - "VoiceScribe.xcodeproj/project.pbxproj"
+    - "SPRECHKRAFT.xcodeproj/project.pbxproj"
 
 decisions:
   - "OutputMode als Forward-Deklaration in TextOutputService.swift — Plan 01 laeuft parallel und legt den kanonischen Enum mit Defaults.Serializable an; Forward-Deklaration wird nach Merge entfernt"
-  - "insertText() als package-interne Funktion (nicht private) — ermoeglicht @testable import VoiceScribe Zugriff ohne separate Test-Hilfsdatei"
+  - "insertText() als package-interne Funktion (nicht private) — ermoeglicht @testable import SPRECHKRAFT Zugriff ohne separate Test-Hilfsdatei"
   - "writeToClipboard() ist internal (nicht private) — wird von Tests via TextOutputService.shared direkt aufgerufen fuer 2040-Guard-Verifikation"
-  - "TextOutput-Unterordner in VoiceScribe/ — konsistent mit bestehenden Audio/ und Transcription/ Gruppen; pbxproj-Gruppe BB040230 angelegt"
+  - "TextOutput-Unterordner in SPRECHKRAFT/ — konsistent mit bestehenden Audio/ und Transcription/ Gruppen; pbxproj-Gruppe BB040230 angelegt"
 
 metrics:
   duration_minutes: 25
@@ -52,8 +52,8 @@ metrics:
 
 | Task | Name | Commit | Files |
 |------|------|--------|-------|
-| 1 | TextOutputServiceProtocol + TextOutputService | 0256fe0 | VoiceScribe/TextOutput/TextOutputService.swift, project.pbxproj |
-| 2 | Unit-Tests fuer TextOutputService via MockTextOutputService | d79bf47 | VoiceScribeTests/TextOutputServiceTests.swift, project.pbxproj |
+| 1 | TextOutputServiceProtocol + TextOutputService | 0256fe0 | SPRECHKRAFT/TextOutput/TextOutputService.swift, project.pbxproj |
+| 2 | Unit-Tests fuer TextOutputService via MockTextOutputService | d79bf47 | SPRECHKRAFTTests/TextOutputServiceTests.swift, project.pbxproj |
 
 ## What Was Built
 
@@ -91,11 +91,11 @@ Testsuiten ohne echte AX-Permission via `MockTextOutputService`:
 - **Grund:** Plan 01 laeuft parallel (wave: 1, separate Worktree) — OutputMode existiert noch nicht in Defaults+Keys.swift
 - **Fix:** `enum OutputMode: String { case field; case clipboard }` am Anfang von TextOutputService.swift als Forward-Deklaration mit TODO-Kommentar
 - **Nach Merge:** Plan-01-OutputMode hat `Defaults.Serializable`-Konformanz; die lokale Deklaration muss entfernt werden
-- **Datei:** VoiceScribe/TextOutput/TextOutputService.swift (Zeilen 12-15)
+- **Datei:** SPRECHKRAFT/TextOutput/TextOutputService.swift (Zeilen 12-15)
 
 **2. [Deviation] insertText() aus injectViaAX() extrahiert**
 - **Grund:** Planvorlage zeigte insertText() als lokale Test-Kopie; fuer DRY und echte Verifikation wurde sie als interne package-Funktion in TextOutputService.swift angelegt
-- **Fix:** `func insertText(...)` in TextOutputService.swift (nicht private) — Tests nutzen diese direkt via `@testable import VoiceScribe`
+- **Fix:** `func insertText(...)` in TextOutputService.swift (nicht private) — Tests nutzen diese direkt via `@testable import SPRECHKRAFT`
 - **Vorteil:** Tests validieren exakt dieselbe Logik wie die Produktion (keine Divergenz moeglich)
 
 **3. [Rule 2 - Missing Test] safe-bounds Test fuer len > remaining ergaenzt**
@@ -106,7 +106,7 @@ Testsuiten ohne echte AX-Permission via `MockTextOutputService`:
 ## Known Stubs
 
 **OutputMode Forward-Deklaration** (wird nach Plan-01-Merge entfernt):
-- Datei: `VoiceScribe/TextOutput/TextOutputService.swift`, Zeilen 12-15
+- Datei: `SPRECHKRAFT/TextOutput/TextOutputService.swift`, Zeilen 12-15
 - Aktuell: `enum OutputMode: String { case field; case clipboard }` (ohne `Defaults.Serializable`)
 - Nach Merge: Plan-01-Deklaration in `Defaults+Keys.swift` hat `Defaults.Serializable`; lokale Deklaration wird entfernt
 - **Intentional:** Plan-02 haengt nicht von Plan-01 ab (wave: 1, parallel)

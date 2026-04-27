@@ -147,7 +147,7 @@ ASRResult.text  -> String?
 
 ### Recommended Project Structure
 ```
-VoiceScribe/
+SPRECHKRAFT/
 ├── Transcription/
 │   ├── TranscriptionBackend.swift    [NEU: Protokoll]
 │   ├── TranscriptionService.swift    [UMBAU: Facade, behält resampleTo16kHz]
@@ -296,9 +296,9 @@ case .modelError:   return "exclamationmark.triangle.fill"
 
 **`accessibilityLabel`-Erweiterungen:**
 ```swift
-case .modelLoading: return "VoiceScribe — Modell wird geladen"
-case .warmingUp:    return "VoiceScribe — Modell wird vorbereitet"
-case .modelError:   return "VoiceScribe — Modellfehler"
+case .modelLoading: return "SPRECHKRAFT — Modell wird geladen"
+case .warmingUp:    return "SPRECHKRAFT — Modell wird vorbereitet"
+case .modelError:   return "SPRECHKRAFT — Modellfehler"
 ```
 
 ### Pattern 5: AppDelegate setupTranscription (minimale Änderungen)
@@ -520,31 +520,31 @@ let models = try await AsrModels.load(from: repoDirectory, version: .v3)
 | Property | Value |
 |----------|-------|
 | Framework | Swift Testing (import Testing) |
-| Config file | Xcode Project — VoiceScribeTests Target |
-| Quick run command | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS' -only-testing:VoiceScribeTests/TranscriptionServiceTests 2>&1 \| tail -20` |
-| Full suite command | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS' 2>&1 \| tail -30` |
+| Config file | Xcode Project — SPRECHKRAFTTests Target |
+| Quick run command | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS' -only-testing:SPRECHKRAFTTests/TranscriptionServiceTests 2>&1 \| tail -20` |
+| Full suite command | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS' 2>&1 \| tail -30` |
 
 ### Phase Requirements → Test Map
 
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| RECORD-04 | ParakeetBackend.transcribeWithResampling gibt nil bei < 1600 Samples zurück | unit | `xcodebuild test ... -only-testing:VoiceScribeTests/TranscriptionServiceTests` | ❌ Wave 0 (bestehend aber anpassen) |
-| RECORD-04 | ParakeetBackend.transcribeWithResampling gibt nil wenn nicht geladen | unit | `xcodebuild test ... -only-testing:VoiceScribeTests/TranscriptionServiceTests` | ❌ Wave 0 (umbenennen/anpassen) |
-| RECORD-05 | ParakeetBackend.isModelReady ist false nach Init | unit | `xcodebuild test ... -only-testing:VoiceScribeTests/TranscriptionServiceTests` | ❌ Wave 0 (bereits vorhanden, anpassen) |
-| RECORD-04 | resampleTo16kHz bleibt korrekt (48kHz→16kHz) | unit | `xcodebuild test ... -only-testing:VoiceScribeTests/TranscriptionServiceTests` | ✅ (TranscriptionServiceTests bleibt gültig) |
-| D-03/D-09 | RecordingState hat .warmingUp und .modelError Cases | unit | `xcodebuild test ... -only-testing:VoiceScribeTests/RecordingStateTests` | ❌ Wave 0 (bestehend, count ändern) |
-| D-08 | AppState.isModelError existiert und ist initial false | unit | `xcodebuild test ... -only-testing:VoiceScribeTests/AppStateTests` | ❌ Wave 0 (neuer Test) |
+| RECORD-04 | ParakeetBackend.transcribeWithResampling gibt nil bei < 1600 Samples zurück | unit | `xcodebuild test ... -only-testing:SPRECHKRAFTTests/TranscriptionServiceTests` | ❌ Wave 0 (bestehend aber anpassen) |
+| RECORD-04 | ParakeetBackend.transcribeWithResampling gibt nil wenn nicht geladen | unit | `xcodebuild test ... -only-testing:SPRECHKRAFTTests/TranscriptionServiceTests` | ❌ Wave 0 (umbenennen/anpassen) |
+| RECORD-05 | ParakeetBackend.isModelReady ist false nach Init | unit | `xcodebuild test ... -only-testing:SPRECHKRAFTTests/TranscriptionServiceTests` | ❌ Wave 0 (bereits vorhanden, anpassen) |
+| RECORD-04 | resampleTo16kHz bleibt korrekt (48kHz→16kHz) | unit | `xcodebuild test ... -only-testing:SPRECHKRAFTTests/TranscriptionServiceTests` | ✅ (TranscriptionServiceTests bleibt gültig) |
+| D-03/D-09 | RecordingState hat .warmingUp und .modelError Cases | unit | `xcodebuild test ... -only-testing:SPRECHKRAFTTests/RecordingStateTests` | ❌ Wave 0 (bestehend, count ändern) |
+| D-08 | AppState.isModelError existiert und ist initial false | unit | `xcodebuild test ... -only-testing:SPRECHKRAFTTests/AppStateTests` | ❌ Wave 0 (neuer Test) |
 
 ### Sampling Rate
-- **Per task commit:** `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS' -only-testing:VoiceScribeTests/TranscriptionServiceTests -only-testing:VoiceScribeTests/RecordingStateTests 2>&1 | tail -20`
+- **Per task commit:** `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS' -only-testing:SPRECHKRAFTTests/TranscriptionServiceTests -only-testing:SPRECHKRAFTTests/RecordingStateTests 2>&1 | tail -20`
 - **Per wave merge:** Full suite
 - **Phase gate:** Full suite green vor `/gsd-verify-work`
 
 ### Wave 0 Gaps
 
-- [ ] `VoiceScribeTests/TranscriptionServiceTests.swift` — bestehende Tests auf neue Facade-API anpassen (mock Backend), `transcribe()` → `transcribeWithResampling()` via Facade; neuer Test für ParakeetBackend.isModelReady
-- [ ] `VoiceScribeTests/RecordingStateTests.swift` — `caseCount()` von 4 auf 7 aktualisieren; neue Cases hinzufügen
-- [ ] `VoiceScribeTests/AppStateTests.swift` — Test für `isModelError: Bool` (initital false) hinzufügen
+- [ ] `SPRECHKRAFTTests/TranscriptionServiceTests.swift` — bestehende Tests auf neue Facade-API anpassen (mock Backend), `transcribe()` → `transcribeWithResampling()` via Facade; neuer Test für ParakeetBackend.isModelReady
+- [ ] `SPRECHKRAFTTests/RecordingStateTests.swift` — `caseCount()` von 4 auf 7 aktualisieren; neue Cases hinzufügen
+- [ ] `SPRECHKRAFTTests/AppStateTests.swift` — Test für `isModelError: Bool` (initital false) hinzufügen
 
 ## Security Domain
 
@@ -569,10 +569,10 @@ let models = try await AsrModels.load(from: repoDirectory, version: .v3)
 
 ### Primary (HIGH confidence)
 - Context7 `/fluidinference/fluidaudio` — Score 89.75; `AsrModels.downloadAndLoad`, `AsrManager.transcribe`, `ASRResult`, `AudioSource`, SPM-URL, Swift-6-Concurrency-Anforderungen
-- Existing codebase: `VoiceScribe/Transcription/TranscriptionService.swift` — bestehende API-Kontrakte, Resampling-Implementierung
-- Existing codebase: `VoiceScribe/AppState.swift` — RecordingState-Enum (5 Cases: idle, recording, transcribing, llmProcessing, error), isModelReady-Pattern
-- Existing codebase: `VoiceScribe/AppDelegate.swift` — setupTranscription(), onRecordingComplete-Callback
-- Existing codebase: `VoiceScribe.xcodeproj/project.pbxproj` — WhisperKit-Referenzen an 5 Stellen (CAFE0028, BEEF0028, DEAD0103)
+- Existing codebase: `SPRECHKRAFT/Transcription/TranscriptionService.swift` — bestehende API-Kontrakte, Resampling-Implementierung
+- Existing codebase: `SPRECHKRAFT/AppState.swift` — RecordingState-Enum (5 Cases: idle, recording, transcribing, llmProcessing, error), isModelReady-Pattern
+- Existing codebase: `SPRECHKRAFT/AppDelegate.swift` — setupTranscription(), onRecordingComplete-Callback
+- Existing codebase: `SPRECHKRAFT.xcodeproj/project.pbxproj` — WhisperKit-Referenzen an 5 Stellen (CAFE0028, BEEF0028, DEAD0103)
 
 ### Secondary (MEDIUM confidence)
 - `.planning/research/SUMMARY.md` — FluidAudio-Pitfalls C4/I8, Wave-Struktur, Modellgröße ~1.2GB

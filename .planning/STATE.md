@@ -90,7 +90,7 @@ Recent decisions affecting current work:
 - [Phase 05-llm-prompt-profiles Plan 04]: API-Key ausschliesslich als Parameter, kein stored property im actor (T-5-01/T-5-02)
 - [Phase 05-llm-prompt-profiles Plan 05]: KeyboardShortcuts.removeHandler(for:) statt disable(_:) — disable() entfernt nur Shortcut-Registrierung, nicht den onKeyDown-Callback
 - [Phase 05-llm-prompt-profiles Plan 05]: pbxproj braucht KeychainAccess in drei Stellen: packageReferences (PBXProject), XCRemoteSwiftPackageReference, packageProductDependencies (Target) — fehlender packageReferences-Eintrag verhindert Xcode-Auflösung
-- [Phase 05-llm-prompt-profiles Plan 06]: ProfileEditorSheet in VoiceScribe/ direkt (kein Views/-Unterverzeichnis); .frame(width:height:) auf NavigationStack statt .frame(width:minHeight:) auf Form; Notification-Bridge für Hotkey-Refresh (SettingsView -> AppDelegate)
+- [Phase 05-llm-prompt-profiles Plan 06]: ProfileEditorSheet in SPRECHKRAFT/ direkt (kein Views/-Unterverzeichnis); .frame(width:height:) auf NavigationStack statt .frame(width:minHeight:) auf Form; Notification-Bridge für Hotkey-Refresh (SettingsView -> AppDelegate)
 
 ### Pending Todos
 

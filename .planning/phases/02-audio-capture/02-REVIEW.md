@@ -4,17 +4,17 @@ reviewed: 2026-04-17T00:00:00Z
 depth: standard
 files_reviewed: 11
 files_reviewed_list:
-  - VoiceScribe/AppDelegate.swift
-  - VoiceScribe/AppState.swift
-  - VoiceScribe/Audio/AudioController.swift
-  - VoiceScribe/Audio/AudioDeviceManager.swift
-  - VoiceScribe/SettingsView.swift
-  - VoiceScribe/StatusBarIconView.swift
-  - VoiceScribe/VoiceScribeApp.swift
-  - VoiceScribeTests/AppStateTests.swift
-  - VoiceScribeTests/AudioControllerTests.swift
-  - VoiceScribeTests/DefaultsKeysTests.swift
-  - VoiceScribeTests/WaveformViewTests.swift
+  - SPRECHKRAFT/AppDelegate.swift
+  - SPRECHKRAFT/AppState.swift
+  - SPRECHKRAFT/Audio/AudioController.swift
+  - SPRECHKRAFT/Audio/AudioDeviceManager.swift
+  - SPRECHKRAFT/SettingsView.swift
+  - SPRECHKRAFT/StatusBarIconView.swift
+  - SPRECHKRAFT/SPRECHKRAFTApp.swift
+  - SPRECHKRAFTTests/AppStateTests.swift
+  - SPRECHKRAFTTests/AudioControllerTests.swift
+  - SPRECHKRAFTTests/DefaultsKeysTests.swift
+  - SPRECHKRAFTTests/WaveformViewTests.swift
 findings:
   critical: 0
   warning: 3
@@ -54,7 +54,7 @@ and two minor test-coverage gaps.
 
 ### WR-01: Silence auto-stop fires on every silent buffer after threshold is crossed
 
-**File:** `VoiceScribe/Audio/AudioController.swift:154-167`
+**File:** `SPRECHKRAFT/Audio/AudioController.swift:154-167`
 
 **Issue:** `updateSilenceDetection` never resets `silenceAccumulator` after the
 threshold is crossed. Once `silenceAccumulator >= Defaults[.silenceDuration]`, every
@@ -88,7 +88,7 @@ func updateSilenceDetection(rms: Float, bufferDuration: TimeInterval) {
 
 ### WR-02: `updateIcon()` creates and discards `NSHostingView` at audio-buffer rate (~86 Hz)
 
-**File:** `VoiceScribe/AppDelegate.swift:177-192`
+**File:** `SPRECHKRAFT/AppDelegate.swift:177-192`
 
 **Issue:** `updateIcon()` is called from the `onLevelUpdate` callback, which fires on
 every audio tap buffer. At 44100 Hz sample rate with a `bufferSize: 1024`, this is
@@ -122,7 +122,7 @@ if abs(clampedLevel - lastDispatchedLevel) > 0.05 {
 
 ### WR-03: Missing `updateIcon()` call in `startRecordingWithCue()` error path
 
-**File:** `VoiceScribe/AppDelegate.swift:66-78`
+**File:** `SPRECHKRAFT/AppDelegate.swift:66-78`
 
 **Issue:** In `startRecordingWithCue()`, `appState?.toggleRecording()` moves state to
 `.recording` before `startRecording()` is called. If `startRecording()` throws,
@@ -148,7 +148,7 @@ do {
 
 ### IN-01: Race-prone `Task.sleep` workaround for activation policy reset
 
-**File:** `VoiceScribe/VoiceScribeApp.swift:73-75`
+**File:** `SPRECHKRAFT/SPRECHKRAFTApp.swift:73-75`
 
 **Issue:** The settings-window activation flow resets `NSApp.setActivationPolicy` to
 `.accessory` after a hardcoded 300 ms sleep. The TODO comment correctly identifies the
@@ -165,7 +165,7 @@ is key.
 
 ### IN-02: `testSilenceDetection_triggersAfterDuration` accumulates exactly at threshold boundary
 
-**File:** `VoiceScribeTests/AudioControllerTests.swift:60-82`
+**File:** `SPRECHKRAFTTests/AudioControllerTests.swift:60-82`
 
 **Issue:** The test passes `3 x 0.5s = 1.5s` silence with `silenceDuration = 1.5s`.
 The condition `silenceAccumulator >= silenceDuration` is a `>=` check, so the
@@ -187,7 +187,7 @@ controller.updateSilenceDetection(rms: 0.001, bufferDuration: 0.6)
 
 ### IN-03: WaveformView tests verify instantiation only
 
-**File:** `VoiceScribeTests/WaveformViewTests.swift:15-45`
+**File:** `SPRECHKRAFTTests/WaveformViewTests.swift:15-45`
 
 **Issue:** All five `WaveformView` and `StatusBarIconView` tests confirm the types can
 be instantiated but do not assert any properties. The test file itself notes that

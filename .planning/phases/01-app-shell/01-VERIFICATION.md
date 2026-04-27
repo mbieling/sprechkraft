@@ -43,7 +43,7 @@ Aus ROADMAP.md Phase 1:
 |---|----------|--------|---------|
 | 1 | App startet ohne Dock-Icon; nur Menu-Bar-Icon sichtbar (SET-06) | VERIFIED | `LSUIElement=<true/>` in Info.plist; `NSApp.setActivationPolicy(.accessory)` in AppDelegate.applicationDidFinishLaunching; manuell bestätigt (Plan 04 Task 1, approved) |
 | 2 | ⌥⌘R cycelt Icon durch alle 4 Zustände (SET-02, FEED-01) | VERIFIED | `KeyboardShortcuts.Name.toggleRecording` mit `default: .init(.r, modifiers: [.option, .command])`; `KeyboardShortcuts.onKeyUp(for: .toggleRecording)` in AppDelegate.setupHotkey(); toggleRecording() cycelt idle→recording→transcribing→llmProcessing→idle; manuell bestätigt (Plan 04 Task 2, approved) |
-| 3 | Menü-Dropdown zeigt App-Name, Beenden-Option und Einstellungen-Placeholder (D-05) | VERIFIED | AppDelegate.showMenu() baut NSMenu mit "VoiceScribe" (disabled), Trennlinie, "Einstellungen…", "Beim Login starten", Trennlinie, "Beenden"; manuell bestätigt (Plan 04 Task 3, approved) |
+| 3 | Menü-Dropdown zeigt App-Name, Beenden-Option und Einstellungen-Placeholder (D-05) | VERIFIED | AppDelegate.showMenu() baut NSMenu mit "SPRECHKRAFT" (disabled), Trennlinie, "Einstellungen…", "Beim Login starten", Trennlinie, "Beenden"; manuell bestätigt (Plan 04 Task 3, approved) |
 | 4 | LaunchAtLogin-Toggle im Menü konfigurierbar und persistent (SET-05) | VERIFIED | `LaunchAtLogin.isEnabled.toggle()` in AppDelegate.toggleLoginItem(); Menü-Item-State reflektiert `LaunchAtLogin.isEnabled`; manuell bestätigt mit Persistenz über App-Neustart (Plan 04 Task 4, approved) |
 
 **Score: 4/4 Wahrheiten verifiziert**
@@ -60,18 +60,18 @@ Keine aufgeschobenen Elemente — alle Success Criteria dieser Phase sind erfül
 
 | Artefakt | Erwartet | Status | Details |
 |----------|----------|--------|---------|
-| `VoiceScribe/AppState.swift` | RecordingState-Enum + AppState @Observable Source of Truth | VERIFIED | Existiert, 71 Zeilen, enthält `enum RecordingState: Equatable` mit 4 Fällen, Farben, isPulsing, pulseSpeed, accessibilityLabel; `@MainActor @Observable final class AppState` mit toggleRecording() |
-| `VoiceScribe/StatusBarIconView.swift` | SwiftUI View für Menu-Bar-Icon mit Pulse-Animation | VERIFIED | Existiert, 67 Zeilen, enthält `mic.fill`, `.renderingMode(.original)`, `repeatForever(autoreverses: true)`, `let state: RecordingState` |
-| `VoiceScribe/Constants/DesignTokens.swift` | Design-Token-Konstanten (Spacing) | VERIFIED | Existiert, 26 Zeilen, enthält `enum DesignTokens` mit `enum Spacing` (xs/sm/md/lg/xl) |
-| `VoiceScribe/Extensions/KeyboardShortcuts+Names.swift` | KeyboardShortcuts.Name.toggleRecording mit ⌥⌘R | VERIFIED | Existiert, 17 Zeilen, enthält `extension KeyboardShortcuts.Name` + `toggleRecording` + `default: .init(.r, modifiers: [.option, .command])` |
-| `VoiceScribe/AppDelegate.swift` | NSStatusItem-Setup, Split-Click-Handler, NSMenu, Hotkey-Callback | VERIFIED | Existiert, 152 Zeilen, enthält NSStatusItem, sendAction(on: [.leftMouseUp, .rightMouseUp]), handleClick, showMenu, NSHostingView, KeyboardShortcuts.onKeyUp, LaunchAtLogin.isEnabled, Notification.Name.openSettings |
-| `VoiceScribe/SettingsView.swift` | Leeres SwiftUI-Fenster mit Placeholder-Text | VERIFIED | Existiert, 24 Zeilen, enthält "Einstellungen folgen in weiteren Phasen.", DesignTokens.Spacing.xl, Color(.labelColor) |
-| `VoiceScribe/VoiceScribeApp.swift` | @main SwiftUI App mit NSApplicationDelegateAdaptor und Window-Scenes | VERIFIED | Existiert, 74 Zeilen, enthält `@main`, `@NSApplicationDelegateAdaptor(AppDelegate.self)`, `Window("VoiceScribe — Einstellungen", id: "settings")`, `Window("Hidden", id: "hidden")`, NSApp.setActivationPolicy(.regular/.accessory), NotificationCenter-Empfänger, appDelegate.appState = appState |
-| `VoiceScribe/Info.plist` | LSUIElement=YES für Menu-Bar-Only-App | VERIFIED | Enthält `<key>LSUIElement</key><true/>` |
-| `VoiceScribe/VoiceScribe.entitlements` | Entitlements-Datei OHNE com.apple.security.app-sandbox | VERIFIED | Leeres dict-Plist, kein Sandbox-Entitlement (grep gibt exit code 1) |
-| `VoiceScribeTests/RecordingStateTests.swift` | Test-Scaffold für RecordingState (FEED-01) | VERIFIED | Existiert, 54 Zeilen, Swift Testing (@Suite, @Test), 8 Tests für 4 Fälle, Farben, isPulsing, pulseSpeed, accessibilityLabel |
-| `VoiceScribeTests/AppStateTests.swift` | Test-Scaffold für AppState.toggleRecording | VERIFIED | Existiert, 25 Zeilen, Swift Testing, 2 Tests für Initialzustand und Demo-Cycle |
-| `VoiceScribeTests/HotkeyTests.swift` | Test-Scaffold für KeyboardShortcuts-Integration | VERIFIED | Existiert, 24 Zeilen, Swift Testing, 2 Tests für Name-Deklaration und Shortcut ⌥⌘R |
+| `SPRECHKRAFT/AppState.swift` | RecordingState-Enum + AppState @Observable Source of Truth | VERIFIED | Existiert, 71 Zeilen, enthält `enum RecordingState: Equatable` mit 4 Fällen, Farben, isPulsing, pulseSpeed, accessibilityLabel; `@MainActor @Observable final class AppState` mit toggleRecording() |
+| `SPRECHKRAFT/StatusBarIconView.swift` | SwiftUI View für Menu-Bar-Icon mit Pulse-Animation | VERIFIED | Existiert, 67 Zeilen, enthält `mic.fill`, `.renderingMode(.original)`, `repeatForever(autoreverses: true)`, `let state: RecordingState` |
+| `SPRECHKRAFT/Constants/DesignTokens.swift` | Design-Token-Konstanten (Spacing) | VERIFIED | Existiert, 26 Zeilen, enthält `enum DesignTokens` mit `enum Spacing` (xs/sm/md/lg/xl) |
+| `SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift` | KeyboardShortcuts.Name.toggleRecording mit ⌥⌘R | VERIFIED | Existiert, 17 Zeilen, enthält `extension KeyboardShortcuts.Name` + `toggleRecording` + `default: .init(.r, modifiers: [.option, .command])` |
+| `SPRECHKRAFT/AppDelegate.swift` | NSStatusItem-Setup, Split-Click-Handler, NSMenu, Hotkey-Callback | VERIFIED | Existiert, 152 Zeilen, enthält NSStatusItem, sendAction(on: [.leftMouseUp, .rightMouseUp]), handleClick, showMenu, NSHostingView, KeyboardShortcuts.onKeyUp, LaunchAtLogin.isEnabled, Notification.Name.openSettings |
+| `SPRECHKRAFT/SettingsView.swift` | Leeres SwiftUI-Fenster mit Placeholder-Text | VERIFIED | Existiert, 24 Zeilen, enthält "Einstellungen folgen in weiteren Phasen.", DesignTokens.Spacing.xl, Color(.labelColor) |
+| `SPRECHKRAFT/SPRECHKRAFTApp.swift` | @main SwiftUI App mit NSApplicationDelegateAdaptor und Window-Scenes | VERIFIED | Existiert, 74 Zeilen, enthält `@main`, `@NSApplicationDelegateAdaptor(AppDelegate.self)`, `Window("SPRECHKRAFT — Einstellungen", id: "settings")`, `Window("Hidden", id: "hidden")`, NSApp.setActivationPolicy(.regular/.accessory), NotificationCenter-Empfänger, appDelegate.appState = appState |
+| `SPRECHKRAFT/Info.plist` | LSUIElement=YES für Menu-Bar-Only-App | VERIFIED | Enthält `<key>LSUIElement</key><true/>` |
+| `SPRECHKRAFT/SPRECHKRAFT.entitlements` | Entitlements-Datei OHNE com.apple.security.app-sandbox | VERIFIED | Leeres dict-Plist, kein Sandbox-Entitlement (grep gibt exit code 1) |
+| `SPRECHKRAFTTests/RecordingStateTests.swift` | Test-Scaffold für RecordingState (FEED-01) | VERIFIED | Existiert, 54 Zeilen, Swift Testing (@Suite, @Test), 8 Tests für 4 Fälle, Farben, isPulsing, pulseSpeed, accessibilityLabel |
+| `SPRECHKRAFTTests/AppStateTests.swift` | Test-Scaffold für AppState.toggleRecording | VERIFIED | Existiert, 25 Zeilen, Swift Testing, 2 Tests für Initialzustand und Demo-Cycle |
+| `SPRECHKRAFTTests/HotkeyTests.swift` | Test-Scaffold für KeyboardShortcuts-Integration | VERIFIED | Existiert, 24 Zeilen, Swift Testing, 2 Tests für Name-Deklaration und Shortcut ⌥⌘R |
 
 ---
 
@@ -79,15 +79,15 @@ Keine aufgeschobenen Elemente — alle Success Criteria dieser Phase sind erfül
 
 | Von | Nach | Via | Status | Details |
 |-----|------|-----|--------|---------|
-| AppDelegate.swift | AppState.swift | appState Property Injection durch VoiceScribeApp | VERIFIED | `var appState: AppState?` in AppDelegate; `appDelegate.appState = appState` in HiddenActivationView.onAppear |
+| AppDelegate.swift | AppState.swift | appState Property Injection durch SPRECHKRAFTApp | VERIFIED | `var appState: AppState?` in AppDelegate; `appDelegate.appState = appState` in HiddenActivationView.onAppear |
 | AppDelegate.swift | StatusBarIconView.swift | NSHostingView(rootView: StatusBarIconView(state:)) | VERIFIED | `NSHostingView(rootView: StatusBarIconView(state: state))` in updateIcon() |
 | AppDelegate.swift | KeyboardShortcuts.Name.toggleRecording | KeyboardShortcuts.onKeyUp(for:) Registrierung | VERIFIED | `KeyboardShortcuts.onKeyUp(for: .toggleRecording)` in setupHotkey() |
 | AppDelegate.swift | LaunchAtLogin.isEnabled | LaunchAtLogin-modern-API im Menu-Item-State und -Action | VERIFIED | `loginItem.state = LaunchAtLogin.isEnabled ? .on : .off` und `LaunchAtLogin.isEnabled.toggle()` |
-| VoiceScribeApp.swift | SettingsView.swift | Window('settings'-ID) Scene | VERIFIED | `Window("VoiceScribe — Einstellungen", id: "settings") { SettingsView() }` |
-| AppDelegate.swift | VoiceScribeApp.swift | NotificationCenter.default.post(name: .openSettings) | VERIFIED | `NotificationCenter.default.post(name: .openSettings, object: nil)` in openSettingsMenu(); empfangen via `.onReceive(NotificationCenter.default.publisher(for: .openSettings))` in HiddenActivationView |
-| VoiceScribe.xcodeproj | VoiceScribe/Info.plist | INFOPLIST_FILE Build Setting | VERIFIED | `INFOPLIST_FILE = VoiceScribe/Info.plist` + `GENERATE_INFOPLIST_FILE = NO` in pbxproj |
-| VoiceScribe.xcodeproj | Package.swift / SPM | SPM Package Dependency | VERIFIED | KeyboardShortcuts, LaunchAtLogin, Defaults als `XCRemoteSwiftPackageReference` im pbxproj registriert |
-| VoiceScribeTests/*.swift | VoiceScribe.xcodeproj | PBXBuildFile am VoiceScribeTests-Target | VERIFIED | RecordingStateTests.swift, AppStateTests.swift, HotkeyTests.swift je als PBXBuildFile mit PBXFileReference im pbxproj eingetragen |
+| SPRECHKRAFTApp.swift | SettingsView.swift | Window('settings'-ID) Scene | VERIFIED | `Window("SPRECHKRAFT — Einstellungen", id: "settings") { SettingsView() }` |
+| AppDelegate.swift | SPRECHKRAFTApp.swift | NotificationCenter.default.post(name: .openSettings) | VERIFIED | `NotificationCenter.default.post(name: .openSettings, object: nil)` in openSettingsMenu(); empfangen via `.onReceive(NotificationCenter.default.publisher(for: .openSettings))` in HiddenActivationView |
+| SPRECHKRAFT.xcodeproj | SPRECHKRAFT/Info.plist | INFOPLIST_FILE Build Setting | VERIFIED | `INFOPLIST_FILE = SPRECHKRAFT/Info.plist` + `GENERATE_INFOPLIST_FILE = NO` in pbxproj |
+| SPRECHKRAFT.xcodeproj | Package.swift / SPM | SPM Package Dependency | VERIFIED | KeyboardShortcuts, LaunchAtLogin, Defaults als `XCRemoteSwiftPackageReference` im pbxproj registriert |
+| SPRECHKRAFTTests/*.swift | SPRECHKRAFT.xcodeproj | PBXBuildFile am SPRECHKRAFTTests-Target | VERIFIED | RecordingStateTests.swift, AppStateTests.swift, HotkeyTests.swift je als PBXBuildFile mit PBXFileReference im pbxproj eingetragen |
 
 ---
 
@@ -96,7 +96,7 @@ Keine aufgeschobenen Elemente — alle Success Criteria dieser Phase sind erfül
 | Artefakt | Datenvariable | Quelle | Liefert reale Daten | Status |
 |----------|---------------|--------|---------------------|--------|
 | StatusBarIconView | `state: RecordingState` | AppDelegate.updateIcon() → AppState.recordingState | Ja — AppState.recordingState wird per toggleRecording() mutiert | FLOWING |
-| AppDelegate.updateIcon() | `appState?.recordingState` | AppState (injiziert via VoiceScribeApp.HiddenActivationView.onAppear) | Ja — AppState ist @Observable, Zustandswechsel trigggert updateIcon() via Variante B | FLOWING |
+| AppDelegate.updateIcon() | `appState?.recordingState` | AppState (injiziert via SPRECHKRAFTApp.HiddenActivationView.onAppear) | Ja — AppState ist @Observable, Zustandswechsel trigggert updateIcon() via Variante B | FLOWING |
 
 ---
 

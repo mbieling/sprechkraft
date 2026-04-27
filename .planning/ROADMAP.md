@@ -1,4 +1,4 @@
-# Roadmap: VoiceScribe
+# Roadmap: SPRECHKRAFT
 
 ## Overview
 
@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 4 plans
 - [x] 01-01-PLAN.md — Xcode-Projekt, Info.plist (LSUIElement=YES), SPM-Dependencies, Test-Scaffolds (RED)
 - [x] 01-02-PLAN.md — RecordingState + AppState @Observable + StatusBarIconView + DesignTokens (GREEN)
-- [x] 01-03-PLAN.md — VoiceScribeApp @main + AppDelegate (NSStatusItem, Split-Click, Menü, Hotkey) + SettingsView + KeyboardShortcuts.Name
+- [x] 01-03-PLAN.md — SPRECHKRAFTApp @main + AppDelegate (NSStatusItem, Split-Click, Menü, Hotkey) + SettingsView + KeyboardShortcuts.Name
 - [x] 01-04-PLAN.md — Manuelle Human-Verify-Checkpoints (Dock-Icon, 4 Zustände, Menü, LaunchAtLogin-Persistenz)
 
 ### Phase 2: Audio Capture
@@ -115,7 +115,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 06-01-PLAN.md — GRDB SPM-Dependency (project.pbxproj 3 Pflichtstellen) + HistoryStoreTests RED-Stubs (Wave 1, Build-Gate)
 - [x] 06-02-PLAN.md — HistoryEntry struct + HistoryStore @MainActor (Schema, Migration v1, FTS5, CRUD, Observation) — alle 5 Tests GREEN (Wave 2)
 - [x] 06-03-PLAN.md — HistoryView SwiftUI (Liste, Datum-Sektionen, Suche 200ms, Copy-Flash, Leer-Zustände, Löschen mit Confirm-Alert) (Wave 3)
-- [x] 06-04-PLAN.md — AppDelegate + VoiceScribeApp Wiring (Menüpunkt "Verlauf…", Window-Scene "history", GRDB-Insert in onRecordingComplete D-15) (Wave 4)
+- [x] 06-04-PLAN.md — AppDelegate + SPRECHKRAFTApp Wiring (Menüpunkt "Verlauf…", Window-Scene "history", GRDB-Insert in onRecordingComplete D-15) (Wave 4)
 - [x] 06-05-PLAN.md — Manuelle Human-Verify-Checkpoints: Menü, Fenster, Diktat→Eintrag, Suche, Copy-Flash, Löschen (Wave 5)
 **UI hint**: yes
 

@@ -6,22 +6,22 @@ tags: [swiftui, avfoundation, waveform, canvas, settings, audio-cues, observatio
 dependency_graph:
   requires: [02-01]
   provides: [WaveformView, SettingsView-Audio, AppDelegate-AudioWiring, AppState-Phase2Toggle]
-  affects: [VoiceScribe/StatusBarIconView.swift, VoiceScribe/SettingsView.swift, VoiceScribe/AppDelegate.swift, VoiceScribe/AppState.swift, VoiceScribe/Audio/AudioController.swift, VoiceScribe/VoiceScribeApp.swift]
+  affects: [SPRECHKRAFT/StatusBarIconView.swift, SPRECHKRAFT/SettingsView.swift, SPRECHKRAFT/AppDelegate.swift, SPRECHKRAFT/AppState.swift, SPRECHKRAFT/Audio/AudioController.swift, SPRECHKRAFT/SPRECHKRAFTApp.swift]
 tech_stack:
   added: [NSSound, AVCaptureDevice-DiscoverySession-UI, SwiftUI-Canvas]
   patterns: [Canvas-Waveform, Observation-B-LevelUpdate, AudioController-Callbacks, Defaults-PropertyWrapper]
 key_files:
   created:
-    - VoiceScribeTests/WaveformViewTests.swift
+    - SPRECHKRAFTTests/WaveformViewTests.swift
   modified:
-    - VoiceScribe/StatusBarIconView.swift
-    - VoiceScribe/SettingsView.swift
-    - VoiceScribe/AppDelegate.swift
-    - VoiceScribe/AppState.swift
-    - VoiceScribe/Audio/AudioController.swift
-    - VoiceScribe/VoiceScribeApp.swift
-    - VoiceScribeTests/AppStateTests.swift
-    - VoiceScribe.xcodeproj/project.pbxproj
+    - SPRECHKRAFT/StatusBarIconView.swift
+    - SPRECHKRAFT/SettingsView.swift
+    - SPRECHKRAFT/AppDelegate.swift
+    - SPRECHKRAFT/AppState.swift
+    - SPRECHKRAFT/Audio/AudioController.swift
+    - SPRECHKRAFT/SPRECHKRAFTApp.swift
+    - SPRECHKRAFTTests/AppStateTests.swift
+    - SPRECHKRAFT.xcodeproj/project.pbxproj
 decisions:
   - "WaveformView als eigene struct in StatusBarIconView.swift — saubere Trennung, einfacher testbar"
   - "onLevelUpdate-Callback in AudioController statt withObservationTracking — konsistent mit Observation-B-Pattern aus Plan 01"
@@ -45,12 +45,12 @@ metrics:
 | Task | Name | Commit | Files |
 |------|------|--------|-------|
 | 1 | StatusBarIconView + WaveformView (FEED-03) | 4e5aa5a | StatusBarIconView.swift, WaveformViewTests.swift, project.pbxproj, AppDelegate.swift (Rule-3-Fix) |
-| 2 | SettingsView mit Mikrofon-Picker, Stille-Slider, Permission-Banner | c857fba | SettingsView.swift, VoiceScribeApp.swift |
-| 3 | AppDelegate-Wiring + Audio-Cues + echtes Toggle | c6adbfd | AppDelegate.swift, AppState.swift, AudioController.swift, VoiceScribeApp.swift, AppStateTests.swift |
+| 2 | SettingsView mit Mikrofon-Picker, Stille-Slider, Permission-Banner | c857fba | SettingsView.swift, SPRECHKRAFTApp.swift |
+| 3 | AppDelegate-Wiring + Audio-Cues + echtes Toggle | c6adbfd | AppDelegate.swift, AppState.swift, AudioController.swift, SPRECHKRAFTApp.swift, AppStateTests.swift |
 
 ## What Was Built
 
-### WaveformView (`VoiceScribe/StatusBarIconView.swift`)
+### WaveformView (`SPRECHKRAFT/StatusBarIconView.swift`)
 - `struct WaveformView: View` mit `Canvas`-Rendering: sin-Kurve, 8 Segmente, 1pt systemRed-Linie
 - Minimalamplitude 1pt (Linie bleibt bei Stille sichtbar), Maximalamplitude 4pt
 - `.frame(width: 18, height: 4)` — exakt UI-SPEC-konform
@@ -59,7 +59,7 @@ metrics:
 - WaveformView nur bei `state == .recording` sichtbar (UI-SPEC Icon-State Machine)
 - Pulse-Animation unveraendert aktiv fuer .recording und .llmProcessing (D-04)
 
-### SettingsView (`VoiceScribe/SettingsView.swift`)
+### SettingsView (`SPRECHKRAFT/SettingsView.swift`)
 - `Section("Mikrofon")`: AVCaptureDevice-Picker via `@Default(.selectedMicUID)`, pickerStyle(.menu)
 - Leerstand-Option "Kein Mikrofon gefunden" wenn `availableMics.isEmpty`
 - Roter Permission-Banner (`Color(.systemRed)`) mit mic.slash.fill, Text und "Einstellungen öffnen"-Button
@@ -69,7 +69,7 @@ metrics:
 - `.formStyle(.grouped)`, xl-Padding, Copywriting-Contract aus UI-SPEC vollstaendig eingehalten
 - Alle Accessibility-Labels: Picker, Slider, Banner gemaess UI-SPEC Accessibility Contract
 
-### AppDelegate Wiring (`VoiceScribe/AppDelegate.swift`)
+### AppDelegate Wiring (`SPRECHKRAFT/AppDelegate.swift`)
 - `private var audioController: AudioController?`
 - `setupAudioController()`: init + `onAutoStop` + `onLevelUpdate` Callbacks
 - `startRecordingWithCue()`: idle→recording, `startRecording()`, `NSSound("Tink").play()` (D-05/06)
@@ -77,16 +77,16 @@ metrics:
 - `handleClick()` und `setupHotkey()` nutzen echte Start/Stopp-Methoden
 - `updateIcon()` uebergibt `audioLevel` an `StatusBarIconView` (FEED-03)
 
-### AudioController (`VoiceScribe/Audio/AudioController.swift`)
+### AudioController (`SPRECHKRAFT/Audio/AudioController.swift`)
 - `var onLevelUpdate: (() -> Void)?` — Callback nach jedem audioLevel-Update
 - Im Tap-Callback: `self?.onLevelUpdate?()` nach `appState?.audioLevel = clampedLevel`
 
-### AppState (`VoiceScribe/AppState.swift`)
+### AppState (`SPRECHKRAFT/AppState.swift`)
 - `toggleRecording()`: Demo-Cycle entfernt; .idle→.recording, .recording→.transcribing (audioLevel Reset)
 - `resetToIdle()`: setzt recordingState und audioLevel auf Ausgangswerte
 - Phase 3 fuellt .transcribing mit echter Transkription
 
-### VoiceScribeApp (`VoiceScribe/VoiceScribeApp.swift`)
+### SPRECHKRAFTApp (`SPRECHKRAFT/SPRECHKRAFTApp.swift`)
 - `appDelegate.setupAudioController()` nach AppState-Injection in `HiddenActivationView.onAppear`
 - `SettingsView(appState: appState)` — AppState-Injection fuer Permission-Banner
 
@@ -102,14 +102,14 @@ metrics:
 - **Found during:** Task 1 Build-Verifikation
 - **Issue:** `StatusBarIconView(state: state)` ohne `audioLevel`-Parameter — Compile-Fehler nach Erweiterung der Signatur
 - **Fix:** `updateIcon()` sofort angepasst: `let level = appState?.audioLevel ?? 0.0` + `StatusBarIconView(state: state, audioLevel: level)`
-- **Files modified:** VoiceScribe/AppDelegate.swift
+- **Files modified:** SPRECHKRAFT/AppDelegate.swift
 - **Commit:** 4e5aa5a (im Task-1-Commit enthalten)
 
 **2. [Rule 1 - Bug] AppStateTests.cyclesThroughAllStates() nach Demo-Cycle-Entfernung**
 - **Found during:** Task 3 Test-Ausfuehrung
 - **Issue:** `cyclesThroughAllStates()` testete den 4-Zustands-Demo-Cycle, der in `toggleRecording()` entfernt wurde → Test schlug fehl
 - **Fix:** `AppStateTests.swift` vollstaendig aktualisiert auf Phase-2-Zustandsmaschine; 5 neue spezifische Tests statt 1 generischem Cycle-Test
-- **Files modified:** VoiceScribeTests/AppStateTests.swift
+- **Files modified:** SPRECHKRAFTTests/AppStateTests.swift
 - **Commit:** c6adbfd (im Task-3-Commit enthalten)
 
 ## Threat Surface Scan
@@ -128,21 +128,21 @@ Keine neuen Threat-Surfaces ausserhalb des Plans `<threat_model>`. Alle 4 STRIDE
 ## Self-Check: PASSED
 
 ### Created Files Exist
-- FOUND: VoiceScribeTests/WaveformViewTests.swift
+- FOUND: SPRECHKRAFTTests/WaveformViewTests.swift
 
 ### Modified Files Exist
-- FOUND: VoiceScribe/StatusBarIconView.swift
-- FOUND: VoiceScribe/SettingsView.swift
-- FOUND: VoiceScribe/AppDelegate.swift
-- FOUND: VoiceScribe/AppState.swift
-- FOUND: VoiceScribe/Audio/AudioController.swift
-- FOUND: VoiceScribe/VoiceScribeApp.swift
-- FOUND: VoiceScribeTests/AppStateTests.swift
+- FOUND: SPRECHKRAFT/StatusBarIconView.swift
+- FOUND: SPRECHKRAFT/SettingsView.swift
+- FOUND: SPRECHKRAFT/AppDelegate.swift
+- FOUND: SPRECHKRAFT/AppState.swift
+- FOUND: SPRECHKRAFT/Audio/AudioController.swift
+- FOUND: SPRECHKRAFT/SPRECHKRAFTApp.swift
+- FOUND: SPRECHKRAFTTests/AppStateTests.swift
 
 ### Commits Exist
 - FOUND: 4e5aa5a — Task 1 (StatusBarIconView, WaveformView, pbxproj, AppDelegate-Fix)
-- FOUND: c857fba — Task 2 (SettingsView, VoiceScribeApp)
-- FOUND: c6adbfd — Task 3 (AppDelegate, AppState, AudioController, VoiceScribeApp, AppStateTests)
+- FOUND: c857fba — Task 2 (SettingsView, SPRECHKRAFTApp)
+- FOUND: c6adbfd — Task 3 (AppDelegate, AppState, AudioController, SPRECHKRAFTApp, AppStateTests)
 
 ### Test Results
 - 25/25 Tests gruen (alle bestehenden Phase-1/2-Tests + 6 neue WaveformView/AppState-Tests)

@@ -22,7 +22,7 @@ Die App startet als Menu-Bar-only-Prozess ohne Dock-Icon. Ein globaler Hotkey (�
 ### Menü-Struktur (SET-02, SET-05, SET-06)
 - **D-05:** Menü-Inhalt minimal:
   ```
-  VoiceScribe          (disabled, App-Name)
+  SPRECHKRAFT          (disabled, App-Name)
   ────────────────
   Einstellungen…
   ☑ Beim Login starten  (Toggle)
@@ -32,7 +32,7 @@ Die App startet als Menu-Bar-only-Prozess ohne Dock-Icon. Ein globaler Hotkey (�
 - **D-06:** **Linksklick auf Icon = direkte Aktion** (Aufnahme starten/stoppen), **Rechtsklick = Menü öffnen**. Erfordert AppKit `NSStatusItem` statt reinem SwiftUI `MenuBarExtra` — der SwiftUI-Layer bleibt für UI-Inhalte, aber der Click-Handler braucht die AppKit-Schicht.
 
 ### Einstellungen-Placeholder
-- **D-07:** `Einstellungen…` öffnet ein **echtes, zunächst leeres SwiftUI-Fenster** mit Titel „VoiceScribe — Einstellungen". Spätere Phasen ergänzen Tabs und Inhalte. Kein greyed-out Menüpunkt.
+- **D-07:** `Einstellungen…` öffnet ein **echtes, zunächst leeres SwiftUI-Fenster** mit Titel „SPRECHKRAFT — Einstellungen". Spätere Phasen ergänzen Tabs und Inhalte. Kein greyed-out Menüpunkt.
 
 ### Claude's Discretion
 - Xcode-Projektstruktur und Swift Package Manager Setup: dem Entwickler überlassen

@@ -1,6 +1,6 @@
 # Architecture Research
 
-**Project:** VoiceScribe — macOS Menu Bar Dictation App
+**Project:** SPRECHKRAFT — macOS Menu Bar Dictation App
 **Researched:** 2026-04-15 (urspruenglich) / 2026-04-21 (aktualisiert fuer Milestone v0.19.0)
 **Overall confidence:** HIGH (alle wesentlichen Befunde aus Context7, GitHub-Quellen und Codebase-Analyse)
 
@@ -306,7 +306,7 @@ empfiehlt sich ein einmaliger Retry-Button in der SettingsView (neues UI-Element
 ### Ist-Zustand
 
 Das Settings-Fenster existiert bereits:
-- `Window("VoiceScribe -- Einstellungen", id: "settings")` in `VoiceScribeApp.swift`
+- `Window("SPRECHKRAFT -- Einstellungen", id: "settings")` in `SPRECHKRAFTApp.swift`
 - Oeffnung via `NotificationCenter.post(.openSettings)` -> `HiddenActivationView.onReceive` ->
   `openWindow(id: "settings")` mit Activation-Policy-Workaround (300ms)
 - `SettingsView.swift` enthaelt vollstaendige SwiftUI-Form mit Mikrofon, Stille-Erkennung,
@@ -331,7 +331,7 @@ ist bereits fuer History und Settings validiert. Kein Wechsel zu:
 - `NSWindowController` (mehr AppKit-Boilerplate, kein Vorteil gegenueber bestehendem Pattern)
 - `sindresorhus/Settings` (zusaetzliche Abhaengigkeit, nicht noetig da native SwiftUI Form ausreicht)
 - `.settings` SwiftUI Scene (bekanntes Problem mit `.accessory`-Policy auf macOS -- bereits
-  dokumentiert in VoiceScribeApp.swift Kommentar)
+  dokumentiert in SPRECHKRAFTApp.swift Kommentar)
 
 **Bestehende Architektur beibehalten:** `Window(id: "settings")` + NotificationCenter-Bruecke
 + `SettingsView` als SwiftUI Form. Neue Einstellungs-Sektionen als zusaetzliche `Section()`-Bloecke
@@ -448,7 +448,7 @@ Vorteil der Facade-Schicht.
 ## Komponenten-Grenzen nach Milestone v0.19.0
 
 ```
-VoiceScribeApp (SwiftUI @main)
+SPRECHKRAFTApp (SwiftUI @main)
 +-- AppDelegate (NSStatusItem, Hotkeys, Callbacks)
 |   +-- AudioController (AVAudioEngine)
 |   +-- TranscriptionService (Facade, actor)
@@ -475,7 +475,7 @@ VoiceScribeApp (SwiftUI @main)
 - TypeWhisper pluggable backend pattern: https://github.com/TypeWhisper/typewhisper-mac
 - steipete.me Settings from Menu Bar: https://steipete.me/posts/2025/showing-settings-from-macos-menu-bar-items
 - IPC Performance (Baeldung): https://www.baeldung.com/linux/ipc-performance-comparison
-- Bestehende Codebase: VoiceScribe/AppDelegate.swift, VoiceScribe/Transcription/TranscriptionService.swift, VoiceScribe/VoiceScribeApp.swift, VoiceScribe/SettingsView.swift
+- Bestehende Codebase: SPRECHKRAFT/AppDelegate.swift, SPRECHKRAFT/Transcription/TranscriptionService.swift, SPRECHKRAFT/SPRECHKRAFTApp.swift, SPRECHKRAFT/SettingsView.swift
 
 ---
 

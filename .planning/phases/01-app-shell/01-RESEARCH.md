@@ -22,7 +22,7 @@
 - D-06: Linksklick = direkte Aktion (Aufnahme toggle), Rechtsklick = Menü — erfordert AppKit NSStatusItem
 
 **Einstellungen-Placeholder (D-07)**
-- Echtes leeres SwiftUI-Fenster „VoiceScribe — Einstellungen", Mindestgröße 400×300 pt
+- Echtes leeres SwiftUI-Fenster „SPRECHKRAFT — Einstellungen", Mindestgröße 400×300 pt
 
 ### Claude's Discretion
 - Xcode-Projektstruktur und Swift Package Manager Setup
@@ -144,7 +144,7 @@ KeyboardShortcuts ──► AppState.handleHotkey()
          ▼                    ▼
   AppState.toggle()     NSMenu.popUp()
                          ┌──────────────────┐
-                         │ VoiceScribe       │
+                         │ SPRECHKRAFT       │
                          │ ─────────────     │
                          │ Einstellungen…   │──► NSApp.activate()
                          │ ☑ Beim Login     │    + Window("settings")
@@ -156,8 +156,8 @@ KeyboardShortcuts ──► AppState.handleHotkey()
 ### Empfohlene Projektstruktur
 
 ```
-VoiceScribe/
-├── VoiceScribeApp.swift        # @main, NSApplicationDelegateAdaptor
+SPRECHKRAFT/
+├── SPRECHKRAFTApp.swift        # @main, NSApplicationDelegateAdaptor
 ├── AppDelegate.swift           # NSStatusItem, NSMenu, Split-Click
 ├── AppState.swift              # @Observable, RecordingState enum
 ├── StatusBarIconView.swift     # SwiftUI View für mic.fill + Animation
@@ -167,7 +167,7 @@ VoiceScribe/
 ├── Constants/
 │   └── DesignTokens.swift      # Farben, Spacings als Swift-Konstanten
 ├── Info.plist                  # LSUIElement = YES
-└── VoiceScribe.entitlements   # Keine Sandbox
+└── SPRECHKRAFT.entitlements   # Keine Sandbox
 ```
 
 ### Pattern 1: @main + NSApplicationDelegateAdaptor + NSStatusItem
@@ -176,10 +176,10 @@ VoiceScribe/
 **Wann verwenden:** Immer wenn Split-Click (Links ≠ Rechts) oder feine Icon-Kontrolle nötig sind.
 
 ```swift
-// VoiceScribeApp.swift
+// SPRECHKRAFTApp.swift
 // Source: Apple Developer Documentation (NSApplicationDelegateAdaptor)
 @main
-struct VoiceScribeApp: App {
+struct SPRECHKRAFTApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @State private var appState = AppState()
 
@@ -204,7 +204,7 @@ struct VoiceScribeApp: App {
         .defaultSize(width: 1, height: 1)
 
         // Einstellungsfenster
-        Window("VoiceScribe — Einstellungen", id: "settings") {
+        Window("SPRECHKRAFT — Einstellungen", id: "settings") {
             SettingsView()
                 .frame(minWidth: 400, minHeight: 300)
         }
@@ -246,7 +246,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showMenu() {
         let menu = NSMenu()
-        let titleItem = NSMenuItem(title: "VoiceScribe", action: nil, keyEquivalent: "")
+        let titleItem = NSMenuItem(title: "SPRECHKRAFT", action: nil, keyEquivalent: "")
         titleItem.isEnabled = false
         menu.addItem(titleItem)
         menu.addItem(.separator())
@@ -443,7 +443,7 @@ extension KeyboardShortcuts.Name {
 
 **Was passiert:** Apple empfiehlt ausdrücklich, `initial:` NICHT für öffentlich verteilte Apps zu setzen.
 **Warum passiert es:** Hotkey-Konflikte mit System- oder anderen App-Shortcuts stören den Benutzer.
-**Wie vermeiden:** Da VoiceScribe kein App-Store-Release ist (Sandbox inkompatibel mit globalem Hotkey + AX-Injektion), ist `initial: .init(.r, modifiers: [.option, .command])` legitim. Dokumentieren dass dies bewusste Entscheidung ist.
+**Wie vermeiden:** Da SPRECHKRAFT kein App-Store-Release ist (Sandbox inkompatibel mit globalem Hotkey + AX-Injektion), ist `initial: .init(.r, modifiers: [.option, .command])` legitim. Dokumentieren dass dies bewusste Entscheidung ist.
 **Warnsignal:** Benutzer beschwert sich über ungewollte Hotkey-Übernahme.
 
 ---
@@ -581,8 +581,8 @@ extension Defaults.Keys {
 | Eigenschaft | Wert |
 |-------------|------|
 | Framework | XCTest (integriert in Xcode) |
-| Config-Datei | `VoiceScribeTests/` (Target in Xcode-Projekt) |
-| Schnell-Befehl | `xcodebuild test -scheme VoiceScribe -destination 'platform=macOS'` |
+| Config-Datei | `SPRECHKRAFTTests/` (Target in Xcode-Projekt) |
+| Schnell-Befehl | `xcodebuild test -scheme SPRECHKRAFT -destination 'platform=macOS'` |
 | Vollständig | Identisch (Phase 1 hat keine komplexen Unit-Tests) |
 
 ### Anforderungen → Test-Map
@@ -590,14 +590,14 @@ extension Defaults.Keys {
 | REQ-ID | Verhalten | Test-Typ | Automatisierter Befehl | Datei |
 |--------|----------|----------|----------------------|-------|
 | SET-06 | App zeigt kein Dock-Icon | UI-Test / manuell | Manuell prüfen nach App-Start | ❌ Wave 0 |
-| SET-02 | Hotkey ⌥⌘R registriert und auslösbar | Unit (AppState) | `xcodebuild test -only-testing:VoiceScribeTests/AppStateTests` | ❌ Wave 0 |
-| SET-05 | LaunchAtLogin-Toggle wechselt State | Unit | `xcodebuild test -only-testing:VoiceScribeTests/AppStateTests` | ❌ Wave 0 |
-| FEED-01 | RecordingState-Enum hat 4 Zustände mit korrekten Farben | Unit | `xcodebuild test -only-testing:VoiceScribeTests/RecordingStateTests` | ❌ Wave 0 |
+| SET-02 | Hotkey ⌥⌘R registriert und auslösbar | Unit (AppState) | `xcodebuild test -only-testing:SPRECHKRAFTTests/AppStateTests` | ❌ Wave 0 |
+| SET-05 | LaunchAtLogin-Toggle wechselt State | Unit | `xcodebuild test -only-testing:SPRECHKRAFTTests/AppStateTests` | ❌ Wave 0 |
+| FEED-01 | RecordingState-Enum hat 4 Zustände mit korrekten Farben | Unit | `xcodebuild test -only-testing:SPRECHKRAFTTests/RecordingStateTests` | ❌ Wave 0 |
 
 ### Wave 0 Gaps
 
-- [ ] `VoiceScribeTests/RecordingStateTests.swift` — prüft alle 4 RecordingState-Farben und isPulsing
-- [ ] `VoiceScribeTests/AppStateTests.swift` — prüft toggleRecording-Zustandsmaschine
+- [ ] `SPRECHKRAFTTests/RecordingStateTests.swift` — prüft alle 4 RecordingState-Farben und isPulsing
+- [ ] `SPRECHKRAFTTests/AppStateTests.swift` — prüft toggleRecording-Zustandsmaschine
 - [ ] Xcode-Projekt mit Test-Target anlegen (Wave 0: Xcode installieren)
 
 ---
@@ -622,7 +622,7 @@ extension Defaults.Keys {
 | Hotkey-Konflikte mit Malware | Elevation of Privilege | KeyboardShortcuts erkennt Konflikte und warnt den Nutzer im Recorder |
 | Kein Sandbox — App kann beliebige Dateien lesen | Information Disclosure | Bewusste Entscheidung (Sandbox inkompatibel mit globalem Hotkey + AX); akzeptiertes Risiko |
 
-**Sandbox-Entscheidung:** VoiceScribe läuft OHNE App Sandbox. Dies ist explizit dokumentiert in STATE.md als initiale Entscheidung. Die Entitlements-Datei muss entsprechend konfiguriert sein (kein `com.apple.security.app-sandbox`).
+**Sandbox-Entscheidung:** SPRECHKRAFT läuft OHNE App Sandbox. Dies ist explizit dokumentiert in STATE.md als initiale Entscheidung. Die Entitlements-Datei muss entsprechend konfiguriert sein (kein `com.apple.security.app-sandbox`).
 
 ---
 

@@ -10,9 +10,9 @@ dependency_graph:
     - TranscriptionService actor (Stub, RED-Phase)
     - TranscriptionServiceTests (5 RED-Tests, RECORD-04/05)
   affects:
-    - VoiceScribe.xcodeproj/project.pbxproj
-    - VoiceScribeTests/TranscriptionServiceTests.swift
-    - VoiceScribe/Transcription/TranscriptionService.swift
+    - SPRECHKRAFT.xcodeproj/project.pbxproj
+    - SPRECHKRAFTTests/TranscriptionServiceTests.swift
+    - SPRECHKRAFT/Transcription/TranscriptionService.swift
 tech_stack:
   added:
     - WhisperKit (argmaxinc/argmax-oss-swift v0.18.0+, SPM)
@@ -21,10 +21,10 @@ tech_stack:
     - TDD RED-Phase mit kompilierendem Stub statt fehlender Typdeklaration
 key_files:
   created:
-    - VoiceScribeTests/TranscriptionServiceTests.swift
-    - VoiceScribe/Transcription/TranscriptionService.swift
+    - SPRECHKRAFTTests/TranscriptionServiceTests.swift
+    - SPRECHKRAFT/Transcription/TranscriptionService.swift
   modified:
-    - VoiceScribe.xcodeproj/project.pbxproj
+    - SPRECHKRAFT.xcodeproj/project.pbxproj
 decisions:
   - "WhisperKit ueber argmaxinc/argmax-oss-swift (umgezogenes Repo) eingetragen, nicht argmaxinc/WhisperKit"
   - "TranscriptionService als minimaler Stub erstellt damit Test-Build kompiliert; Wave 1 implementiert echte Logik"
@@ -46,14 +46,14 @@ metrics:
 
 | Task | Name | Commit | Files |
 |------|------|--------|-------|
-| 1 | WhisperKit SPM-Dependency im Xcode-Projekt | ee5ed56 | VoiceScribe.xcodeproj/project.pbxproj |
-| 2 | TranscriptionServiceTests RED-Stubs | 56428d0 | VoiceScribeTests/TranscriptionServiceTests.swift, VoiceScribe/Transcription/TranscriptionService.swift, project.pbxproj |
+| 1 | WhisperKit SPM-Dependency im Xcode-Projekt | ee5ed56 | SPRECHKRAFT.xcodeproj/project.pbxproj |
+| 2 | TranscriptionServiceTests RED-Stubs | 56428d0 | SPRECHKRAFTTests/TranscriptionServiceTests.swift, SPRECHKRAFT/Transcription/TranscriptionService.swift, project.pbxproj |
 
 ## Verification Results
 
 - `xcodebuild -resolvePackageDependencies`: WhisperKit (whisperkit @ 0.18.0) aufgeloest — EXIT 0
-- `xcodebuild build -scheme VoiceScribe`: BUILD SUCCEEDED
-- `xcodebuild test -only-testing VoiceScribeTests/AudioControllerTests`: alle 4 Tests gruen
+- `xcodebuild build -scheme SPRECHKRAFT`: BUILD SUCCEEDED
+- `xcodebuild test -only-testing SPRECHKRAFTTests/AudioControllerTests`: alle 4 Tests gruen
 - TranscriptionServiceTests: 4/5 Tests gruen (korrekt fuer RED), 1 Test (testResamplingProducesCorrectLength) schlaegt fehl (Resampling-Stub gibt Input unveraendert zurueck — erwartet Wave 1)
 
 ## Deviations from Plan
@@ -64,7 +64,7 @@ metrics:
 
 **Issue:** Der Plan sagt explizit "Keinen Dummy-TranscriptionService-Typ erstellen" und gleichzeitig "Bestehende Tests laufen weiterhin gruen". Beides ist nicht gleichzeitig erfuellbar wenn `TranscriptionServiceTests.swift` im selben Test-Target liegt: Ohne `TranscriptionService`-Deklaration kompiliert das gesamte Test-Target nicht, und auch AudioControllerTests schlagen fehl.
 
-**Fix:** Minimaler `actor TranscriptionService`-Stub in `VoiceScribe/Transcription/TranscriptionService.swift` erstellt. Der Stub:
+**Fix:** Minimaler `actor TranscriptionService`-Stub in `SPRECHKRAFT/Transcription/TranscriptionService.swift` erstellt. Der Stub:
 - Kompiliert ohne Fehler (loest Compilation-Conflict auf)
 - Gibt `isModelReady = false` zurueck (korrekt fuer RECORD-05)
 - Gibt `nil` aus `transcribe()` zurueck (korrekt fuer "not ready"-Tests)
@@ -72,7 +72,7 @@ metrics:
 
 **Intent des Plans bleibt gewahrt:** Der Stub hat keine echte WhisperKit-Implementierung. Wave 1 (03-02) ersetzt den Stub vollstaendig.
 
-**Files modified:** VoiceScribe/Transcription/TranscriptionService.swift (neu), VoiceScribe.xcodeproj/project.pbxproj
+**Files modified:** SPRECHKRAFT/Transcription/TranscriptionService.swift (neu), SPRECHKRAFT.xcodeproj/project.pbxproj
 
 **Commit:** 56428d0
 
@@ -90,9 +90,9 @@ Der `test(...)`-Commit deckt die RED-Phase ab. Der `feat(...)`-Commit in Wave 1 
 
 | Stub | File | Reason |
 |------|------|--------|
-| `resampleTo16kHz` gibt Input unveraendert zurueck | VoiceScribe/Transcription/TranscriptionService.swift | Wave 1 implementiert AVAudioConverter-Resampling |
-| `transcribe` gibt immer nil zurueck | VoiceScribe/Transcription/TranscriptionService.swift | Wave 1 implementiert WhisperKit-Transkription |
-| `downloadAndLoad` ist leer | VoiceScribe/Transcription/TranscriptionService.swift | Wave 1 implementiert WhisperKit.download() + Initialisierung |
+| `resampleTo16kHz` gibt Input unveraendert zurueck | SPRECHKRAFT/Transcription/TranscriptionService.swift | Wave 1 implementiert AVAudioConverter-Resampling |
+| `transcribe` gibt immer nil zurueck | SPRECHKRAFT/Transcription/TranscriptionService.swift | Wave 1 implementiert WhisperKit-Transkription |
+| `downloadAndLoad` ist leer | SPRECHKRAFT/Transcription/TranscriptionService.swift | Wave 1 implementiert WhisperKit.download() + Initialisierung |
 
 ## Threat Surface Scan
 
@@ -100,8 +100,8 @@ Keine neuen Netzwerk-Endpunkte, Auth-Pfade oder Datei-Zugriffsmuster eingefuehrt
 
 ## Self-Check: PASSED
 
-- [x] VoiceScribeTests/TranscriptionServiceTests.swift: FOUND
-- [x] VoiceScribe/Transcription/TranscriptionService.swift: FOUND
+- [x] SPRECHKRAFTTests/TranscriptionServiceTests.swift: FOUND
+- [x] SPRECHKRAFT/Transcription/TranscriptionService.swift: FOUND
 - [x] Commit ee5ed56: FOUND (feat(03-01): WhisperKit SPM-Dependency)
 - [x] Commit 56428d0: FOUND (test(03-01): TranscriptionServiceTests RED-Stubs)
 - [x] pbxproj enthaelt `argmaxinc/argmax-oss-swift`: 4 Treffer

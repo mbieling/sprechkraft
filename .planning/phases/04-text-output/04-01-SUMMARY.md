@@ -22,11 +22,11 @@ tech_stack:
 key_files:
   created: []
   modified:
-    - VoiceScribe/Extensions/Defaults+Keys.swift
-    - VoiceScribe/Extensions/KeyboardShortcuts+Names.swift
-    - VoiceScribe/AppState.swift
-    - VoiceScribe/Info.plist
-    - VoiceScribeTests/DefaultsKeysTests.swift
+    - SPRECHKRAFT/Extensions/Defaults+Keys.swift
+    - SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift
+    - SPRECHKRAFT/AppState.swift
+    - SPRECHKRAFT/Info.plist
+    - SPRECHKRAFTTests/DefaultsKeysTests.swift
 decisions:
   - "OutputMode als separate top-level enum vor extension Defaults.Keys, nicht nested"
   - "NSAccessibilityUsageDescription in Info.plist (kein AX-Entitlement laut Pitfall 6)"
@@ -62,7 +62,7 @@ Alle Datentypen, Defaults-Keys und AppState-Properties, die Phase 4 benoetigt:
 
 | Task | Name | Commit | Dateien |
 |------|------|--------|---------|
-| RED | Failing tests fuer OutputMode + toggleOutputMode | 3067960 | VoiceScribeTests/DefaultsKeysTests.swift |
+| RED | Failing tests fuer OutputMode + toggleOutputMode | 3067960 | SPRECHKRAFTTests/DefaultsKeysTests.swift |
 | 1 | OutputMode enum + outputMode Key + toggleOutputMode Name | 1bee67f | Defaults+Keys.swift, KeyboardShortcuts+Names.swift |
 | 2 | axPermissionDenied + NSAccessibilityUsageDescription | f7cc344 | AppState.swift, Info.plist |
 

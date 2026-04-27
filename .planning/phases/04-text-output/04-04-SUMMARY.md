@@ -42,10 +42,10 @@ Manuelle End-to-End-Verifikation aller Phase-4-Features unter realen Bedingungen
 ## Key Files
 
 ### key-files.verified
-- VoiceScribe/AppDelegate.swift — TextOutputService-Wiring, AX-Check, Hotkey, Menü-Häkchen
-- VoiceScribe/SettingsView.swift — AX-Permission-Banner, OutputMode-Picker, Hotkey-Recorder
-- VoiceScribe/TextOutput/TextOutputService.swift — AX-Injektion + Clipboard-Fallback
-- VoiceScribeTests/TextOutputServiceTests.swift — 15 Unit-Tests, alle grün
+- SPRECHKRAFT/AppDelegate.swift — TextOutputService-Wiring, AX-Check, Hotkey, Menü-Häkchen
+- SPRECHKRAFT/SettingsView.swift — AX-Permission-Banner, OutputMode-Picker, Hotkey-Recorder
+- SPRECHKRAFT/TextOutput/TextOutputService.swift — AX-Injektion + Clipboard-Fallback
+- SPRECHKRAFTTests/TextOutputServiceTests.swift — 15 Unit-Tests, alle grün
 
 ## Self-Check: PASSED
 

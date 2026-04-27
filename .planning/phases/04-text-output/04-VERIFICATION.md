@@ -51,14 +51,14 @@ human_verification:
 
 | Artefakt | Erwartet | Status | Details |
 |----------|---------|--------|---------|
-| `VoiceScribe/Extensions/Defaults+Keys.swift` | OutputMode enum + Defaults.Keys.outputMode | VERIFIZIERT | enum OutputMode Z.13, Key Z.29, Defaults.Serializable-Konformanz korrekt |
-| `VoiceScribe/Extensions/KeyboardShortcuts+Names.swift` | toggleOutputMode Name | VERIFIZIERT | Z.18-21, .v + [.shift, .command] |
-| `VoiceScribe/AppState.swift` | axPermissionDenied: Bool Property | VERIFIZIERT | Z.80, Standardwert false, korrekt kommentiert |
-| `VoiceScribe/Info.plist` | NSAccessibilityUsageDescription | VERIFIZIERT | Z.27-28, kein AX-Entitlement (Pitfall 6 beachtet) |
-| `VoiceScribe/TextOutput/TextOutputService.swift` | @MainActor TextOutputService mit output(), injectViaAX(), writeToClipboard() | VERIFIZIERT | Alle drei Methoden vorhanden, Unicode-Scalar-korrekt, AXValueGetValue (kein direktes CFRange-Casting) |
-| `VoiceScribeTests/TextOutputServiceTests.swift` | Unit-Tests via Protocol/Mock | VERIFIZIERT | 4 Suiten, 17 Tests, MockTextOutputService ohne AX-Permission |
-| `VoiceScribe/AppDelegate.swift` | TextOutputService-Wiring + AX-Check + Hotkey + Menü-Häkchen | VERIFIZIERT | Alle 4 Änderungen implementiert (Z.87, Z.71, Z.298, Z.179-197) |
-| `VoiceScribe/SettingsView.swift` | AX-Permission-Banner + OutputMode-Section | VERIFIZIERT | Section "Textausgabe" Z.116-163 mit Banner, Picker und Recorder |
+| `SPRECHKRAFT/Extensions/Defaults+Keys.swift` | OutputMode enum + Defaults.Keys.outputMode | VERIFIZIERT | enum OutputMode Z.13, Key Z.29, Defaults.Serializable-Konformanz korrekt |
+| `SPRECHKRAFT/Extensions/KeyboardShortcuts+Names.swift` | toggleOutputMode Name | VERIFIZIERT | Z.18-21, .v + [.shift, .command] |
+| `SPRECHKRAFT/AppState.swift` | axPermissionDenied: Bool Property | VERIFIZIERT | Z.80, Standardwert false, korrekt kommentiert |
+| `SPRECHKRAFT/Info.plist` | NSAccessibilityUsageDescription | VERIFIZIERT | Z.27-28, kein AX-Entitlement (Pitfall 6 beachtet) |
+| `SPRECHKRAFT/TextOutput/TextOutputService.swift` | @MainActor TextOutputService mit output(), injectViaAX(), writeToClipboard() | VERIFIZIERT | Alle drei Methoden vorhanden, Unicode-Scalar-korrekt, AXValueGetValue (kein direktes CFRange-Casting) |
+| `SPRECHKRAFTTests/TextOutputServiceTests.swift` | Unit-Tests via Protocol/Mock | VERIFIZIERT | 4 Suiten, 17 Tests, MockTextOutputService ohne AX-Permission |
+| `SPRECHKRAFT/AppDelegate.swift` | TextOutputService-Wiring + AX-Check + Hotkey + Menü-Häkchen | VERIFIZIERT | Alle 4 Änderungen implementiert (Z.87, Z.71, Z.298, Z.179-197) |
+| `SPRECHKRAFT/SettingsView.swift` | AX-Permission-Banner + OutputMode-Section | VERIFIZIERT | Section "Textausgabe" Z.116-163 mit Banner, Picker und Recorder |
 
 ---
 

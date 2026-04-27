@@ -10,21 +10,21 @@
 
 | New/Modified File | Role | Data Flow | Closest Analog | Match Quality |
 |---|---|---|---|---|
-| `VoiceScribe/Transcription/TranscriptionBackend.swift` | protocol | request-response | `VoiceScribe/Transcription/TranscriptionService.swift` | role-match (defines contract that service implements) |
-| `VoiceScribe/Transcription/ParakeetBackend.swift` | service/actor | request-response | `VoiceScribe/Transcription/TranscriptionService.swift` | exact (same role: ML actor, same data flow: download + transcribe) |
-| `VoiceScribe/Transcription/WhisperKitBackend.swift` | service/actor | request-response | `VoiceScribe/Transcription/TranscriptionService.swift` | exact (same structure, fully commented-out) |
-| `VoiceScribe/Transcription/TranscriptionService.swift` | service/actor (facade) | request-response | `VoiceScribe/Transcription/TranscriptionService.swift` | self (modify in-place, strip WhisperKit, add delegation) |
-| `VoiceScribe/AppState.swift` | model/state | event-driven | `VoiceScribe/AppState.swift` | self (extend RecordingState enum, add isModelError property) |
-| `VoiceScribe/StatusBarIconView.swift` | component | event-driven | `VoiceScribe/StatusBarIconView.swift` | self (extend switch on RecordingState, add previews) |
-| `VoiceScribe.xcodeproj/project.pbxproj` | config | — | `VoiceScribe.xcodeproj/project.pbxproj` | self (remove WhisperKit refs, add FluidAudio) |
+| `SPRECHKRAFT/Transcription/TranscriptionBackend.swift` | protocol | request-response | `SPRECHKRAFT/Transcription/TranscriptionService.swift` | role-match (defines contract that service implements) |
+| `SPRECHKRAFT/Transcription/ParakeetBackend.swift` | service/actor | request-response | `SPRECHKRAFT/Transcription/TranscriptionService.swift` | exact (same role: ML actor, same data flow: download + transcribe) |
+| `SPRECHKRAFT/Transcription/WhisperKitBackend.swift` | service/actor | request-response | `SPRECHKRAFT/Transcription/TranscriptionService.swift` | exact (same structure, fully commented-out) |
+| `SPRECHKRAFT/Transcription/TranscriptionService.swift` | service/actor (facade) | request-response | `SPRECHKRAFT/Transcription/TranscriptionService.swift` | self (modify in-place, strip WhisperKit, add delegation) |
+| `SPRECHKRAFT/AppState.swift` | model/state | event-driven | `SPRECHKRAFT/AppState.swift` | self (extend RecordingState enum, add isModelError property) |
+| `SPRECHKRAFT/StatusBarIconView.swift` | component | event-driven | `SPRECHKRAFT/StatusBarIconView.swift` | self (extend switch on RecordingState, add previews) |
+| `SPRECHKRAFT.xcodeproj/project.pbxproj` | config | — | `SPRECHKRAFT.xcodeproj/project.pbxproj` | self (remove WhisperKit refs, add FluidAudio) |
 
 ---
 
 ## Pattern Assignments
 
-### `VoiceScribe/Transcription/TranscriptionBackend.swift` (protocol, request-response)
+### `SPRECHKRAFT/Transcription/TranscriptionBackend.swift` (protocol, request-response)
 
-**Analog:** `VoiceScribe/Transcription/TranscriptionService.swift`
+**Analog:** `SPRECHKRAFT/Transcription/TranscriptionService.swift`
 
 The protocol mirrors the three public-facing methods already declared in `TranscriptionService`. The planner should define a protocol that `TranscriptionService` forwards to and `ParakeetBackend` implements.
 
@@ -59,9 +59,9 @@ protocol TranscriptionBackend: Sendable {
 
 ---
 
-### `VoiceScribe/Transcription/ParakeetBackend.swift` (actor, request-response)
+### `SPRECHKRAFT/Transcription/ParakeetBackend.swift` (actor, request-response)
 
-**Analog:** `VoiceScribe/Transcription/TranscriptionService.swift`
+**Analog:** `SPRECHKRAFT/Transcription/TranscriptionService.swift`
 
 **Imports pattern** — modeled after TranscriptionService.swift lines 9-10:
 ```swift
@@ -155,9 +155,9 @@ func transcribeWithResampling(_ samples: [Float], sampleRate: Double) async -> S
 
 ---
 
-### `VoiceScribe/Transcription/WhisperKitBackend.swift` (actor, request-response — commented out)
+### `SPRECHKRAFT/Transcription/WhisperKitBackend.swift` (actor, request-response — commented out)
 
-**Analog:** `VoiceScribe/Transcription/TranscriptionService.swift` (full file)
+**Analog:** `SPRECHKRAFT/Transcription/TranscriptionService.swift` (full file)
 
 This file is the CURRENT `TranscriptionService.swift` content wrapped in a new actor name and fully wrapped in block comments (`/* ... */`). The planner should:
 1. Copy the entire content of the current `TranscriptionService.swift`
@@ -166,13 +166,13 @@ This file is the CURRENT `TranscriptionService.swift` content wrapped in a new a
 4. Wrap everything in `/* ... */` block comment
 5. Add a header comment explaining: "Reaktivieren: SPM-Dependency https://github.com/argmaxinc/argmax-oss-swift hinzufügen + Block-Kommentar entfernen"
 
-The full source to copy from is `VoiceScribe/Transcription/TranscriptionService.swift` lines 1-158.
+The full source to copy from is `SPRECHKRAFT/Transcription/TranscriptionService.swift` lines 1-158.
 
 ---
 
-### `VoiceScribe/Transcription/TranscriptionService.swift` (actor facade, request-response — MODIFY)
+### `SPRECHKRAFT/Transcription/TranscriptionService.swift` (actor facade, request-response — MODIFY)
 
-**Analog:** `VoiceScribe/Transcription/TranscriptionService.swift` (self — rewrite keeping resampleTo16kHz)
+**Analog:** `SPRECHKRAFT/Transcription/TranscriptionService.swift` (self — rewrite keeping resampleTo16kHz)
 
 **What to keep unchanged:**
 - The entire `resampleTo16kHz` method (lines 103-157) — copy verbatim, D-13
@@ -221,9 +221,9 @@ actor TranscriptionService {
 
 ---
 
-### `VoiceScribe/AppState.swift` (model/state — MODIFY)
+### `SPRECHKRAFT/AppState.swift` (model/state — MODIFY)
 
-**Analog:** `VoiceScribe/AppState.swift` (self — extend in-place)
+**Analog:** `SPRECHKRAFT/AppState.swift` (self — extend in-place)
 
 **RecordingState enum extension** — copy the existing switch pattern from lines 23-66 and add three new cases. The pattern for each computed property is exhaustive switch — all cases must be added or the build fails.
 
@@ -303,9 +303,9 @@ var pulseSpeed: Double? {
 var accessibilityLabel: String {
     switch self {
     // ... add:
-    case .modelLoading: return "VoiceScribe — Modell wird geladen"
-    case .warmingUp:    return "VoiceScribe — Modell wird vorbereitet"
-    case .modelError:   return "VoiceScribe — Modellfehler"
+    case .modelLoading: return "SPRECHKRAFT — Modell wird geladen"
+    case .warmingUp:    return "SPRECHKRAFT — Modell wird vorbereitet"
+    case .modelError:   return "SPRECHKRAFT — Modellfehler"
     }
 }
 ```
@@ -324,9 +324,9 @@ var isModelError: Bool = false
 
 ---
 
-### `VoiceScribe/StatusBarIconView.swift` (component — MODIFY)
+### `SPRECHKRAFT/StatusBarIconView.swift` (component — MODIFY)
 
-**Analog:** `VoiceScribe/StatusBarIconView.swift` (self — add previews for new states)
+**Analog:** `SPRECHKRAFT/StatusBarIconView.swift` (self — add previews for new states)
 
 The view body itself requires NO changes — it already uses `state.systemImage`, `state.color`, `state.pulseSpeed`, and the `applyAnimation(for:)` pattern which all delegate to the RecordingState computed properties extended above.
 
@@ -353,7 +353,7 @@ The view body itself requires NO changes — it already uses `state.systemImage`
 
 ---
 
-### `VoiceScribe.xcodeproj/project.pbxproj` (config — MODIFY)
+### `SPRECHKRAFT.xcodeproj/project.pbxproj` (config — MODIFY)
 
 **No code analog** — mechanical surgery per RESEARCH.md Pitfall 7.
 
@@ -377,7 +377,7 @@ Preferred approach: add via Xcode UI (File > Add Package Dependencies) — Xcode
 ## Shared Patterns
 
 ### Actor isolation for ML services
-**Source:** `VoiceScribe/Transcription/TranscriptionService.swift` line 12
+**Source:** `SPRECHKRAFT/Transcription/TranscriptionService.swift` line 12
 **Apply to:** `ParakeetBackend.swift`, facade `TranscriptionService.swift`
 ```swift
 actor TranscriptionService {   // ← pattern: ML services are actors
@@ -385,7 +385,7 @@ actor TranscriptionService {   // ← pattern: ML services are actors
 All public methods on these actors are implicitly async and serialized. No manual locking needed.
 
 ### Silent error return (D-13)
-**Source:** `VoiceScribe/Transcription/TranscriptionService.swift` lines 55-58 and 81-84
+**Source:** `SPRECHKRAFT/Transcription/TranscriptionService.swift` lines 55-58 and 81-84
 **Apply to:** `ParakeetBackend.swift` (both downloadAndLoad and transcribeWithResampling)
 ```swift
 } catch {
@@ -395,7 +395,7 @@ All public methods on these actors are implicitly async and serialized. No manua
 ```
 
 ### progressHandler signature
-**Source:** `VoiceScribe/Transcription/TranscriptionService.swift` lines 27-29
+**Source:** `SPRECHKRAFT/Transcription/TranscriptionService.swift` lines 27-29
 **Apply to:** `TranscriptionBackend` protocol, `ParakeetBackend.downloadAndLoad`
 ```swift
 func downloadAndLoad(
@@ -405,7 +405,7 @@ func downloadAndLoad(
 This signature is called from `AppDelegate.setupTranscription()` (line 444). Any change breaks the call site.
 
 ### Observation-B icon update pattern
-**Source:** `VoiceScribe/AppDelegate.swift` lines 421-435
+**Source:** `SPRECHKRAFT/AppDelegate.swift` lines 421-435
 **Apply to:** All new AppState state mutations in `setupTranscription()` modification
 ```swift
 // After every state mutation, call updateIcon() manually:
@@ -417,7 +417,7 @@ updateIcon()
 ```
 
 ### @MainActor Task dispatch in setupTranscription
-**Source:** `VoiceScribe/AppDelegate.swift` lines 443-454
+**Source:** `SPRECHKRAFT/AppDelegate.swift` lines 443-454
 **Apply to:** Modified `setupTranscription()` in AppDelegate
 ```swift
 // Existing pattern (lines 443-454):
@@ -436,7 +436,7 @@ private func setupTranscription() {
 ```
 
 ### Bool-flag property pattern on AppState
-**Source:** `VoiceScribe/AppState.swift` lines 83-88 (`isModelReady`) and lines 92-96 (`axPermissionDenied`)
+**Source:** `SPRECHKRAFT/AppState.swift` lines 83-88 (`isModelReady`) and lines 92-96 (`axPermissionDenied`)
 **Apply to:** New `isModelError: Bool` property
 ```swift
 // Pattern (lines 83-88):
@@ -446,13 +446,13 @@ var isModelReady: Bool = false
 ```
 
 ### Swift Testing test structure
-**Source:** `VoiceScribeTests/RecordingStateTests.swift` and `VoiceScribeTests/TranscriptionServiceTests.swift`
+**Source:** `SPRECHKRAFTTests/RecordingStateTests.swift` and `SPRECHKRAFTTests/TranscriptionServiceTests.swift`
 **Apply to:** All test modifications in Wave 0
 ```swift
 // Import pattern (RecordingStateTests.swift lines 1-3):
 import Testing
 import SwiftUI
-@testable import VoiceScribe
+@testable import SPRECHKRAFT
 
 // Suite + Test pattern (lines 5-11):
 @Suite("RecordingState (FEED-01)")
@@ -474,7 +474,7 @@ All files have close analogs. No entries.
 
 ## Metadata
 
-**Analog search scope:** `VoiceScribe/`, `VoiceScribeTests/`
+**Analog search scope:** `SPRECHKRAFT/`, `SPRECHKRAFTTests/`
 **Files read:** 7 source files + 2 planning files
 **Pattern extraction date:** 2026-04-24
 

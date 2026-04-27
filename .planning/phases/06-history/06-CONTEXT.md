@@ -93,8 +93,8 @@ Phase (Profile bleiben in Defaults).
 
 ### Stack & Architektur
 - `CLAUDE.md` — Technology Stack: GRDB.swift v7.5.0, Defaults, KeyboardShortcuts, SwiftUI
-- `VoiceScribe/Extensions/Defaults+Keys.swift` — bestehende Persistence-Pattern (Vorlage für GRDB-Integration)
-- `VoiceScribe/AppDelegate.swift` — onRecordingComplete-Pipeline: hier wird der GRDB-Insert-Punkt sein (D-15)
+- `SPRECHKRAFT/Extensions/Defaults+Keys.swift` — bestehende Persistence-Pattern (Vorlage für GRDB-Integration)
+- `SPRECHKRAFT/AppDelegate.swift` — onRecordingComplete-Pipeline: hier wird der GRDB-Insert-Punkt sein (D-15)
 
 ### Prior Phase Context
 - `.planning/phases/05-llm-prompt-profiles/05-CONTEXT.md` — D-04: "Einfache Migration zu GRDB in Phase 6"
@@ -109,11 +109,11 @@ Phase (Profile bleiben in Defaults).
 ## Existing Code Insights
 
 ### Reusable Assets
-- `VoiceScribe/AppDelegate.swift` `onRecordingComplete`: Insert-Punkt für GRDB (nach TextOutputService, D-15)
-- `VoiceScribe/Extensions/Defaults+Keys.swift`: Pattern für type-safe Keys, als Vorlage für GRDB-Keys
-- `VoiceScribe/Models/PromptProfile.swift`: Codable-Struct-Pattern; HistoryEntry analog modellieren
-- `VoiceScribe/AppDelegate.swift` `openSettingsMenu()`: Vorlage für neuen „openHistory()"-Menüpunkt (D-02)
-- `VoiceScribe/Constants/DesignTokens.swift`: Spacing/Color-Token für History-UI
+- `SPRECHKRAFT/AppDelegate.swift` `onRecordingComplete`: Insert-Punkt für GRDB (nach TextOutputService, D-15)
+- `SPRECHKRAFT/Extensions/Defaults+Keys.swift`: Pattern für type-safe Keys, als Vorlage für GRDB-Keys
+- `SPRECHKRAFT/Models/PromptProfile.swift`: Codable-Struct-Pattern; HistoryEntry analog modellieren
+- `SPRECHKRAFT/AppDelegate.swift` `openSettingsMenu()`: Vorlage für neuen „openHistory()"-Menüpunkt (D-02)
+- `SPRECHKRAFT/Constants/DesignTokens.swift`: Spacing/Color-Token für History-UI
 
 ### Established Patterns
 - Menü-Einträge: NSMenuItem mit `@objc`-Selektoren in AppDelegate (D-02: „Verlauf …" analog zu „Einstellungen …")
