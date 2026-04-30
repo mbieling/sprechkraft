@@ -20,6 +20,7 @@ struct MockTranscriptionBackend: TranscriptionBackend {
     }
 
     func transcribeWithResampling(_ samples: [Float], sampleRate: Double) async -> String? {
+        guard isModelReady else { return nil }
         guard samples.count >= 1600 else { return nil }
         return "mock transcript"
     }
